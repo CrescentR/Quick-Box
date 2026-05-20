@@ -33,10 +33,22 @@ pub fn run() {
             storage::migrations::run_migrations(app.handle())?;
 
             let shortcut = Shortcut::new(Some(Modifiers::ALT), Code::Space);
-            app.global_shortcut().register(shortcut)?;
+            let shortcut_registered = match app.global_shortcut().register(shortcut) {
+                Ok(()) => true,
+                Err(error) => {
+                    eprintln!("failed to register global shortcut Alt+Space: {error}");
+                    false
+                }
+            };
 
             if let Some(window) = app.get_webview_window("main") {
                 platform::configure_launcher_window(&window)?;
+
+                if cfg!(debug_assertions) || !shortcut_registered {
+                    window.center()?;
+                    window.show()?;
+                    window.set_focus()?;
+                }
             }
 
             Ok(())
