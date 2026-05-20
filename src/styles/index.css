@@ -1,0 +1,172 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow: hidden;
+  background: transparent;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+.app-shell {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: stretch;
+  background: var(--bg);
+}
+
+.launcher {
+  width: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  border: 1px solid var(--border);
+  background: var(--panel);
+}
+
+.window-header {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  user-select: none;
+}
+
+.launcher-body {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+}
+
+.command-panel {
+  min-width: 0;
+  border-right: 1px solid var(--border);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.command-input {
+  width: 100%;
+  height: 52px;
+  border: 0;
+  outline: 0;
+  color: var(--text);
+  background: #15181e;
+  border-bottom: 1px solid var(--border);
+  padding: 0 16px;
+}
+
+.command-list {
+  min-height: 0;
+  overflow: auto;
+  padding: 8px;
+}
+
+.command-item {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.command-item:hover,
+.command-item.is-selected {
+  background: var(--panel-strong);
+}
+
+.command-item-title {
+  font-weight: 600;
+}
+
+.command-item-description,
+.command-item-source,
+.empty-state,
+.view-missing {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.plugin-view {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  padding: 16px;
+}
+
+.tool-view {
+  display: grid;
+  gap: 12px;
+}
+
+.tool-view h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.tool-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.tool-field {
+  display: grid;
+  gap: 8px;
+}
+
+.tool-field textarea,
+.tool-field input {
+  width: 100%;
+  min-height: 120px;
+  color: var(--text);
+  background: #11141a;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px;
+  outline: none;
+}
+
+.tool-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tool-actions button {
+  border: 1px solid var(--border);
+  color: var(--text);
+  background: var(--panel-strong);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+@media (max-width: 720px) {
+  .launcher-body,
+  .tool-grid {
+    grid-template-columns: 1fr;
+  }
+}
