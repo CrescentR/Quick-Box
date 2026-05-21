@@ -3,9 +3,9 @@ import TimestampToolView from './TimestampToolView'
 
 const plugin: ToolPlugin = {
   id: 'official.timestamp-tool',
-  name: 'Timestamp Tool',
+  name: '时间戳转换',
   version: '0.1.0',
-  description: 'Convert between Unix timestamps and ISO time strings',
+  description: '在 Unix 时间戳和 ISO 时间之间转换',
   author: 'QuickBox',
   source: 'builtin',
   permissions: ['clipboard.read', 'clipboard.write'],
@@ -13,9 +13,9 @@ const plugin: ToolPlugin = {
     {
       id: 'official.timestamp-tool.open',
       pluginId: 'official.timestamp-tool',
-      title: 'Timestamp Tool',
-      description: 'Convert timestamps and dates',
-      keywords: ['timestamp', 'time', 'date', 'unix', 'iso'],
+      title: '时间戳转换',
+      description: '转换时间戳和日期',
+      keywords: ['timestamp', 'time', 'date', 'unix', 'iso', '时间戳', '时间', '日期'],
       source: 'builtin',
       executeMode: 'view',
       run: async (ctx) => {
@@ -26,7 +26,7 @@ const plugin: ToolPlugin = {
   views: [
     {
       id: 'official.timestamp-tool.view',
-      title: 'Timestamp Tool',
+      title: '时间戳转换',
       component: TimestampToolView,
     },
   ],

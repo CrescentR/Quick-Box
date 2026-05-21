@@ -53,8 +53,8 @@ function PluginViewRenderer({ activeView }: { activeView?: ActiveViewState }) {
     return (
       <EmptyState
         icon={<Icon icon={AppWindow} size={20} tone="muted" />}
-        title="View unavailable"
-        description={`QuickBox could not find the view "${activeView.viewId}".`}
+        title="视图不可用"
+        description={`QuickBox 找不到视图 "${activeView.viewId}"。`}
       />
     )
   }
@@ -83,18 +83,18 @@ function getSourceTone(source: CommandSource): 'primary' | 'success' | 'warning'
 function getSourceLabel(source: CommandSource) {
   switch (source) {
     case 'builtin':
-      return 'Official'
+      return '官方'
     case 'local':
-      return 'Local'
+      return '本地'
     case 'market':
-      return 'Market'
+      return '市场'
     default:
       return source
   }
 }
 
 function getExecuteModeLabel(mode: CommandSearchResult['command']['executeMode']) {
-  return mode === 'view' ? 'Open View' : 'Run Directly'
+  return mode === 'view' ? '打开视图' : '直接执行'
 }
 
 function ResultDetail({
@@ -112,12 +112,12 @@ function ResultDetail({
     return (
       <EmptyState
         icon={<Icon icon={Search} size={20} tone="muted" />}
-        title="Ready to launch"
-        description="Search commands, jump through tools, and keep the entire launcher workflow on the keyboard."
+        title="准备启动"
+        description="搜索命令、打开工具，并用键盘完成整个 QuickBox 流程。"
         action={
           <span className="qb-launcher-empty-action">
             <KeyboardShortcut keys={['Alt', 'Space']} />
-            <span>Call QuickBox</span>
+            <span>呼出 QuickBox</span>
           </span>
         }
       />
@@ -137,49 +137,49 @@ function ResultDetail({
         </div>
 
         <div className="qb-launcher-detail__hero-copy">
-          <div className="qb-launcher-detail__eyebrow">Selected command</div>
+          <div className="qb-launcher-detail__eyebrow">当前命令</div>
           <div className="qb-launcher-detail__hero-title">{result.command.title}</div>
           <div className="qb-launcher-detail__hero-description">
             {result.command.description ??
-              'A focused launcher action designed for fast keyboard-driven workflows.'}
+              '一个为快速键盘工作流设计的 QuickBox 命令。'}
           </div>
         </div>
 
         <div className="qb-launcher-detail__hero-tags">
           <Tag tone="default">{getExecuteModeLabel(result.command.executeMode)}</Tag>
           <Tag tone="default">{result.command.pluginId}</Tag>
-          <Tag tone="default">score {result.score.toFixed(2)}</Tag>
+          <Tag tone="default">匹配度 {result.score.toFixed(2)}</Tag>
         </div>
 
         <div className="qb-launcher-detail__actionbar">
           <button className="qb-launcher-detail__action" type="button" onClick={onRun}>
             <KeyboardShortcut keys="Enter" />
-            <span>Run command</span>
+            <span>执行命令</span>
           </button>
           <div className="qb-launcher-detail__action-copy">
             <KeyboardShortcut keys={['Ctrl', 'K']} />
-            <span className="qb-launcher-footer__label">Open actions</span>
+            <span className="qb-launcher-footer__label">打开动作面板</span>
           </div>
         </div>
       </section>
 
       <div className="qb-launcher-detail__meta-grid">
         <div className="qb-launcher-detail__meta-card">
-          <div className="qb-launcher-detail__meta-label">Source</div>
+          <div className="qb-launcher-detail__meta-label">来源</div>
           <div className="qb-launcher-detail__meta-value">
             {getSourceLabel(result.command.source)}
           </div>
         </div>
         <div className="qb-launcher-detail__meta-card">
-          <div className="qb-launcher-detail__meta-label">Plugin</div>
+          <div className="qb-launcher-detail__meta-label">插件</div>
           <div className="qb-launcher-detail__meta-value">{result.command.pluginId}</div>
         </div>
         <div className="qb-launcher-detail__meta-card">
-          <div className="qb-launcher-detail__meta-label">Library Size</div>
-          <div className="qb-launcher-detail__meta-value">{totalCommands} commands</div>
+          <div className="qb-launcher-detail__meta-label">命令库</div>
+          <div className="qb-launcher-detail__meta-value">{totalCommands} 条命令</div>
         </div>
         <div className="qb-launcher-detail__meta-card">
-          <div className="qb-launcher-detail__meta-label">Execute mode</div>
+          <div className="qb-launcher-detail__meta-label">执行方式</div>
           <div className="qb-launcher-detail__meta-value">
             {getExecuteModeLabel(result.command.executeMode)}
           </div>
@@ -187,7 +187,7 @@ function ResultDetail({
       </div>
 
       <section className="qb-launcher-detail__summary">
-        <div className="qb-launcher-detail__summary-title">What happens next</div>
+        <div className="qb-launcher-detail__summary-title">接下来会发生什么</div>
         <div className="qb-launcher-detail__bullet-list">
           <div className="qb-launcher-detail__bullet">
             <Icon icon={ArrowRight} size={14} tone="primary" />
@@ -195,15 +195,15 @@ function ResultDetail({
           </div>
           <div className="qb-launcher-detail__bullet">
             <Icon icon={ShieldCheck} size={14} tone="primary" />
-            <span>Visuals stay inside the QuickBox design system shell</span>
+            <span>工具视图会保持在 QuickBox 统一设计外壳内</span>
           </div>
           <div className="qb-launcher-detail__bullet">
             <Icon icon={Sparkles} size={14} tone="primary" />
-            <span>Matched text: {result.matchedText || result.command.title}</span>
+            <span>匹配文本：{result.matchedText || result.command.title}</span>
           </div>
           <button className="qb-launcher-detail__inline-action" type="button" onClick={onOpenActions}>
             <KeyboardShortcut keys={['Ctrl', 'K']} />
-            <span>Open action panel for page navigation and launcher commands</span>
+            <span>打开动作面板，切换页面或执行当前命令</span>
           </button>
         </div>
       </section>
@@ -318,7 +318,7 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
     await runResult(selectedResult)
     setToast({
       tone: 'success',
-      title: selectedResult.command.executeMode === 'view' ? 'Opened tool view' : 'Command executed',
+      title: selectedResult.command.executeMode === 'view' ? '已打开工具视图' : '命令已执行',
       description: selectedResult.command.title,
     })
   }
@@ -328,27 +328,27 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
     setIsActionPanelOpen(false)
     setToast({
       tone: 'default',
-      title: 'Switched workspace',
+      title: '已切换工作区',
       description:
         page === 'plugins'
-          ? 'Browsing the plugin catalog.'
+          ? '正在查看插件能力。'
           : page === 'settings'
-            ? 'Adjusting launcher behavior.'
-            : 'Returned to the launcher.',
+            ? '正在调整启动器行为。'
+            : '已回到启动器。',
     })
   }
 
   const actionItems: ActionPanelItem[] = [
     {
       id: 'run-selected',
-      title: selectedResult ? `Run ${selectedResult.command.title}` : 'Run selected command',
+      title: selectedResult ? `执行 ${selectedResult.command.title}` : '执行选中命令',
       description: selectedResult
         ? getExecuteModeLabel(selectedResult.command.executeMode)
-        : 'Select a command first',
+        : '请先选择一个命令',
       icon: <Icon icon={selectedResult?.command.executeMode === 'view' ? AppWindow : Command} size={16} tone="primary" />,
       shortcut: 'Enter',
       disabled: !selectedResult,
-      keywords: ['run', 'open', 'selected', 'command'],
+      keywords: ['run', 'open', 'selected', 'command', '执行', '打开', '命令'],
       onAction: () => {
         setIsActionPanelOpen(false)
         void launchSelected()
@@ -356,11 +356,11 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
     },
     {
       id: 'clear-search',
-      title: 'Clear search',
-      description: 'Reset the current launcher query and jump back to the full command library.',
+      title: '清空搜索',
+      description: '重置当前搜索词，并回到完整命令库。',
       icon: <Icon icon={Search} size={16} tone="muted" />,
       shortcut: 'Esc',
-      keywords: ['clear', 'reset', 'search'],
+      keywords: ['clear', 'reset', 'search', '清空', '重置', '搜索'],
       onAction: () => {
         setQuery('')
         setSelectedIndex(0)
@@ -369,38 +369,38 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
     },
     {
       id: 'go-launcher',
-      title: 'Open Launcher',
-      description: 'Return to the main command search workspace.',
+      title: '打开启动器',
+      description: '回到主命令搜索工作区。',
       icon: <Icon icon={Command} size={16} tone="primary" />,
       shortcut: 'Ctrl+1',
-      keywords: ['launcher', 'home', 'workspace'],
+      keywords: ['launcher', 'home', 'workspace', '启动器', '首页', '工作区'],
       onAction: () => navigateToPage('launcher'),
     },
     {
       id: 'go-plugins',
-      title: 'Open Plugins',
-      description: 'Review official tools, permissions, and enabled status.',
+      title: '打开插件',
+      description: '查看官方工具、权限和启用状态。',
       icon: <Icon icon={LayoutPanelTop} size={16} tone="primary" />,
       shortcut: 'Ctrl+2',
-      keywords: ['plugins', 'catalog', 'extensions'],
+      keywords: ['plugins', 'catalog', 'extensions', '插件', '能力', '扩展'],
       onAction: () => navigateToPage('plugins'),
     },
     {
       id: 'go-settings',
-      title: 'Open Settings',
-      description: 'Adjust theme, invocation, and desktop integration.',
+      title: '打开设置',
+      description: '调整主题、呼出方式和桌面集成。',
       icon: <Icon icon={Settings2} size={16} tone="primary" />,
       shortcut: 'Ctrl+3',
-      keywords: ['settings', 'preferences', 'theme'],
+      keywords: ['settings', 'preferences', 'theme', '设置', '偏好', '主题'],
       onAction: () => navigateToPage('settings'),
     },
     {
       id: 'hide-launcher',
-      title: 'Hide QuickBox',
-      description: 'Dismiss the launcher window and return to the desktop.',
+      title: '隐藏 QuickBox',
+      description: '收起启动器窗口并回到桌面。',
       icon: <Icon icon={AppWindow} size={16} tone="muted" />,
       shortcut: 'Esc',
-      keywords: ['hide', 'dismiss', 'close'],
+      keywords: ['hide', 'dismiss', 'close', '隐藏', '关闭'],
       onAction: () => {
         setIsActionPanelOpen(false)
         void hideLauncherWindow()
@@ -411,11 +411,11 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
   if (activeViewId) {
     actionItems.unshift({
       id: 'close-view',
-      title: 'Back to search results',
-      description: 'Close the current tool view and return to the command detail pane.',
+      title: '返回搜索结果',
+      description: '关闭当前工具视图，回到命令详情面板。',
       icon: <Icon icon={ArrowRight} size={16} tone="primary" />,
       shortcut: 'Esc',
-      keywords: ['back', 'close', 'view'],
+      keywords: ['back', 'close', 'view', '返回', '关闭', '视图'],
       onAction: () => {
         closeView()
         setIsActionPanelOpen(false)
@@ -449,23 +449,23 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
         <PageHeader
           currentPage={currentPage}
           onPageChange={onPageChange}
-          eyebrow="Workspace"
-          title="QuickBox Launcher"
-          description="A focused desktop launcher built for command search, tool previews, and fast keyboard execution."
+          eyebrow="工作区"
+          title="QuickBox 启动器"
+          description="用于命令搜索、工具预览和快速键盘执行的桌面入口。"
         />
       }
       footer={
         <div className="qb-launcher-footer">
           <div className="qb-launcher-footer__left">
-            <span className="qb-launcher-footer__label">Navigate</span>
+            <span className="qb-launcher-footer__label">导航</span>
             <KeyboardShortcut keys={['Up', 'Down']} />
             <KeyboardShortcut keys="Enter" />
             <KeyboardShortcut keys="Esc" />
           </div>
           <div className="qb-launcher-footer__right">
-            <span className="qb-launcher-footer__label">{results.length} results</span>
+            <span className="qb-launcher-footer__label">{results.length} 条结果</span>
             <KeyboardShortcut keys={['Ctrl', 'K']} />
-            <span className="qb-launcher-footer__label">Actions</span>
+            <span className="qb-launcher-footer__label">动作</span>
           </div>
         </div>
       }
@@ -475,11 +475,11 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
           <div className="qb-launcher-search">
             <div className="qb-launcher-search__meta">
               <div className="qb-launcher-search__meta-group">
-                <span className="qb-launcher-search__label">Command search</span>
-                <Tag tone="primary">{allCommands.length} loaded</Tag>
+                <span className="qb-launcher-search__label">命令搜索</span>
+                <Tag tone="primary">已载入 {allCommands.length} 条</Tag>
               </div>
               <div className="qb-launcher-search__meta-group">
-                <Tag tone="default">Keyboard-first</Tag>
+                <Tag tone="default">键盘优先</Tag>
               </div>
             </div>
 
@@ -489,7 +489,7 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
             value={query}
             onChange={setQuery}
             onKeyDown={handleInputKeyDown}
-            placeholder="Search commands, built-in tools, or plugin actions"
+            placeholder="搜索命令、内置工具或插件动作"
           />
           </div>
 
@@ -498,15 +498,15 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
             emptyState={
               <EmptyState
                 icon={<Icon icon={PackageSearch} size={20} tone="muted" />}
-                title="No matching commands"
-                description="Try a broader keyword or open more built-in tools later."
+                title="没有匹配的命令"
+                description="换一个更宽泛的关键词，或稍后启用更多内置工具。"
               />
             }
           >
             {groupedResults.map((section) => (
               <List.Section
                 key={section.source}
-                title={`${getSourceLabel(section.source)} commands`}
+                title={`${getSourceLabel(section.source)}命令`}
               >
                 {section.items.map(({ result, index }) => (
                   <ListItem
@@ -541,7 +541,7 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
                     accessory={
                       index === selectedIndex ? (
                         <span className="qb-launcher-list-item__accessory">
-                          <Tag tone="primary">Active</Tag>
+                          <Tag tone="primary">当前</Tag>
                           <KeyboardShortcut keys="Enter" />
                         </span>
                       ) : (
@@ -576,8 +576,8 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
 
         <ActionPanel
           open={isActionPanelOpen}
-          title="Launcher Actions"
-          description="Jump across workspaces or trigger focused actions for the current selection."
+          title="启动器动作"
+          description="切换工作区，或对当前选中项执行聚焦操作。"
           actions={actionItems}
           query={actionQuery}
           onQueryChange={setActionQuery}

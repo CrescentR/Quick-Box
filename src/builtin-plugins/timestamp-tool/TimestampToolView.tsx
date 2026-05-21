@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { CalendarClock } from 'lucide-react'
 import { writeClipboardText } from '../../api/clipboard-api'
 import { Detail, Tag } from '../../ui'
 import { unixSeconds } from '../../utils/time'
@@ -10,7 +9,7 @@ export default function TimestampToolView() {
   const dateText = useMemo(() => {
     const value = Number(timestamp)
     if (!Number.isFinite(value)) {
-      return 'Invalid timestamp'
+      return '时间戳无效'
     }
 
     const milliseconds = timestamp.length <= 10 ? value * 1000 : value
@@ -21,21 +20,21 @@ export default function TimestampToolView() {
     <section className="qb-tool-view">
       <header className="qb-tool-view__header">
         <div className="qb-tool-view__header-copy">
-          <div className="qb-tool-view__eyebrow">Official Tool</div>
-          <div className="qb-tool-view__title">Timestamp Tool</div>
+          <div className="qb-tool-view__eyebrow">官方工具</div>
+          <div className="qb-tool-view__title">时间戳转换</div>
           <div className="qb-tool-view__description">
-            Convert Unix timestamps and ISO time strings in a compact reference view built for quick developer checks.
+            在 Unix 时间戳和 ISO 时间之间快速转换，适合调试接口、日志和事件时间。
           </div>
         </div>
         <div className="qb-tool-view__header-meta">
-          <Tag tone="primary">Builtin</Tag>
+          <Tag tone="primary">内置</Tag>
           <Tag tone="default">Unix / ISO</Tag>
         </div>
       </header>
 
       <div className="qb-tool-grid">
         <label className="qb-tool-field">
-          <span className="qb-tool-label">Timestamp</span>
+          <span className="qb-tool-label">时间戳</span>
           <input
             className="qb-tool-input qb-mono"
             value={timestamp}
@@ -44,7 +43,7 @@ export default function TimestampToolView() {
         </label>
 
         <label className="qb-tool-field">
-          <span className="qb-tool-label">ISO Time</span>
+          <span className="qb-tool-label">ISO 时间</span>
           <input className="qb-tool-input qb-mono" readOnly value={dateText} />
         </label>
       </div>
@@ -55,23 +54,23 @@ export default function TimestampToolView() {
           type="button"
           onClick={() => setTimestamp(String(unixSeconds()))}
         >
-          Current Seconds
+          当前秒级时间戳
         </button>
         <button className="qb-tool-button" type="button" onClick={() => setTimestamp(String(Date.now()))}>
-          Current Milliseconds
+          当前毫秒时间戳
         </button>
         <button className="qb-tool-button" type="button" onClick={() => void writeClipboardText(dateText)}>
-          Copy ISO Time
+          复制 ISO 时间
         </button>
       </div>
 
       <Detail
-        title="Quick Notes"
-        markdown="- 10 digits are treated as Unix seconds.\n- Longer values are treated as milliseconds.\n- Output uses ISO-8601 for consistent debugging and API work."
+        title="使用说明"
+        markdown="- 10 位数字会按 Unix 秒级时间戳处理。\n- 更长的数字会按毫秒时间戳处理。\n- 输出使用 ISO-8601，方便调试和 API 对齐。"
         metadata={[
-          { label: 'Mode', value: 'Timestamp <-> ISO reference' },
-          { label: 'Precision', value: 'Seconds and milliseconds' },
-          { label: 'Output', value: 'UTC ISO-8601 string' },
+          { label: '模式', value: '时间戳 <-> ISO 对照' },
+          { label: '精度', value: '秒级和毫秒级' },
+          { label: '输出', value: 'UTC ISO-8601 字符串' },
         ]}
       />
     </section>

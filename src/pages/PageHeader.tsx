@@ -3,9 +3,9 @@ import { Icon, KeyboardShortcut, Tag, WindowControls } from '../ui'
 import type { AppPage, PageNavigationProps } from './page-types'
 
 const pageLabels: Record<AppPage, string> = {
-  launcher: 'Launcher',
-  plugins: 'Plugins',
-  settings: 'Settings',
+  launcher: '启动器',
+  plugins: '插件',
+  settings: '设置',
 }
 
 export interface PageHeaderProps extends PageNavigationProps {

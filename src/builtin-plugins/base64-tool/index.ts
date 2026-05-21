@@ -3,9 +3,9 @@ import Base64ToolView from './Base64ToolView'
 
 const plugin: ToolPlugin = {
   id: 'official.base64-tool',
-  name: 'Base64 Tool',
+  name: 'Base64 编解码',
   version: '0.1.0',
-  description: 'Encode and decode Base64 text payloads',
+  description: '编码和解码 Base64 文本',
   author: 'QuickBox',
   source: 'builtin',
   permissions: ['clipboard.read', 'clipboard.write'],
@@ -13,9 +13,9 @@ const plugin: ToolPlugin = {
     {
       id: 'official.base64-tool.open',
       pluginId: 'official.base64-tool',
-      title: 'Base64 Tool',
-      description: 'Encode and decode Base64',
-      keywords: ['base64', 'encode', 'decode', 'text'],
+      title: 'Base64 编解码',
+      description: '编码和解码 Base64',
+      keywords: ['base64', 'encode', 'decode', 'text', '编码', '解码', '文本'],
       source: 'builtin',
       executeMode: 'view',
       run: async (ctx) => {
@@ -26,7 +26,7 @@ const plugin: ToolPlugin = {
   views: [
     {
       id: 'official.base64-tool.view',
-      title: 'Base64 Tool',
+      title: 'Base64 编解码',
       component: Base64ToolView,
     },
   ],

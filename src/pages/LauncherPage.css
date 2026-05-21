@@ -89,7 +89,7 @@
 }
 
 .qb-launcher-command-input::after {
-  content: 'Search';
+  content: '搜索';
   position: absolute;
   right: 44px;
   top: 50%;

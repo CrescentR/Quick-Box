@@ -19,6 +19,12 @@ QuickBox 的 UI 目标不是做一个复杂的桌面管理后台，而是做一�
 - Developer-oriented：适合开发者和高级用户，支持代码、JSON、日志等信息展示。
 - Extensible：从 V0.1 起为插件化和未来 UI Schema 预留结构。
 
+界面文案策略：
+
+- V0.1 统一使用中文界面文案。
+- JSON、Base64、UUID、ISO、Unix 等技术术语允许保留英文。
+- 内部 plugin id、permission id、view id 不应作为主文案直接暴露给用户。
+
 ---
 
 ## 2. 设计原则

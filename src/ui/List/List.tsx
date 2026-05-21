@@ -31,7 +31,7 @@ function ListRoot({
           {!isLoading && hasContent ? children : null}
           {!isLoading && !hasContent
             ? (emptyState ?? (
-                <EmptyState title="No results" description="Nothing to show right now." />
+                <EmptyState title="暂无结果" description="当前没有可显示的内容。" />
               ))
             : null}
         </div>

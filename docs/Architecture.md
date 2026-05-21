@@ -1,58 +1,58 @@
-# QuickBox Architecture
+# QuickBox 架构说明
 
-QuickBox is a lightweight desktop launcher built with Tauri 2, React, TypeScript, Rust, and SQLite.
+QuickBox 是一个基于 Tauri 2、React、TypeScript、Rust 和 SQLite 的轻量级桌面启动器。
 
-## Architecture Principle
+## 架构原则
 
-Frontend is the experience layer.
-Rust is the system and capability layer.
-Plugins are capability consumers and must not access sensitive system APIs directly.
+前端负责体验层。  
+Rust 负责系统能力层。  
+插件是能力消费者，不能直接访问敏感系统 API。
 
-## Frontend Responsibilities
+## 前端职责
 
-- Launcher UI
-- Command input
-- Command list rendering
-- Tool views
-- Settings page
-- Plugin manager UI
-- Lightweight builtin tool logic
+- 启动器 UI
+- 命令输入
+- 命令列表渲染
+- 工具视图
+- 设置页
+- 插件管理界面
+- 轻量内置工具逻辑
 
-## Rust Core Responsibilities
+## Rust Core 职责
 
-- Global shortcuts
-- Window show/hide
-- Window focus
-- System tray
-- Clipboard access
-- SQLite storage
-- Local app config
-- Plugin permission validation
-- Platform-specific behavior
+- 全局快捷键
+- 窗口显示与隐藏
+- 窗口聚焦
+- 系统托盘
+- 剪贴板访问
+- SQLite 存储
+- 本地应用配置
+- 插件权限校验
+- 平台差异行为
 
-## Plugin Rules
+## 插件规则
 
-- All tools must be registered as plugins.
-- Builtin tools are also plugins.
-- LauncherPage must not directly import concrete tools.
-- Commands are discovered from PluginRegistry.
-- Sensitive APIs must go through Rust commands.
-- Plugins declare permissions.
-- Permission checks are performed by Rust.
+- 所有工具都必须注册为插件。
+- 内置工具同样是插件。
+- `LauncherPage` 不能直接导入具体工具。
+- 命令必须从 `PluginRegistry` 发现。
+- 敏感 API 必须通过 Rust command 访问。
+- 插件必须声明权限。
+- 权限检查由 Rust 执行。
 
-## V0.1 Scope
+## V0.1 范围
 
-- Builtin plugin loading only
-- No external plugin execution
-- No plugin market
-- No user account
-- No sync
-- No cloud service
+- 仅加载内置插件
+- 不执行外部插件
+- 不提供插件市场
+- 不引入用户账户
+- 不支持同步
+- 不接入云服务
 
-## Future Scope
+## 未来范围
 
-- Local plugin loading
-- Plugin package installation
-- Plugin signature verification
-- Plugin market
-- Developer upload platform
+- 本地插件加载
+- 插件包安装
+- 插件签名校验
+- 插件市场
+- 开发者上传平台

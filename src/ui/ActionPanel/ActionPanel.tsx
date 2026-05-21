@@ -39,8 +39,8 @@ function filterActions(actions: ActionPanelItem[], query: string) {
 
 export function ActionPanel({
   open,
-  title = 'Action Panel',
-  description = 'Fast actions for the current launcher context.',
+  title = '动作面板',
+  description = '当前启动器上下文中的快捷动作。',
   actions,
   query,
   onQueryChange,
@@ -126,7 +126,7 @@ export function ActionPanel({
               setInternalQuery(value)
             }
           }}
-          placeholder="Search actions"
+          placeholder="搜索动作"
           className="qb-action-panel__input"
         />
 
@@ -139,8 +139,8 @@ export function ActionPanel({
             emptyState ?? (
               <EmptyState
                 icon={<Icon icon={Search} size={18} tone="muted" />}
-                title="No actions found"
-                description="Try a broader search or close the panel."
+                title="没有找到动作"
+                description="换一个更宽泛的关键词，或关闭面板。"
               />
             )
           )}

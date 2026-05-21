@@ -6,6 +6,19 @@ import PageHeader from './PageHeader'
 import type { PageNavigationProps } from './page-types'
 import './Workbench.css'
 
+const permissionLabels: Record<string, string> = {
+  'clipboard.read': '读取剪贴板',
+  'clipboard.write': '写入剪贴板',
+}
+
+function formatPermissions(permissions: string[]) {
+  if (!permissions.length) {
+    return '未声明额外权限'
+  }
+
+  return permissions.map((permission) => permissionLabels[permission] ?? permission).join('、')
+}
+
 export default function PluginManagerPage({ currentPage, onPageChange }: PageNavigationProps) {
   const plugins = pluginRegistry.listPlugins()
   const { enabledPluginIds, setEnabledPluginIds } = usePluginStore()
@@ -23,16 +36,16 @@ export default function PluginManagerPage({ currentPage, onPageChange }: PageNav
         <PageHeader
           currentPage={currentPage}
           onPageChange={onPageChange}
-          eyebrow="Workspace"
-          title="Plugin Manager"
-          description="Review official tools, inspect permissions, and keep the plugin surface deliberate."
+          eyebrow="工作区"
+          title="插件管理"
+          description="查看官方工具、权限声明和启用状态，让插件能力保持清晰克制。"
         />
       }
       footer={
         <div className="qb-page-footer">
           <div className="qb-page-footer__left">
-            <span className="qb-page-footer__label">Installed</span>
-            <Tag tone="primary">{plugins.length} official tools</Tag>
+            <span className="qb-page-footer__label">已安装</span>
+            <Tag tone="primary">{plugins.length} 个官方工具</Tag>
           </div>
           <div className="qb-page-footer__right">
             <KeyboardShortcut keys={['Up', 'Down']} />
@@ -46,17 +59,17 @@ export default function PluginManagerPage({ currentPage, onPageChange }: PageNav
           <div className="qb-page-stack">
             <div className="qb-page-grid qb-page-grid--three">
               <div className="qb-page-stat">
-                <div className="qb-page-stat__label">Plugins</div>
+                <div className="qb-page-stat__label">插件</div>
                 <div className="qb-page-stat__value">{plugins.length}</div>
               </div>
               <div className="qb-page-stat">
-                <div className="qb-page-stat__label">Commands</div>
+                <div className="qb-page-stat__label">命令</div>
                 <div className="qb-page-stat__value">
                   {plugins.reduce((count, plugin) => count + plugin.commands.length, 0)}
                 </div>
               </div>
               <div className="qb-page-stat">
-                <div className="qb-page-stat__label">Views</div>
+                <div className="qb-page-stat__label">视图</div>
                 <div className="qb-page-stat__value">
                   {plugins.reduce((count, plugin) => count + (plugin.views?.length ?? 0), 0)}
                 </div>
@@ -70,26 +83,26 @@ export default function PluginManagerPage({ currentPage, onPageChange }: PageNav
                     <div>
                       <div className="qb-page-card__title">{plugin.name}</div>
                       <div className="qb-page-card__description">
-                        {plugin.description ?? 'No description provided yet.'}
+                        {plugin.description ?? '暂未提供说明。'}
                       </div>
                     </div>
                     <Icon icon={Boxes} size={18} tone="primary" />
                   </div>
 
                   <div className="qb-page-card__meta">
-                    <Tag tone="primary">Official</Tag>
+                    <Tag tone="primary">官方</Tag>
                     <Tag tone="default">{plugin.version}</Tag>
                     <Tag tone={isEnabled(plugin.id) ? 'success' : 'warning'}>
-                      {isEnabled(plugin.id) ? 'Enabled' : 'Disabled'}
+                      {isEnabled(plugin.id) ? '已启用' : '已停用'}
                     </Tag>
                   </div>
 
                   <div className="qb-page-list">
                     <div className="qb-page-toggle">
                       <div className="qb-page-toggle__copy">
-                        <div className="qb-page-toggle__title">Command surface</div>
+                        <div className="qb-page-toggle__title">命令入口</div>
                         <div className="qb-page-toggle__description">
-                          {plugin.commands.length} launcher command{plugin.commands.length > 1 ? 's' : ''}
+                          {plugin.commands.length} 条启动器命令
                         </div>
                       </div>
                       <Tag tone="default">{plugin.commands.length}</Tag>
@@ -97,9 +110,9 @@ export default function PluginManagerPage({ currentPage, onPageChange }: PageNav
 
                     <div className="qb-page-toggle">
                       <div className="qb-page-toggle__copy">
-                        <div className="qb-page-toggle__title">Available views</div>
+                        <div className="qb-page-toggle__title">可用视图</div>
                         <div className="qb-page-toggle__description">
-                          {plugin.views?.length ?? 0} registered view{(plugin.views?.length ?? 0) > 1 ? 's' : ''}
+                          已注册 {plugin.views?.length ?? 0} 个工具视图
                         </div>
                       </div>
                       <Tag tone="default">{plugin.views?.length ?? 0}</Tag>
@@ -107,9 +120,9 @@ export default function PluginManagerPage({ currentPage, onPageChange }: PageNav
 
                     <div className="qb-page-toggle">
                       <div className="qb-page-toggle__copy">
-                        <div className="qb-page-toggle__title">Enable plugin</div>
+                        <div className="qb-page-toggle__title">启用插件</div>
                         <div className="qb-page-toggle__description">
-                          Prototype toggle backed by the in-memory plugin store.
+                          当前由内存中的插件状态驱动，后续会接入持久化配置。
                         </div>
                       </div>
                       <input
@@ -130,11 +143,11 @@ export default function PluginManagerPage({ currentPage, onPageChange }: PageNav
             </div>
 
             <Detail
-              title="Permission Summary"
-              markdown="- Plugins currently come from the official builtin set.\n- Permissions are still declared explicitly in plugin metadata.\n- This screen is ready to grow into a fuller plugin governance surface later."
+              title="权限摘要"
+              markdown="- 当前插件全部来自官方内置集合。\n- 权限仍由插件 metadata 显式声明，方便后续治理。\n- 这个页面会继续扩展为更完整的插件能力管理界面。"
               metadata={plugins.slice(0, 4).map((plugin) => ({
                 label: plugin.name,
-                value: plugin.permissions.join(', ') || 'No explicit permissions',
+                value: formatPermissions(plugin.permissions),
               }))}
             />
           </div>

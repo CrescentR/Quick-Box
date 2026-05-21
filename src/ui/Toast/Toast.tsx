@@ -60,7 +60,7 @@ export function Toast({
         <button
           type="button"
           className="qb-toast__dismiss qb-focus-ring"
-          aria-label="Dismiss message"
+          aria-label="关闭消息"
           onClick={onDismiss}
         >
           <X size={16} />

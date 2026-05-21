@@ -14,7 +14,7 @@ export interface CommandInputProps
 export function CommandInput({
   value,
   onChange,
-  placeholder = 'Search commands or tools',
+  placeholder = '搜索命令或工具',
   isLoading = false,
   className,
   ...props

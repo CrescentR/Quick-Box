@@ -21,13 +21,13 @@ export function CodeBlock({
   className,
   ...props
 }: CodeBlockProps) {
-  const [copyLabel, setCopyLabel] = useState('Copy')
+  const [copyLabel, setCopyLabel] = useState('复制')
   const lines = code.split('\n')
 
   const handleCopy = async () => {
     await writeClipboardText(code)
-    setCopyLabel('Copied')
-    window.setTimeout(() => setCopyLabel('Copy'), 1200)
+    setCopyLabel('已复制')
+    window.setTimeout(() => setCopyLabel('复制'), 1200)
   }
 
   return (

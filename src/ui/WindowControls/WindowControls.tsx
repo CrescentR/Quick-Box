@@ -40,8 +40,8 @@ export function WindowControls() {
       <button
         type="button"
         className="qb-window-controls__button qb-focus-ring"
-        aria-label="Minimize window"
-        title="Minimize"
+        aria-label="最小化窗口"
+        title="最小化"
         onClick={() => {
           void minimizeCurrentWindow()
         }}
@@ -52,8 +52,8 @@ export function WindowControls() {
       <button
         type="button"
         className="qb-window-controls__button qb-focus-ring"
-        aria-label={isMaximized ? 'Restore window size' : 'Maximize window'}
-        title={isMaximized ? 'Restore' : 'Maximize'}
+        aria-label={isMaximized ? '还原窗口大小' : '最大化窗口'}
+        title={isMaximized ? '还原' : '最大化'}
         onClick={async () => {
           if (isMaximized) {
             await unmaximizeCurrentWindow()
@@ -71,8 +71,8 @@ export function WindowControls() {
       <button
         type="button"
         className="qb-window-controls__button qb-window-controls__button--reset qb-focus-ring"
-        aria-label="Reset window size"
-        title="Reset size"
+        aria-label="重置窗口大小"
+        title="重置大小"
         onClick={() => {
           void resetCurrentWindow()
         }}
@@ -83,8 +83,8 @@ export function WindowControls() {
       <button
         type="button"
         className="qb-window-controls__button qb-window-controls__button--danger qb-focus-ring"
-        aria-label="Close window"
-        title="Close"
+        aria-label="关闭窗口"
+        title="关闭"
         onClick={() => {
           void closeCurrentWindow()
         }}

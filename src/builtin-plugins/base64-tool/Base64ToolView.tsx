@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
-import { Binary, ClipboardCopy } from 'lucide-react'
 import { writeClipboardText } from '../../api/clipboard-api'
-import { CodeBlock, Detail, Icon, Tag } from '../../ui'
+import { CodeBlock, Detail, Tag } from '../../ui'
 
 function encodeBase64(value: string) {
   return btoa(unescape(encodeURIComponent(value)))
@@ -34,21 +33,21 @@ export default function Base64ToolView() {
     <section className="qb-tool-view">
       <header className="qb-tool-view__header">
         <div className="qb-tool-view__header-copy">
-          <div className="qb-tool-view__eyebrow">Official Tool</div>
-          <div className="qb-tool-view__title">Base64 Tool</div>
+          <div className="qb-tool-view__eyebrow">官方工具</div>
+          <div className="qb-tool-view__title">Base64 编解码</div>
           <div className="qb-tool-view__description">
-            Encode and decode text with a compact developer-first view that keeps both representations visible at once.
+            快速编码或解码 Base64 文本，在同一个面板中同时查看输入、编码结果和解码结果。
           </div>
         </div>
         <div className="qb-tool-view__header-meta">
-          <Tag tone="primary">Builtin</Tag>
-          <Tag tone="default">Encode / Decode</Tag>
+          <Tag tone="primary">内置</Tag>
+          <Tag tone="default">编码 / 解码</Tag>
         </div>
       </header>
 
       <div className="qb-tool-grid">
         <label className="qb-tool-field">
-          <span className="qb-tool-label">Input</span>
+          <span className="qb-tool-label">输入</span>
           <textarea
             className="qb-tool-textarea qb-mono"
             value={input}
@@ -57,13 +56,13 @@ export default function Base64ToolView() {
         </label>
 
         <div className="qb-tool-field">
-          <span className="qb-tool-label">Encoded</span>
-          <CodeBlock code={encoded || '// Unable to encode'} language="txt" wrap copyable />
+          <span className="qb-tool-label">编码结果</span>
+          <CodeBlock code={encoded || '// 无法编码'} language="txt" wrap copyable />
         </div>
 
         <div className="qb-tool-field qb-tool-field--full">
-          <span className="qb-tool-label">Decoded</span>
-          <CodeBlock code={decoded || '// Unable to decode current input'} language="txt" wrap copyable />
+          <span className="qb-tool-label">解码结果</span>
+          <CodeBlock code={decoded || '// 当前输入无法解码'} language="txt" wrap copyable />
         </div>
       </div>
 
@@ -73,20 +72,20 @@ export default function Base64ToolView() {
           type="button"
           onClick={() => void writeClipboardText(encoded)}
         >
-          Copy Encoded
+          复制编码结果
         </button>
         <button className="qb-tool-button" type="button" onClick={() => void writeClipboardText(decoded)}>
-          Copy Decoded
+          复制解码结果
         </button>
       </div>
 
       <Detail
-        title="Quick Notes"
-        markdown="- Works best with UTF-8 text content.\n- Decoding panel stays empty when the current input is not valid Base64.\n- Useful for quick payload inspection inside the launcher."
+        title="使用说明"
+        markdown="- 适合处理 UTF-8 文本内容。\n- 当前输入不是合法 Base64 时，解码区域会显示提示。\n- 适合在启动器内快速检查接口载荷或短文本。"
         metadata={[
-          { label: 'Mode', value: 'Base64 encode / decode' },
-          { label: 'Input', value: 'UTF-8 text' },
-          { label: 'Clipboard', value: 'Supported' },
+          { label: '模式', value: 'Base64 编码 / 解码' },
+          { label: '输入', value: 'UTF-8 文本' },
+          { label: '剪贴板', value: '支持复制' },
         ]}
       />
     </section>

@@ -1,12 +1,18 @@
-import { MonitorCog, Palette, ShieldCheck, Sparkles } from 'lucide-react'
+import { MonitorCog, Palette } from 'lucide-react'
+import type { QuickBoxConfig } from '../core/config/config-types'
 import { useConfigStore } from '../stores/config-store'
 import { Detail, Icon, KeyboardShortcut, Tag, WindowShell } from '../ui'
 import PageHeader from './PageHeader'
 import type { PageNavigationProps } from './page-types'
 import './Workbench.css'
 
+function getThemeLabel(theme: QuickBoxConfig['theme']) {
+  return theme === 'light' ? '浅色' : theme === 'system' ? '跟随系统' : '暗色'
+}
+
 export default function SettingsPage({ currentPage, onPageChange }: PageNavigationProps) {
   const { config, setConfig } = useConfigStore()
+  const themeLabel = getThemeLabel(config.theme)
 
   return (
     <WindowShell
@@ -15,19 +21,19 @@ export default function SettingsPage({ currentPage, onPageChange }: PageNavigati
         <PageHeader
           currentPage={currentPage}
           onPageChange={onPageChange}
-          eyebrow="Workspace"
-          title="Settings"
-          description="Tune launcher behavior, appearance, and desktop integration from one place."
+          eyebrow="工作区"
+          title="设置"
+          description="集中调整启动器行为、视觉外观和桌面集成。"
         />
       }
       footer={
         <div className="qb-page-footer">
           <div className="qb-page-footer__left">
-            <span className="qb-page-footer__label">Quick toggle</span>
+            <span className="qb-page-footer__label">快速打开</span>
             <KeyboardShortcut keys={['Ctrl', ',']} />
           </div>
           <div className="qb-page-footer__right">
-            <span className="qb-page-footer__label">Theme: {config.theme}</span>
+            <span className="qb-page-footer__label">主题：{themeLabel}</span>
           </div>
         </div>
       }
@@ -37,16 +43,16 @@ export default function SettingsPage({ currentPage, onPageChange }: PageNavigati
           <div className="qb-page-stack">
             <div className="qb-page-grid qb-page-grid--three">
               <div className="qb-page-stat">
-                <div className="qb-page-stat__label">Theme</div>
-                <div className="qb-page-stat__value">{config.theme}</div>
+                <div className="qb-page-stat__label">主题</div>
+                <div className="qb-page-stat__value">{themeLabel}</div>
               </div>
               <div className="qb-page-stat">
-                <div className="qb-page-stat__label">Hotkey</div>
+                <div className="qb-page-stat__label">热键</div>
                 <div className="qb-page-stat__value">{config.hotkey}</div>
               </div>
               <div className="qb-page-stat">
-                <div className="qb-page-stat__label">Tray</div>
-                <div className="qb-page-stat__value">{config.enableTray ? 'Enabled' : 'Disabled'}</div>
+                <div className="qb-page-stat__label">托盘</div>
+                <div className="qb-page-stat__value">{config.enableTray ? '已启用' : '已停用'}</div>
               </div>
             </div>
 
@@ -54,16 +60,16 @@ export default function SettingsPage({ currentPage, onPageChange }: PageNavigati
               <section className="qb-page-card">
                 <div className="qb-page-card__top">
                   <div>
-                    <div className="qb-page-card__title">Appearance</div>
+                    <div className="qb-page-card__title">外观</div>
                     <div className="qb-page-card__description">
-                      Keep QuickBox aligned with the dark-first design system while leaving room for system-aware themes.
+                      让 QuickBox 保持暗色优先的设计气质，同时为跟随系统主题预留空间。
                     </div>
                   </div>
                   <Icon icon={Palette} size={18} tone="primary" />
                 </div>
 
                 <label className="qb-page-field">
-                  <span className="qb-page-label">Theme mode</span>
+                  <span className="qb-page-label">主题模式</span>
                   <select
                     className="qb-page-select"
                     value={config.theme}
@@ -74,14 +80,14 @@ export default function SettingsPage({ currentPage, onPageChange }: PageNavigati
                       })
                     }
                   >
-                    <option value="dark">Dark</option>
-                    <option value="light">Light</option>
-                    <option value="system">System</option>
+                    <option value="dark">暗色</option>
+                    <option value="light">浅色</option>
+                    <option value="system">跟随系统</option>
                   </select>
                 </label>
 
                 <div className="qb-page-card__meta">
-                  <Tag tone="primary">Dark-first</Tag>
+                  <Tag tone="primary">暗色优先</Tag>
                   <Tag tone="default">Mica-like</Tag>
                 </div>
               </section>
@@ -89,16 +95,16 @@ export default function SettingsPage({ currentPage, onPageChange }: PageNavigati
               <section className="qb-page-card">
                 <div className="qb-page-card__top">
                   <div>
-                    <div className="qb-page-card__title">Invocation</div>
+                    <div className="qb-page-card__title">呼出方式</div>
                     <div className="qb-page-card__description">
-                      Configure how the launcher is called and whether it stays reachable through desktop affordances.
+                      配置启动器如何被唤起，以及是否通过桌面托盘保持可见入口。
                     </div>
                   </div>
                   <Icon icon={MonitorCog} size={18} tone="primary" />
                 </div>
 
                 <label className="qb-page-field">
-                  <span className="qb-page-label">Launcher hotkey</span>
+                  <span className="qb-page-label">启动器热键</span>
                   <input
                     className="qb-page-input"
                     value={config.hotkey}
@@ -113,9 +119,9 @@ export default function SettingsPage({ currentPage, onPageChange }: PageNavigati
 
                 <div className="qb-page-toggle">
                   <div className="qb-page-toggle__copy">
-                    <div className="qb-page-toggle__title">Tray presence</div>
+                    <div className="qb-page-toggle__title">显示托盘入口</div>
                     <div className="qb-page-toggle__description">
-                      Keep QuickBox discoverable from desktop chrome while keyboard workflows continue to work.
+                      在桌面托盘保留 QuickBox 入口，同时不影响键盘优先的工作流。
                     </div>
                   </div>
                   <input
@@ -134,12 +140,12 @@ export default function SettingsPage({ currentPage, onPageChange }: PageNavigati
             </div>
 
             <Detail
-              title="Settings Roadmap"
-              markdown="- Theme, hotkey, and tray options now share the same UI language as the launcher.\n- This page is ready to connect to persistence once config save/load flows are expanded.\n- Keyboard-first affordances stay visible so it feels like part of the launcher rather than a separate admin screen."
+              title="设置路线"
+              markdown="- 主题、热键和托盘选项已经与启动器保持同一套视觉语言。\n- 后续扩展配置读写流程后，这里可以直接接入持久化。\n- 键盘提示会持续可见，让设置页仍然像 QuickBox 的一部分，而不是独立后台。"
               metadata={[
-                { label: 'Status', value: 'Interactive prototype' },
-                { label: 'Backed by', value: 'Zustand config store' },
-                { label: 'Next', value: 'Persist changes to desktop config' },
+                { label: '状态', value: '交互原型' },
+                { label: '状态来源', value: 'Zustand 配置 Store' },
+                { label: '下一步', value: '持久化到桌面配置' },
               ]}
             />
           </div>
