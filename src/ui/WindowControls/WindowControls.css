@@ -1,0 +1,32 @@
+.qb-window-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--qb-space-1);
+}
+
+.qb-window-controls__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--qb-border-subtle);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.025);
+  color: var(--qb-text-secondary);
+  transition:
+    background-color var(--qb-motion-fast) var(--qb-ease-out),
+    border-color var(--qb-motion-fast) var(--qb-ease-out),
+    color var(--qb-motion-fast) var(--qb-ease-out);
+}
+
+.qb-window-controls__button:hover {
+  border-color: var(--qb-border-strong);
+  background: var(--qb-bg-surface);
+  color: var(--qb-text-primary);
+}
+
+.qb-window-controls__button--danger:hover {
+  border-color: var(--qb-status-danger);
+  background: var(--qb-status-danger-soft);
+}

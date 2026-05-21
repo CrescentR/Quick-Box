@@ -3,9 +3,9 @@ import UuidToolView from './UuidToolView'
 
 const plugin: ToolPlugin = {
   id: 'official.uuid-tool',
-  name: 'UUID 工具',
+  name: 'UUID Tool',
   version: '0.1.0',
-  description: '生成 UUID',
+  description: 'Generate random UUID values',
   author: 'QuickBox',
   source: 'builtin',
   permissions: ['clipboard.write'],
@@ -13,9 +13,9 @@ const plugin: ToolPlugin = {
     {
       id: 'official.uuid-tool.open',
       pluginId: 'official.uuid-tool',
-      title: 'UUID 工具',
-      description: '生成随机 UUID',
-      keywords: ['uuid', 'guid', 'id', 'random', '生成'],
+      title: 'UUID Tool',
+      description: 'Generate random UUID v4 values',
+      keywords: ['uuid', 'guid', 'id', 'random'],
       source: 'builtin',
       executeMode: 'view',
       run: async (ctx) => {
@@ -26,7 +26,7 @@ const plugin: ToolPlugin = {
   views: [
     {
       id: 'official.uuid-tool.view',
-      title: 'UUID 工具',
+      title: 'UUID Tool',
       component: UuidToolView,
     },
   ],

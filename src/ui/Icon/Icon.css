@@ -1,0 +1,30 @@
+.qb-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--qb-icon-color, currentColor);
+}
+
+.qb-icon--default {
+  --qb-icon-color: currentColor;
+}
+
+.qb-icon--primary {
+  --qb-icon-color: var(--qb-accent-primary);
+}
+
+.qb-icon--success {
+  --qb-icon-color: var(--qb-status-success);
+}
+
+.qb-icon--warning {
+  --qb-icon-color: var(--qb-status-warning);
+}
+
+.qb-icon--danger {
+  --qb-icon-color: var(--qb-status-danger);
+}
+
+.qb-icon--muted {
+  --qb-icon-color: var(--qb-text-secondary);
+}

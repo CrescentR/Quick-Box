@@ -1,0 +1,24 @@
+.qb-spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--qb-spinner-size, 16px);
+  height: var(--qb-spinner-size, 16px);
+  color: var(--qb-accent-primary);
+}
+
+.qb-spinner::before {
+  content: '';
+  width: 100%;
+  height: 100%;
+  border: 2px solid rgba(255, 255, 255, 0.14);
+  border-top-color: currentColor;
+  border-radius: var(--qb-radius-pill);
+  animation: qb-spinner-rotate var(--qb-motion-normal) linear infinite;
+}
+
+@keyframes qb-spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}

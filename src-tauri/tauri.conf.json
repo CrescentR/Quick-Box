@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "identifier": "com.quickbox.app",
   "build": {
-    "beforeDevCommand": "pnpm dev",
+    "beforeDevCommand": "powershell -ExecutionPolicy Bypass -File .\\scripts\\start-vite.ps1",
     "devUrl": "http://127.0.0.1:1420",
     "beforeBuildCommand": "pnpm build",
     "frontendDist": "../dist"
@@ -15,14 +15,16 @@
       {
         "label": "main",
         "title": "QuickBox",
-        "width": 900,
-        "height": 560,
+        "width": 960,
+        "height": 620,
+        "minWidth": 820,
+        "minHeight": 520,
         "center": true,
         "decorations": false,
         "resizable": true,
-        "visible": false,
-        "skipTaskbar": true,
-        "alwaysOnTop": true
+        "visible": true,
+        "skipTaskbar": false,
+        "alwaysOnTop": false
       }
     ],
     "security": {

@@ -1,0 +1,45 @@
+.qb-error-state {
+  display: grid;
+  gap: var(--qb-space-4);
+  padding: var(--qb-space-5);
+  border: 1px solid color-mix(in srgb, var(--qb-status-danger) 28%, var(--qb-border-subtle));
+  border-radius: var(--qb-radius-panel);
+  background:
+    linear-gradient(180deg, rgba(248, 113, 113, 0.08), transparent),
+    rgba(255, 255, 255, 0.02);
+}
+
+.qb-error-state__title {
+  color: var(--qb-text-primary);
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: var(--qb-font-weight-semibold);
+}
+
+.qb-error-state__description {
+  color: var(--qb-text-secondary);
+  font-size: var(--qb-font-size-body);
+  line-height: var(--qb-line-height-body);
+}
+
+.qb-error-state__meta {
+  color: var(--qb-text-muted);
+  font-size: var(--qb-font-size-caption);
+  line-height: var(--qb-line-height-caption);
+}
+
+.qb-error-state__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--qb-space-2);
+  flex-wrap: wrap;
+}
+
+.qb-error-state__button {
+  min-height: 32px;
+  padding: 0 var(--qb-space-3);
+  border: 1px solid var(--qb-border-subtle);
+  border-radius: var(--qb-radius-control);
+  background: var(--qb-bg-surface);
+  color: var(--qb-text-primary);
+}

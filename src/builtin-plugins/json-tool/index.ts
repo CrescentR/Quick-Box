@@ -3,9 +3,9 @@ import JsonToolView from './JsonToolView'
 
 const plugin: ToolPlugin = {
   id: 'official.json-tool',
-  name: 'JSON 工具',
+  name: 'JSON Tool',
   version: '0.1.0',
-  description: 'JSON 格式化、压缩和校验',
+  description: 'Format, minify, and validate JSON content',
   author: 'QuickBox',
   source: 'builtin',
   permissions: ['clipboard.read', 'clipboard.write'],
@@ -13,9 +13,9 @@ const plugin: ToolPlugin = {
     {
       id: 'official.json-tool.open',
       pluginId: 'official.json-tool',
-      title: 'JSON 工具',
-      description: '格式化、压缩和校验 JSON',
-      keywords: ['json', 'format', 'minify', 'validate', '格式化', '压缩', '校验'],
+      title: 'JSON Tool',
+      description: 'Format, minify, and validate JSON',
+      keywords: ['json', 'format', 'minify', 'validate', 'beautify'],
       source: 'builtin',
       executeMode: 'view',
       run: async (ctx) => {
@@ -26,7 +26,7 @@ const plugin: ToolPlugin = {
   views: [
     {
       id: 'official.json-tool.view',
-      title: 'JSON 工具',
+      title: 'JSON Tool',
       component: JsonToolView,
     },
   ],

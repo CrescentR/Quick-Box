@@ -1,0 +1,105 @@
+.qb-toast {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--qb-space-3);
+  min-height: 52px;
+  padding: var(--qb-space-3) var(--qb-space-4);
+  border: 1px solid var(--qb-border-subtle);
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015)),
+    var(--qb-bg-window);
+  box-shadow: var(--qb-shadow-panel);
+}
+
+.qb-toast--success {
+  border-color: var(--qb-status-success);
+}
+
+.qb-toast--warning {
+  border-color: var(--qb-status-warning);
+}
+
+.qb-toast--danger {
+  border-color: var(--qb-status-danger);
+}
+
+.qb-toast__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: var(--qb-bg-surface-elevated);
+}
+
+.qb-toast--success .qb-toast__icon {
+  background: var(--qb-status-success-soft);
+}
+
+.qb-toast--warning .qb-toast__icon {
+  background: var(--qb-status-warning-soft);
+}
+
+.qb-toast--danger .qb-toast__icon {
+  background: var(--qb-status-danger-soft);
+}
+
+.qb-toast__content {
+  min-width: 0;
+}
+
+.qb-toast__title {
+  color: var(--qb-text-primary);
+  font-size: var(--qb-font-size-body);
+  line-height: var(--qb-line-height-body);
+  font-weight: var(--qb-font-weight-semibold);
+}
+
+.qb-toast__description {
+  color: var(--qb-text-secondary);
+  font-size: var(--qb-font-size-caption);
+  line-height: var(--qb-line-height-caption);
+}
+
+.qb-toast__action,
+.qb-toast__dismiss {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  border: 1px solid var(--qb-border-subtle);
+  border-radius: 10px;
+  background: var(--qb-bg-surface);
+  color: var(--qb-text-primary);
+  transition:
+    border-color var(--qb-motion-fast) var(--qb-ease-out),
+    background-color var(--qb-motion-fast) var(--qb-ease-out);
+}
+
+.qb-toast__action {
+  padding: 0 var(--qb-space-3);
+}
+
+.qb-toast__dismiss {
+  width: 32px;
+}
+
+.qb-toast__action:hover,
+.qb-toast__dismiss:hover {
+  border-color: var(--qb-border-strong);
+  background: var(--qb-bg-surface-elevated);
+}
+
+@media (max-width: 720px) {
+  .qb-toast {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .qb-toast__dismiss {
+    grid-column: 3;
+    grid-row: 1;
+  }
+}

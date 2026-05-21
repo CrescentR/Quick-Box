@@ -24,6 +24,12 @@ pub fn run() {
             commands::window::show_launcher_window,
             commands::window::hide_launcher_window,
             commands::window::toggle_launcher_window,
+            commands::window::minimize_launcher_window,
+            commands::window::maximize_launcher_window,
+            commands::window::unmaximize_launcher_window,
+            commands::window::close_launcher_window,
+            commands::window::reset_launcher_window,
+            commands::window::is_launcher_window_maximized,
             commands::clipboard::read_clipboard_text,
             commands::clipboard::write_clipboard_text,
             commands::config::load_config,
@@ -48,6 +54,8 @@ pub fn run() {
                     window.center()?;
                     window.show()?;
                     window.set_focus()?;
+                    #[cfg(target_os = "windows")]
+                    platform::ensure_taskbar_icon(&window)?;
                 }
             }
 

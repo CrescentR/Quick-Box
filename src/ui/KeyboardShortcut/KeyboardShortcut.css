@@ -1,0 +1,28 @@
+.qb-keyboard-shortcut {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--qb-space-1);
+  color: var(--qb-text-secondary);
+  font-size: var(--qb-font-size-caption);
+  line-height: var(--qb-line-height-caption);
+  white-space: nowrap;
+}
+
+.qb-keyboard-shortcut__key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  min-height: 22px;
+  padding: 0 var(--qb-space-2);
+  border: 1px solid var(--qb-border-subtle);
+  border-bottom-color: var(--qb-border-strong);
+  border-radius: 8px;
+  background: var(--qb-bg-surface);
+  color: var(--qb-text-primary);
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.qb-keyboard-shortcut__separator {
+  color: var(--qb-text-muted);
+}

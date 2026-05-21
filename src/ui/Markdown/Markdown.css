@@ -1,0 +1,54 @@
+.qb-markdown {
+  display: grid;
+  gap: var(--qb-space-3);
+  color: var(--qb-text-secondary);
+  font-size: var(--qb-font-size-body);
+  line-height: var(--qb-line-height-body);
+}
+
+.qb-markdown :where(h1, h2, h3, p, ul, ol) {
+  margin: 0;
+}
+
+.qb-markdown h1,
+.qb-markdown h2,
+.qb-markdown h3 {
+  color: var(--qb-text-primary);
+  font-weight: var(--qb-font-weight-semibold);
+}
+
+.qb-markdown h1 {
+  font-size: 24px;
+  line-height: 30px;
+}
+
+.qb-markdown h2 {
+  font-size: 18px;
+  line-height: 24px;
+}
+
+.qb-markdown h3 {
+  font-size: 15px;
+  line-height: 20px;
+}
+
+.qb-markdown ul,
+.qb-markdown ol {
+  display: grid;
+  gap: var(--qb-space-2);
+  padding-left: 1.2rem;
+}
+
+.qb-markdown li::marker {
+  color: var(--qb-accent-primary);
+}
+
+.qb-markdown code {
+  display: inline-block;
+  padding: 0 var(--qb-space-1);
+  border: 1px solid var(--qb-border-subtle);
+  border-radius: 6px;
+  background: var(--qb-bg-surface);
+  color: var(--qb-text-primary);
+  font-size: 0.95em;
+}

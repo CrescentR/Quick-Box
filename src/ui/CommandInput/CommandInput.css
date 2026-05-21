@@ -1,0 +1,44 @@
+@import "../shared.css";
+
+.qb-command-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: var(--qb-search-height);
+  border-bottom: 1px solid var(--qb-border-subtle);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent),
+    var(--qb-bg-input);
+}
+
+.qb-command-input:focus-within {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent),
+    var(--qb-bg-focus);
+}
+
+.qb-command-input__field {
+  width: 100%;
+  height: var(--qb-search-height);
+  border: 0;
+  padding: 0 calc(var(--qb-space-6) + 20px) 0 var(--qb-space-5);
+  background: transparent;
+  color: var(--qb-text-primary);
+  font-size: var(--qb-font-size-search);
+  line-height: var(--qb-line-height-search);
+}
+
+.qb-command-input__field::placeholder {
+  color: var(--qb-text-muted);
+}
+
+.qb-command-input__field:focus-visible {
+  box-shadow: inset 0 -1px 0 var(--qb-border-focus);
+}
+
+.qb-command-input__spinner {
+  position: absolute;
+  right: var(--qb-space-4);
+  color: var(--qb-accent-primary);
+  pointer-events: none;
+}

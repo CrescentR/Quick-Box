@@ -1,0 +1,15 @@
+.qb-ui-text-muted {
+  color: var(--qb-text-muted);
+}
+
+.qb-ui-control {
+  border: 1px solid var(--qb-border-subtle);
+  border-radius: var(--qb-radius-control);
+  background: var(--qb-bg-surface);
+}
+
+.qb-ui-card {
+  border: 1px solid var(--qb-border-subtle);
+  border-radius: var(--qb-radius-panel);
+  background: var(--qb-bg-surface);
+}

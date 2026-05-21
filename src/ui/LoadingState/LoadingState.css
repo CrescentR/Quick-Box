@@ -1,0 +1,28 @@
+.qb-loading-state {
+  display: grid;
+  gap: var(--qb-space-2);
+  width: 100%;
+}
+
+.qb-loading-state__row {
+  display: grid;
+  gap: var(--qb-space-2);
+  min-height: var(--qb-list-item-height-compact);
+  padding: var(--qb-space-3);
+  border: 1px solid var(--qb-border-subtle);
+  border-radius: var(--qb-radius-item);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.qb-loading-state__line {
+  height: 10px;
+  border-radius: var(--qb-radius-pill);
+}
+
+.qb-loading-state__line--title {
+  width: 48%;
+}
+
+.qb-loading-state__line--subtitle {
+  width: 72%;
+}

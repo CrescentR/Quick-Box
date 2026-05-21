@@ -1,0 +1,145 @@
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --qb-font-sans: system-ui, "Segoe UI", "Microsoft YaHei UI", -apple-system, sans-serif;
+  --qb-font-mono: "JetBrains Mono", "Cascadia Code", "SF Mono", Consolas, monospace;
+
+  --qb-font-size-search: 16px;
+  --qb-font-size-body: 14px;
+  --qb-font-size-caption: 12px;
+  --qb-line-height-search: 24px;
+  --qb-line-height-body: 20px;
+  --qb-line-height-caption: 16px;
+  --qb-font-weight-regular: 400;
+  --qb-font-weight-medium: 500;
+  --qb-font-weight-semibold: 600;
+
+  --qb-bg-app: #0d0f14;
+  --qb-bg-window: rgba(24, 24, 30, 0.94);
+  --qb-bg-window-solid: #18181e;
+  --qb-bg-surface: rgba(255, 255, 255, 0.04);
+  --qb-bg-surface-strong: rgba(255, 255, 255, 0.06);
+  --qb-bg-surface-elevated: rgba(255, 255, 255, 0.075);
+  --qb-bg-focus: rgba(255, 255, 255, 0.07);
+  --qb-bg-overlay: rgba(0, 0, 0, 0.4);
+  --qb-bg-input: rgba(255, 255, 255, 0.05);
+  --qb-bg-selection: rgba(124, 92, 255, 0.32);
+  --qb-bg-scrollbar: rgba(255, 255, 255, 0.14);
+  --qb-bg-scrollbar-hover: rgba(255, 255, 255, 0.22);
+
+  --qb-border-subtle: rgba(255, 255, 255, 0.08);
+  --qb-border-strong: rgba(255, 255, 255, 0.12);
+  --qb-border-focus: rgba(124, 92, 255, 0.45);
+
+  --qb-accent-primary: #7c5cff;
+  --qb-accent-primary-hover: #8e72ff;
+  --qb-accent-primary-soft: rgba(124, 92, 255, 0.18);
+  --qb-accent-primary-strong: rgba(124, 92, 255, 0.34);
+
+  --qb-text-primary: #f1f1f4;
+  --qb-text-secondary: #a1a1aa;
+  --qb-text-muted: rgba(161, 161, 170, 0.72);
+  --qb-text-on-accent: #f8f7ff;
+
+  --qb-status-success: #34d399;
+  --qb-status-success-soft: rgba(52, 211, 153, 0.16);
+  --qb-status-warning: #fbbf24;
+  --qb-status-warning-soft: rgba(251, 191, 36, 0.16);
+  --qb-status-danger: #f87171;
+  --qb-status-danger-soft: rgba(248, 113, 113, 0.16);
+
+  --qb-radius-window: 18px;
+  --qb-radius-panel: 16px;
+  --qb-radius-item: 12px;
+  --qb-radius-control: 10px;
+  --qb-radius-pill: 999px;
+
+  --qb-shadow-window: 0 24px 80px rgba(0, 0, 0, 0.45);
+  --qb-shadow-panel: 0 18px 60px rgba(0, 0, 0, 0.4);
+  --qb-shadow-focus: 0 0 0 1px var(--qb-border-focus), 0 0 0 4px rgba(124, 92, 255, 0.16);
+
+  --qb-space-0: 0;
+  --qb-space-1: 4px;
+  --qb-space-2: 8px;
+  --qb-space-3: 12px;
+  --qb-space-4: 16px;
+  --qb-space-5: 20px;
+  --qb-space-6: 24px;
+  --qb-space-7: 32px;
+
+  --qb-motion-fast: 120ms;
+  --qb-motion-normal: 160ms;
+  --qb-motion-panel: 180ms;
+  --qb-motion-slow: 200ms;
+  --qb-ease-out: ease-out;
+  --qb-ease-panel: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --qb-window-width-launcher: 760px;
+  --qb-window-height-launcher: 480px;
+  --qb-window-width-split: 960px;
+  --qb-window-height-split: 620px;
+  --qb-panel-width-list: 360px;
+  --qb-panel-width-detail: 600px;
+  --qb-search-height: 64px;
+  --qb-header-height: 36px;
+  --qb-footer-height: 30px;
+  --qb-list-item-height-compact: 52px;
+  --qb-list-item-height-comfortable: 64px;
+  --qb-icon-size-sm: 16px;
+  --qb-icon-size-md: 20px;
+  --qb-icon-size-lg: 24px;
+  --qb-scrollbar-size: 10px;
+
+  --qb-z-base: 0;
+  --qb-z-raised: 10;
+  --qb-z-overlay: 20;
+  --qb-z-panel: 30;
+  --qb-z-toast: 40;
+  --qb-z-modal: 50;
+
+  /* Compatibility aliases for the existing UI layer. */
+  --bg: var(--qb-bg-app);
+  --panel: var(--qb-bg-window);
+  --panel-strong: var(--qb-bg-focus);
+  --border: var(--qb-border-subtle);
+  --text: var(--qb-text-primary);
+  --muted: var(--qb-text-secondary);
+  --accent: var(--qb-accent-primary);
+  --accent-strong: var(--qb-accent-primary-hover);
+  --danger: var(--qb-status-danger);
+  --radius: var(--qb-radius-control);
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  --qb-bg-app: #eef1f7;
+  --qb-bg-window: rgba(250, 250, 252, 0.94);
+  --qb-bg-window-solid: #fafafc;
+  --qb-bg-surface: rgba(17, 24, 39, 0.04);
+  --qb-bg-surface-strong: rgba(17, 24, 39, 0.07);
+  --qb-bg-surface-elevated: rgba(17, 24, 39, 0.1);
+  --qb-bg-focus: rgba(124, 92, 255, 0.12);
+  --qb-bg-overlay: rgba(15, 23, 42, 0.16);
+  --qb-bg-input: rgba(17, 24, 39, 0.04);
+  --qb-bg-selection: rgba(124, 92, 255, 0.18);
+  --qb-bg-scrollbar: rgba(17, 24, 39, 0.14);
+  --qb-bg-scrollbar-hover: rgba(17, 24, 39, 0.24);
+
+  --qb-border-subtle: rgba(17, 24, 39, 0.08);
+  --qb-border-strong: rgba(17, 24, 39, 0.14);
+  --qb-border-focus: rgba(124, 92, 255, 0.32);
+
+  --qb-text-primary: #151821;
+  --qb-text-secondary: #4b5563;
+  --qb-text-muted: rgba(75, 85, 99, 0.76);
+  --qb-text-on-accent: #ffffff;
+  --qb-status-success-soft: rgba(52, 211, 153, 0.14);
+  --qb-status-warning-soft: rgba(251, 191, 36, 0.14);
+  --qb-status-danger-soft: rgba(248, 113, 113, 0.14);
+
+  --qb-shadow-window: 0 22px 72px rgba(15, 23, 42, 0.14);
+  --qb-shadow-panel: 0 16px 48px rgba(15, 23, 42, 0.12);
+  --qb-shadow-focus: 0 0 0 1px var(--qb-border-focus), 0 0 0 4px rgba(124, 92, 255, 0.12);
+}
