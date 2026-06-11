@@ -1,17 +1,39 @@
 import { useMemo, useState } from 'react'
-import { writeClipboardText } from '../../api/clipboard-api'
+import { useClipboardToast } from '../../hooks/useClipboardToast'
 import { CodeBlock, Detail, Tag } from '../../ui'
 
+function bytesToBase64(bytes: Uint8Array) {
+  let binary = ''
+
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte)
+  }
+
+  return btoa(binary)
+}
+
+function base64ToBytes(value: string) {
+  const binary = atob(value)
+  const bytes = new Uint8Array(binary.length)
+
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index)
+  }
+
+  return bytes
+}
+
 function encodeBase64(value: string) {
-  return btoa(unescape(encodeURIComponent(value)))
+  return bytesToBase64(new TextEncoder().encode(value))
 }
 
 function decodeBase64(value: string) {
-  return decodeURIComponent(escape(atob(value)))
+  return new TextDecoder('utf-8', { fatal: true }).decode(base64ToBytes(value))
 }
 
 export default function Base64ToolView() {
   const [input, setInput] = useState('QuickBox')
+  const { copyText, clipboardToast } = useClipboardToast()
 
   const encoded = useMemo(() => {
     try {
@@ -49,6 +71,8 @@ export default function Base64ToolView() {
         <label className="qb-tool-field">
           <span className="qb-tool-label">输入</span>
           <textarea
+            id="base64-tool-input"
+            name="base64-tool-input"
             className="qb-tool-textarea qb-mono"
             value={input}
             onChange={(event) => setInput(event.target.value)}
@@ -70,11 +94,11 @@ export default function Base64ToolView() {
         <button
           className="qb-tool-button qb-tool-button--primary"
           type="button"
-          onClick={() => void writeClipboardText(encoded)}
+          onClick={() => void copyText(encoded, 'Encoded Base64 result')}
         >
           复制编码结果
         </button>
-        <button className="qb-tool-button" type="button" onClick={() => void writeClipboardText(decoded)}>
+        <button className="qb-tool-button" type="button" onClick={() => void copyText(decoded, 'Decoded Base64 result')}>
           复制解码结果
         </button>
       </div>
@@ -88,6 +112,7 @@ export default function Base64ToolView() {
           { label: '剪贴板', value: '支持复制' },
         ]}
       />
+      {clipboardToast}
     </section>
   )
 }

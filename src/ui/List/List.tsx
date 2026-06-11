@@ -1,3 +1,4 @@
+import { forwardRef } from 'react'
 import type { HTMLAttributes, ReactNode } from 'react'
 import clsx from 'clsx'
 import { EmptyState } from '../EmptyState/EmptyState'
@@ -12,19 +13,19 @@ export interface ListProps extends HTMLAttributes<HTMLDivElement> {
   loadingRows?: number
 }
 
-function ListRoot({
+const ListRoot = forwardRef<HTMLDivElement, ListProps>(function ListRoot({
   children,
   isLoading = false,
   emptyState,
   loadingRows = 5,
   className,
   ...props
-}: ListProps) {
+}, ref) {
   const childCount = Array.isArray(children) ? children.length : children ? 1 : 0
   const hasContent = childCount > 0
 
   return (
-    <div className={clsx('qb-list', className)} {...props}>
+    <div ref={ref} className={clsx('qb-list', className)} {...props}>
       <div className="qb-list__viewport qb-scrollbar">
         <div className="qb-list__content">
           {isLoading ? <LoadingState rows={loadingRows} /> : null}
@@ -38,7 +39,7 @@ function ListRoot({
       </div>
     </div>
   )
-}
+})
 
 export const List = Object.assign(ListRoot, {
   Section: ListSection,

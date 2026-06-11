@@ -13,7 +13,7 @@ export interface MarkdownProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 function parseBlocks(content: string): MarkdownBlock[] {
-  const lines = content.replace(/\r\n/g, '\n').split('\n')
+  const lines = content.replace(/\\n/g, '\n').replace(/\r\n/g, '\n').split('\n')
   const blocks: MarkdownBlock[] = []
   let index = 0
 

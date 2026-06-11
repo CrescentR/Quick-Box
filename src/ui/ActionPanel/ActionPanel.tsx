@@ -70,30 +70,34 @@ export function ActionPanel({
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault()
+        event.stopPropagation()
         onClose?.()
         return
       }
 
       if (event.key === 'ArrowDown') {
         event.preventDefault()
+        event.stopPropagation()
         setSelectedIndex((current) => Math.min(current + 1, Math.max(filteredActions.length - 1, 0)))
         return
       }
 
       if (event.key === 'ArrowUp') {
         event.preventDefault()
+        event.stopPropagation()
         setSelectedIndex((current) => Math.max(current - 1, 0))
         return
       }
 
       if (event.key === 'Enter') {
         event.preventDefault()
+        event.stopPropagation()
         filteredActions[selectedIndex]?.onAction?.()
       }
     }
 
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
+    window.addEventListener('keydown', onKeyDown, { capture: true })
+    return () => window.removeEventListener('keydown', onKeyDown, { capture: true })
   }, [filteredActions, onClose, open, selectedIndex])
 
   if (!open) {

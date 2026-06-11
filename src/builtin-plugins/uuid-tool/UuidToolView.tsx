@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { writeClipboardText } from '../../api/clipboard-api'
+import { useClipboardToast } from '../../hooks/useClipboardToast'
 import { CodeBlock, Detail, Tag } from '../../ui'
 import { createUuid } from '../../utils/id'
 
 export default function UuidToolView() {
   const [uuid, setUuid] = useState(createUuid())
+  const { copyText, clipboardToast } = useClipboardToast()
 
   return (
     <section className="qb-tool-view">
@@ -28,7 +29,7 @@ export default function UuidToolView() {
         <button className="qb-tool-button qb-tool-button--primary" type="button" onClick={() => setUuid(createUuid())}>
           再生成一个
         </button>
-        <button className="qb-tool-button" type="button" onClick={() => void writeClipboardText(uuid)}>
+        <button className="qb-tool-button" type="button" onClick={() => void copyText(uuid, 'UUID v4')}>
           复制 UUID
         </button>
       </div>
@@ -42,6 +43,7 @@ export default function UuidToolView() {
           { label: '剪贴板', value: '支持复制' },
         ]}
       />
+      {clipboardToast}
     </section>
   )
 }

@@ -1,7 +1,7 @@
 [package]
 name = "quickbox"
-version = "0.1.0"
-description = "A lightweight cross-platform desktop launcher"
+version = "1.0.0"
+description = "A lightweight keyboard-first desktop tool launcher"
 authors = ["QuickBox"]
 edition = "2021"
 

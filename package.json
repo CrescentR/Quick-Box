@@ -1,16 +1,22 @@
 {
   "name": "quickbox",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
     "typecheck": "tsc --noEmit",
     "build": "tsc && vite build",
+    "check:rust": "cd src-tauri && cargo check",
+    "verify": "pnpm typecheck && pnpm build && pnpm check:rust",
     "preview": "vite preview",
-    "tauri": "scripts\\tauri-env.cmd",
-    "tauri:dev": "scripts\\tauri-env.cmd dev",
-    "tauri:build": "scripts\\tauri-env.cmd build"
+    "tauri": "node scripts/tauri-run.cjs",
+    "tauri:dev": "node scripts/tauri-run.cjs dev",
+    "tauri:build": "node scripts/tauri-run.cjs build",
+    "tauri:build:mac": "node scripts/tauri-run.cjs build --bundles app,dmg",
+    "tauri:build:mac:universal": "node scripts/tauri-run.cjs build --target universal-apple-darwin --bundles app,dmg",
+    "tauri:build:win": "node scripts/tauri-run.cjs build --bundles nsis,msi",
+    "tauri:build:linux": "node scripts/tauri-run.cjs build --bundles appimage,deb"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.0.0",

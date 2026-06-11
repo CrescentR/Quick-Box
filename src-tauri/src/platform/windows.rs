@@ -7,10 +7,6 @@ use windows::Win32::UI::WindowsAndMessaging::{
     WS_EX_TOOLWINDOW,
 };
 
-pub fn platform_name() -> &'static str {
-    "windows"
-}
-
 pub fn configure_launcher_window(window: &WebviewWindow) -> Result<(), tauri::Error> {
     window.set_skip_taskbar(false)?;
     Ok(())

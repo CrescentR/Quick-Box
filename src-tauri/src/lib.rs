@@ -1,10 +1,14 @@
 mod commands;
+mod command_usage;
+mod config;
 mod errors;
 mod platform;
+mod plugin_state;
+mod shortcuts;
 mod storage;
 
 use tauri::Manager;
-use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
+use tauri_plugin_global_shortcut::ShortcutState;
 
 pub fn run() {
     tauri::Builder::default()
@@ -34,18 +38,17 @@ pub fn run() {
             commands::clipboard::write_clipboard_text,
             commands::config::load_config,
             commands::config::save_config,
+            commands::plugins::load_plugin_states,
+            commands::plugins::save_plugin_states,
+            commands::usage::load_command_usage,
+            commands::usage::record_command_usage,
         ])
         .setup(|app| {
             storage::migrations::run_migrations(app.handle())?;
 
-            let shortcut = Shortcut::new(Some(Modifiers::ALT), Code::Space);
-            let shortcut_registered = match app.global_shortcut().register(shortcut) {
-                Ok(()) => true,
-                Err(error) => {
-                    eprintln!("failed to register global shortcut Alt+Space: {error}");
-                    false
-                }
-            };
+            let config = storage::config_store::load_config(app.handle()).unwrap_or_default();
+            let shortcut_registered =
+                shortcuts::register_initial_launcher_hotkey(app.handle(), &config.hotkey);
 
             if let Some(window) = app.get_webview_window("main") {
                 platform::configure_launcher_window(&window)?;

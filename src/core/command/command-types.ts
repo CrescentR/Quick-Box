@@ -22,3 +22,8 @@ export interface CommandSearchResult {
   score: number
   matchedText: string
 }
+
+export interface CommandUsageInfo {
+  runCount: number
+  lastRunAt?: string
+}

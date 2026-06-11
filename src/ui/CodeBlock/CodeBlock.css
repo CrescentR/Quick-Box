@@ -5,9 +5,9 @@
   border: 1px solid var(--qb-border-subtle);
   border-radius: var(--qb-radius-panel);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent),
-    rgba(7, 8, 12, 0.55);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    linear-gradient(180deg, var(--qb-bg-code-glint), transparent),
+    var(--qb-bg-code);
+  box-shadow: var(--qb-shadow-code);
 }
 
 .qb-code-block__header {
@@ -40,6 +40,14 @@
   color: var(--qb-text-primary);
   font-size: var(--qb-font-size-caption);
   line-height: var(--qb-line-height-caption);
+  transition:
+    border-color var(--qb-motion-fast) var(--qb-ease-out),
+    background-color var(--qb-motion-fast) var(--qb-ease-out);
+}
+
+.qb-code-block__copy:hover {
+  border-color: var(--qb-border-strong);
+  background: var(--qb-bg-focus);
 }
 
 .qb-code-block__body {

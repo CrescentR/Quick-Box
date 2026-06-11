@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react'
-import { writeClipboardText } from '../../api/clipboard-api'
+import { useClipboardToast } from '../../hooks/useClipboardToast'
 import { Detail, Tag } from '../../ui'
 import { unixSeconds } from '../../utils/time'
 
 export default function TimestampToolView() {
   const [timestamp, setTimestamp] = useState(String(unixSeconds()))
+  const { copyText, clipboardToast } = useClipboardToast()
 
   const dateText = useMemo(() => {
     const value = Number(timestamp)
@@ -36,6 +37,8 @@ export default function TimestampToolView() {
         <label className="qb-tool-field">
           <span className="qb-tool-label">时间戳</span>
           <input
+            id="timestamp-tool-input"
+            name="timestamp-tool-input"
             className="qb-tool-input qb-mono"
             value={timestamp}
             onChange={(event) => setTimestamp(event.target.value)}
@@ -44,7 +47,13 @@ export default function TimestampToolView() {
 
         <label className="qb-tool-field">
           <span className="qb-tool-label">ISO 时间</span>
-          <input className="qb-tool-input qb-mono" readOnly value={dateText} />
+          <input
+            id="timestamp-tool-iso-output"
+            name="timestamp-tool-iso-output"
+            className="qb-tool-input qb-mono"
+            readOnly
+            value={dateText}
+          />
         </label>
       </div>
 
@@ -59,7 +68,7 @@ export default function TimestampToolView() {
         <button className="qb-tool-button" type="button" onClick={() => setTimestamp(String(Date.now()))}>
           当前毫秒时间戳
         </button>
-        <button className="qb-tool-button" type="button" onClick={() => void writeClipboardText(dateText)}>
+        <button className="qb-tool-button" type="button" onClick={() => void copyText(dateText, 'ISO timestamp')}>
           复制 ISO 时间
         </button>
       </div>
@@ -73,6 +82,7 @@ export default function TimestampToolView() {
           { label: '输出', value: 'UTC ISO-8601 字符串' },
         ]}
       />
+      {clipboardToast}
     </section>
   )
 }

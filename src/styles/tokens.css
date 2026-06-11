@@ -16,6 +16,9 @@
   --qb-font-weight-semibold: 600;
 
   --qb-bg-app: #0d0f14;
+  --qb-bg-app-top: #11131a;
+  --qb-bg-app-bottom: #090b10;
+  --qb-bg-app-glow: rgba(124, 92, 255, 0.14);
   --qb-bg-window: rgba(24, 24, 30, 0.94);
   --qb-bg-window-solid: #18181e;
   --qb-bg-surface: rgba(255, 255, 255, 0.04);
@@ -24,6 +27,8 @@
   --qb-bg-focus: rgba(255, 255, 255, 0.07);
   --qb-bg-overlay: rgba(0, 0, 0, 0.4);
   --qb-bg-input: rgba(255, 255, 255, 0.05);
+  --qb-bg-code: rgba(7, 8, 12, 0.55);
+  --qb-bg-code-glint: rgba(255, 255, 255, 0.03);
   --qb-bg-selection: rgba(124, 92, 255, 0.32);
   --qb-bg-scrollbar: rgba(255, 255, 255, 0.14);
   --qb-bg-scrollbar-hover: rgba(255, 255, 255, 0.22);
@@ -57,6 +62,7 @@
 
   --qb-shadow-window: 0 24px 80px rgba(0, 0, 0, 0.45);
   --qb-shadow-panel: 0 18px 60px rgba(0, 0, 0, 0.4);
+  --qb-shadow-code: inset 0 1px 0 rgba(255, 255, 255, 0.03);
   --qb-shadow-focus: 0 0 0 1px var(--qb-border-focus), 0 0 0 4px rgba(124, 92, 255, 0.16);
 
   --qb-space-0: 0;
@@ -77,8 +83,8 @@
 
   --qb-window-width-launcher: 760px;
   --qb-window-height-launcher: 480px;
-  --qb-window-width-split: 960px;
-  --qb-window-height-split: 620px;
+  --qb-window-width-split: 1080px;
+  --qb-window-height-split: 720px;
   --qb-panel-width-list: 360px;
   --qb-panel-width-detail: 600px;
   --qb-search-height: 64px;
@@ -115,6 +121,9 @@
   color-scheme: light;
 
   --qb-bg-app: #eef1f7;
+  --qb-bg-app-top: #f8f9fd;
+  --qb-bg-app-bottom: #e5e9f2;
+  --qb-bg-app-glow: rgba(124, 92, 255, 0.1);
   --qb-bg-window: rgba(250, 250, 252, 0.94);
   --qb-bg-window-solid: #fafafc;
   --qb-bg-surface: rgba(17, 24, 39, 0.04);
@@ -123,6 +132,8 @@
   --qb-bg-focus: rgba(124, 92, 255, 0.12);
   --qb-bg-overlay: rgba(15, 23, 42, 0.16);
   --qb-bg-input: rgba(17, 24, 39, 0.04);
+  --qb-bg-code: rgba(255, 255, 255, 0.74);
+  --qb-bg-code-glint: rgba(255, 255, 255, 0.58);
   --qb-bg-selection: rgba(124, 92, 255, 0.18);
   --qb-bg-scrollbar: rgba(17, 24, 39, 0.14);
   --qb-bg-scrollbar-hover: rgba(17, 24, 39, 0.24);
@@ -141,5 +152,8 @@
 
   --qb-shadow-window: 0 22px 72px rgba(15, 23, 42, 0.14);
   --qb-shadow-panel: 0 16px 48px rgba(15, 23, 42, 0.12);
+  --qb-shadow-code:
+    inset 0 1px 0 rgba(255, 255, 255, 0.78),
+    0 10px 28px rgba(15, 23, 42, 0.06);
   --qb-shadow-focus: 0 0 0 1px var(--qb-border-focus), 0 0 0 4px rgba(124, 92, 255, 0.12);
 }

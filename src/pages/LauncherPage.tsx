@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
 import {
   AppWindow,
   ArrowRight,
+  ChevronDown,
+  ChevronRight,
   Command,
   LayoutPanelTop,
   PackageSearch,
@@ -10,15 +12,20 @@ import {
   Settings2,
   ShieldCheck,
   Sparkles,
+  Star,
+  StarOff,
+  X,
 } from 'lucide-react'
 import type { AppPage } from './page-types'
+import { loadCommandUsage, recordCommandUsage } from '../api/command-usage-api'
 import { hideLauncherWindow } from '../api/window-api'
 import { commandRegistry } from '../core/command/command-registry'
 import { runCommand } from '../core/command/command-runner'
 import { searchCommands } from '../core/command/command-search'
-import type { CommandSearchResult, CommandSource } from '../core/command/command-types'
+import type { Command as QuickBoxCommand, CommandSearchResult, CommandSource } from '../core/command/command-types'
 import { pluginRegistry } from '../core/plugin/plugin-registry'
 import { useLauncherStore } from '../stores/launcher-store'
+import { usePluginStore } from '../stores/plugin-store'
 import {
   ActionPanel,
   type ActionPanelItem,
@@ -100,12 +107,16 @@ function getExecuteModeLabel(mode: CommandSearchResult['command']['executeMode']
 function ResultDetail({
   result,
   totalCommands,
+  isQuick,
   onRun,
+  onToggleQuick,
   onOpenActions,
 }: {
   result?: CommandSearchResult
   totalCommands: number
+  isQuick: boolean
   onRun: () => void
+  onToggleQuick: () => void
   onOpenActions: () => void
 }) {
   if (!result) {
@@ -152,10 +163,22 @@ function ResultDetail({
         </div>
 
         <div className="qb-launcher-detail__actionbar">
-          <button className="qb-launcher-detail__action" type="button" onClick={onRun}>
-            <KeyboardShortcut keys="Enter" />
-            <span>执行命令</span>
-          </button>
+          <div className="qb-launcher-detail__action-group">
+            <button className="qb-launcher-detail__action" type="button" onClick={onRun}>
+              <KeyboardShortcut keys="Enter" />
+              <span>执行命令</span>
+            </button>
+            <button
+              className="qb-launcher-detail__action qb-launcher-detail__action--secondary"
+              type="button"
+              onClick={onToggleQuick}
+              aria-pressed={isQuick}
+              title={isQuick ? '从快捷工具移除' : '加入快捷工具'}
+            >
+              <Icon icon={isQuick ? StarOff : Star} size={15} tone={isQuick ? 'warning' : 'muted'} />
+              <span>{isQuick ? '移出快捷' : '设为快捷'}</span>
+            </button>
+          </div>
           <div className="qb-launcher-detail__action-copy">
             <KeyboardShortcut keys={['Ctrl', 'K']} />
             <span className="qb-launcher-footer__label">打开动作面板</span>
@@ -230,6 +253,29 @@ interface LauncherToastState {
   description: string
 }
 
+const COMMAND_LIST_COLLAPSED_STORAGE_KEY = 'quickbox.launcher.commandListCollapsed'
+const QUICK_COMMAND_IDS_STORAGE_KEY = 'quickbox.launcher.quickCommandIds'
+
+function readBooleanPreference(key: string, fallback: boolean) {
+  if (typeof window === 'undefined') return fallback
+  return window.localStorage.getItem(key) === 'true'
+}
+
+function readStringArrayPreference(key: string) {
+  if (typeof window === 'undefined') return []
+  try {
+    const value = JSON.parse(window.localStorage.getItem(key) ?? '[]') as unknown
+    return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : []
+  } catch {
+    return []
+  }
+}
+
+function writePreference(key: string, value: unknown) {
+  if (typeof window === 'undefined') return
+  window.localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value))
+}
+
 export default function LauncherPage({ currentPage, onPageChange }: PageNavigationProps) {
   const {
     query,
@@ -244,9 +290,39 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
   const [isActionPanelOpen, setIsActionPanelOpen] = useState(false)
   const [actionQuery, setActionQuery] = useState('')
   const [toast, setToast] = useState<LauncherToastState | null>(null)
+  const [isCommandListCollapsed, setIsCommandListCollapsed] = useState(() =>
+    readBooleanPreference(COMMAND_LIST_COLLAPSED_STORAGE_KEY, false),
+  )
+  const [quickCommandIds, setQuickCommandIds] = useState<string[]>(() =>
+    readStringArrayPreference(QUICK_COMMAND_IDS_STORAGE_KEY),
+  )
+  const [usageByCommandId, setUsageByCommandId] = useState<Record<string, { runCount: number; lastRunAt?: string }>>({})
+  const commandListRef = useRef<HTMLDivElement>(null)
+  const selectedCommandIdRef = useRef<string>()
+  const { enabledPluginIds, status: pluginStatus } = usePluginStore()
 
-  const allCommands = useMemo(() => commandRegistry.list(), [])
-  const results = useMemo(() => searchCommands(allCommands, query), [allCommands, query])
+  const allCommands = useMemo(() => {
+    const commands = commandRegistry.list()
+
+    if (pluginStatus === 'idle' || pluginStatus === 'loading') {
+      return commands
+    }
+
+    const enabledPlugins = new Set(enabledPluginIds)
+    return commands.filter((command) => enabledPlugins.has(command.pluginId))
+  }, [enabledPluginIds, pluginStatus])
+  const commandById = useMemo(
+    () => new Map(allCommands.map((command) => [command.id, command])),
+    [allCommands],
+  )
+  const quickCommands = useMemo(
+    () =>
+      quickCommandIds
+        .map((commandId) => commandById.get(commandId))
+        .filter((command): command is QuickBoxCommand => Boolean(command)),
+    [commandById, quickCommandIds],
+  )
+  const results = useMemo(() => searchCommands(allCommands, query, usageByCommandId), [allCommands, query, usageByCommandId])
   const groupedResults = useMemo(() => groupResults(results), [results])
 
   const activeView = activeViewId
@@ -257,12 +333,216 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
     : undefined
 
   const selectedResult = results[selectedIndex]
+  const selectedIsQuick = selectedResult ? quickCommandIds.includes(selectedResult.command.id) : false
+
+  const launchCommand = useCallback(
+    async (command: QuickBoxCommand) => {
+      await runCommand(command, {
+        openView: async (viewId, params) => openView(viewId, params),
+        closeView,
+      })
+      try {
+        const usage = await recordCommandUsage(command.id)
+        setUsageByCommandId((current) => ({
+          ...current,
+          [usage.commandId]: {
+            runCount: usage.runCount,
+            lastRunAt: usage.lastRunAt,
+          },
+        }))
+      } catch {
+        // 使用记录不应阻断命令本身执行。
+      }
+    },
+    [closeView, openView],
+  )
+
+  const runResult = useCallback(
+    async (result: CommandSearchResult) => {
+      await launchCommand(result.command)
+    },
+    [launchCommand],
+  )
+
+  const toggleQuickCommand = useCallback(
+    (command: QuickBoxCommand) => {
+      const isQuickCommand = quickCommandIds.includes(command.id)
+      setQuickCommandIds(
+        isQuickCommand
+          ? quickCommandIds.filter((commandId) => commandId !== command.id)
+          : [command.id, ...quickCommandIds.filter((commandId) => commandId !== command.id)].slice(0, 12),
+      )
+      setToast({
+        tone: isQuickCommand ? 'default' : 'success',
+        title: isQuickCommand ? '已移出快捷工具' : '已加入快捷工具',
+        description: command.title,
+      })
+    },
+    [quickCommandIds],
+  )
+
+  const launchQuickCommand = useCallback(
+    async (command: QuickBoxCommand) => {
+      await launchCommand(command)
+      setToast({
+        tone: 'success',
+        title: command.executeMode === 'view' ? '已打开快捷工具' : '快捷命令已执行',
+        description: command.title,
+      })
+    },
+    [launchCommand],
+  )
+
+  const selectResult = useCallback(
+    async (index: number) => {
+      const nextIndex = Math.min(Math.max(index, 0), Math.max(results.length - 1, 0))
+      const nextResult = results[nextIndex]
+
+      selectedCommandIdRef.current = nextResult?.command.id
+      setSelectedIndex(nextIndex)
+
+      if (!nextResult) {
+        closeView()
+        return
+      }
+
+      if (activeViewId) {
+        await runResult(nextResult)
+      }
+    },
+    [activeViewId, closeView, results, runResult, setSelectedIndex],
+  )
+
+  const handleQueryChange = useCallback(
+    (nextQuery: string) => {
+      selectedCommandIdRef.current = undefined
+      setQuery(nextQuery)
+
+      if (activeViewId) {
+        closeView()
+      }
+    },
+    [activeViewId, closeView, setQuery],
+  )
+
+  const launchSelected = useCallback(async () => {
+    if (!selectedResult) {
+      return
+    }
+
+    selectedCommandIdRef.current = selectedResult.command.id
+    await runResult(selectedResult)
+    setToast({
+      tone: 'success',
+      title: selectedResult.command.executeMode === 'view' ? '已打开工具视图' : '命令已执行',
+      description: selectedResult.command.title,
+    })
+  }, [runResult, selectedResult])
 
   useEffect(() => {
-    if (selectedIndex >= results.length) {
-      setSelectedIndex(Math.max(results.length - 1, 0))
+    let cancelled = false
+
+    async function hydrateUsage() {
+      try {
+        const usage = await loadCommandUsage()
+        if (cancelled) return
+        setUsageByCommandId(
+          Object.fromEntries(
+            usage.map((item) => [
+              item.commandId,
+              {
+                runCount: item.runCount,
+                lastRunAt: item.lastRunAt,
+              },
+            ]),
+          ),
+        )
+      } catch {
+        if (!cancelled) {
+          setUsageByCommandId({})
+        }
+      }
     }
-  }, [results.length, selectedIndex, setSelectedIndex])
+
+    void hydrateUsage()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    const selectedCommandId = selectedCommandIdRef.current
+
+    if (selectedCommandId) {
+      const nextIndex = results.findIndex((result) => result.command.id === selectedCommandId)
+
+      if (nextIndex >= 0) {
+        if (nextIndex !== selectedIndex) {
+          setSelectedIndex(nextIndex)
+        }
+        return
+      }
+
+      selectedCommandIdRef.current = undefined
+    }
+
+    if (selectedIndex >= results.length) {
+      const nextIndex = Math.max(results.length - 1, 0)
+      selectedCommandIdRef.current = results[nextIndex]?.command.id
+      setSelectedIndex(nextIndex)
+    }
+  }, [results, selectedIndex, setSelectedIndex])
+
+  useEffect(() => {
+    if (isCommandListCollapsed) {
+      return
+    }
+
+    const listRoot = commandListRef.current
+    const viewport = listRoot?.querySelector<HTMLElement>('.qb-list__viewport')
+    const selectedItem = listRoot?.querySelector<HTMLElement>('[data-qb-command-selected="true"]')
+
+    if (!viewport || !selectedItem) {
+      return
+    }
+
+    const viewportRect = viewport.getBoundingClientRect()
+    const itemRect = selectedItem.getBoundingClientRect()
+    const edgeBuffer = Math.min(96, Math.max(48, viewport.clientHeight * 0.24))
+    let nextScrollTop = viewport.scrollTop
+
+    if (itemRect.bottom > viewportRect.bottom - edgeBuffer) {
+      nextScrollTop += itemRect.bottom - (viewportRect.bottom - edgeBuffer)
+    } else if (itemRect.top < viewportRect.top + edgeBuffer) {
+      nextScrollTop -= viewportRect.top + edgeBuffer - itemRect.top
+    }
+
+    if (nextScrollTop !== viewport.scrollTop) {
+      viewport.scrollTo({
+        top: nextScrollTop,
+        behavior: 'smooth',
+      })
+    }
+  }, [isCommandListCollapsed, results, selectedIndex])
+
+  useEffect(() => {
+    writePreference(COMMAND_LIST_COLLAPSED_STORAGE_KEY, String(isCommandListCollapsed))
+  }, [isCommandListCollapsed])
+
+  useEffect(() => {
+    writePreference(QUICK_COMMAND_IDS_STORAGE_KEY, quickCommandIds)
+  }, [quickCommandIds])
+
+  useEffect(() => {
+    if (!activeViewId || pluginStatus === 'idle' || pluginStatus === 'loading') {
+      return
+    }
+
+    const plugin = pluginRegistry.getPluginByView(activeViewId)
+    if (plugin && !enabledPluginIds.includes(plugin.id)) {
+      closeView()
+    }
+  }, [activeViewId, closeView, enabledPluginIds, pluginStatus])
 
   useEffect(() => {
     if (!toast) {
@@ -278,13 +558,28 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
 
   useEffect(() => {
     const onKeyDown = async (event: KeyboardEvent) => {
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+      const isCommandModifier = event.ctrlKey || event.metaKey
+      const target = event.target instanceof HTMLElement ? event.target : null
+      const isLauncherSearch = Boolean(target?.closest('[data-qb-launcher-search="true"]'))
+      const isEditingToolField = Boolean(target?.closest('input, textarea, select, [contenteditable="true"]')) && !isLauncherSearch
+
+      if (event.altKey && event.code === 'Space') {
         event.preventDefault()
+        event.stopPropagation()
+        return
+      }
+
+      if (isCommandModifier && event.key.toLowerCase() === 'k') {
+        event.preventDefault()
+        event.stopPropagation()
         setIsActionPanelOpen(true)
         return
       }
 
       if (event.key === 'Escape') {
+        event.preventDefault()
+        event.stopPropagation()
+
         if (isActionPanelOpen) {
           setIsActionPanelOpen(false)
           return
@@ -296,32 +591,44 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
         }
 
         await hideLauncherWindow()
+        return
+      }
+
+      if (isActionPanelOpen || isEditingToolField) {
+        return
+      }
+
+      if (event.key === 'ArrowDown') {
+        event.preventDefault()
+        event.stopPropagation()
+        await selectResult(selectedIndex + 1)
+        return
+      }
+
+      if (event.key === 'ArrowUp') {
+        event.preventDefault()
+        event.stopPropagation()
+        await selectResult(selectedIndex - 1)
+        return
+      }
+
+      if (event.key === 'Enter') {
+        event.preventDefault()
+        event.stopPropagation()
+        await launchSelected()
       }
     }
 
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [activeViewId, closeView, isActionPanelOpen])
-
-  const runResult = async (result: CommandSearchResult) => {
-    await runCommand(result.command, {
-      openView: async (viewId, params) => openView(viewId, params),
-      closeView,
-    })
-  }
-
-  const launchSelected = async () => {
-    if (!selectedResult) {
-      return
-    }
-
-    await runResult(selectedResult)
-    setToast({
-      tone: 'success',
-      title: selectedResult.command.executeMode === 'view' ? '已打开工具视图' : '命令已执行',
-      description: selectedResult.command.title,
-    })
-  }
+    window.addEventListener('keydown', onKeyDown, { capture: true })
+    return () => window.removeEventListener('keydown', onKeyDown, { capture: true })
+  }, [
+    activeViewId,
+    closeView,
+    isActionPanelOpen,
+    launchSelected,
+    selectResult,
+    selectedIndex,
+  ])
 
   const navigateToPage = (page: AppPage) => {
     onPageChange(page)
@@ -355,6 +662,25 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
       },
     },
     {
+      id: 'toggle-quick-selected',
+      title: selectedResult
+        ? selectedIsQuick
+          ? `移出快捷工具：${selectedResult.command.title}`
+          : `加入快捷工具：${selectedResult.command.title}`
+        : '加入快捷工具',
+      description: selectedResult ? '把当前命令放到左侧快捷工具区。' : '请先选择一个命令',
+      icon: <Icon icon={selectedIsQuick ? StarOff : Star} size={16} tone={selectedIsQuick ? 'warning' : 'muted'} />,
+      shortcut: 'Star',
+      disabled: !selectedResult,
+      keywords: ['quick', 'favorite', 'pin', '快捷', '收藏', '常用'],
+      onAction: () => {
+        if (selectedResult) {
+          toggleQuickCommand(selectedResult.command)
+        }
+        setIsActionPanelOpen(false)
+      },
+    },
+    {
       id: 'clear-search',
       title: '清空搜索',
       description: '重置当前搜索词，并回到完整命令库。',
@@ -362,6 +688,7 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
       shortcut: 'Esc',
       keywords: ['clear', 'reset', 'search', '清空', '重置', '搜索'],
       onAction: () => {
+        selectedCommandIdRef.current = undefined
         setQuery('')
         setSelectedIndex(0)
         setIsActionPanelOpen(false)
@@ -426,13 +753,13 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
   const handleInputKeyDown = async (event: ReactKeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'ArrowDown') {
       event.preventDefault()
-      setSelectedIndex(Math.min(selectedIndex + 1, Math.max(results.length - 1, 0)))
+      await selectResult(selectedIndex + 1)
       return
     }
 
     if (event.key === 'ArrowUp') {
       event.preventDefault()
-      setSelectedIndex(Math.max(selectedIndex - 1, 0))
+      await selectResult(selectedIndex - 1)
       return
     }
 
@@ -484,79 +811,156 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
             </div>
 
           <CommandInput
+            id="quickbox-command-search"
+            name="quickbox-command-search"
             autoFocus
             className="qb-launcher-command-input"
             value={query}
-            onChange={setQuery}
+            onChange={handleQueryChange}
             onKeyDown={handleInputKeyDown}
+            data-qb-launcher-search="true"
             placeholder="搜索命令、内置工具或插件动作"
           />
           </div>
 
-          <List
-            className="qb-launcher-list"
-            emptyState={
-              <EmptyState
-                icon={<Icon icon={PackageSearch} size={20} tone="muted" />}
-                title="没有匹配的命令"
-                description="换一个更宽泛的关键词，或稍后启用更多内置工具。"
-              />
-            }
-          >
-            {groupedResults.map((section) => (
-              <List.Section
-                key={section.source}
-                title={`${getSourceLabel(section.source)}命令`}
-              >
-                {section.items.map(({ result, index }) => (
-                  <ListItem
-                    key={result.command.id}
-                    id={result.command.id}
-                    selected={index === selectedIndex}
-                    height={result.command.description ? 'comfortable' : 'compact'}
-                    onClick={() => {
-                      setSelectedIndex(index)
-                    }}
-                    icon={
-                      <Icon
-                        icon={result.command.executeMode === 'view' ? AppWindow : Command}
-                        size={18}
-                        tone={index === selectedIndex ? 'primary' : 'muted'}
-                      />
-                    }
-                    title={
-                      <span className="qb-launcher-list-item__title">
-                        <span className="qb-launcher-list-item__title-text">
-                          {result.command.title}
-                        </span>
+          <section className="qb-launcher-quick">
+            <header className="qb-launcher-section-header">
+              <div className="qb-launcher-section-header__copy">
+                <span className="qb-launcher-search__label">快捷工具</span>
+                <Tag tone={quickCommands.length ? 'success' : 'default'}>{quickCommands.length} 个</Tag>
+              </div>
+            </header>
+            {quickCommands.length ? (
+              <div className="qb-launcher-quick__list qb-scrollbar">
+                {quickCommands.map((command) => (
+                  <div className="qb-launcher-quick__row" key={command.id}>
+                    <button
+                      className="qb-launcher-quick__run"
+                      type="button"
+                      onClick={() => {
+                        void launchQuickCommand(command)
+                      }}
+                      title={`打开 ${command.title}`}
+                    >
+                      <Icon icon={command.executeMode === 'view' ? AppWindow : Command} size={16} tone="primary" />
+                      <span className="qb-launcher-quick__text">
+                        <span className="qb-launcher-quick__title">{command.title}</span>
+                        <span className="qb-launcher-quick__description">{command.description}</span>
                       </span>
-                    }
-                    subtitle={
-                      result.command.description ? (
-                        <span className="qb-launcher-list-item__subtitle">
-                          <span>{result.command.description}</span>
-                        </span>
-                      ) : undefined
-                    }
-                    accessory={
-                      index === selectedIndex ? (
-                        <span className="qb-launcher-list-item__accessory">
-                          <Tag tone="primary">当前</Tag>
-                          <KeyboardShortcut keys="Enter" />
-                        </span>
-                      ) : (
-                        <Tag tone={getSourceTone(result.command.source)}>
-                          <span className="qb-launcher-list-item__source">
-                            {getSourceLabel(result.command.source)}
-                          </span>
-                        </Tag>
-                      )
-                    }
-                  />
+                    </button>
+                    <button
+                      className="qb-launcher-quick__remove"
+                      type="button"
+                      onClick={() => toggleQuickCommand(command)}
+                      title="移出快捷工具"
+                      aria-label={`移出快捷工具：${command.title}`}
+                    >
+                      <Icon icon={X} size={14} tone="muted" />
+                    </button>
+                  </div>
                 ))}
-              </List.Section>
-            ))}
-          </List>
+              </div>
+            ) : (
+              <div className="qb-launcher-quick__empty">
+                选中命令后点击星标，把常用工具放在这里。
+              </div>
+            )}
+          </section>
+
+          <section className={`qb-launcher-command-panel${isCommandListCollapsed ? ' qb-launcher-command-panel--collapsed' : ''}`}>
+            <header className="qb-launcher-command-panel__header">
+              <div className="qb-launcher-section-header__copy">
+                <span className="qb-launcher-search__label">命令列表</span>
+                <Tag tone="default">{results.length} 条结果</Tag>
+              </div>
+              <button
+                className="qb-launcher-command-panel__toggle"
+                type="button"
+                onClick={() => setIsCommandListCollapsed((current) => !current)}
+                aria-expanded={!isCommandListCollapsed}
+                title={isCommandListCollapsed ? '展开命令列表' : '收起命令列表'}
+              >
+                <Icon icon={isCommandListCollapsed ? ChevronRight : ChevronDown} size={16} tone="muted" />
+                <span>{isCommandListCollapsed ? '展开' : '收起'}</span>
+              </button>
+            </header>
+
+            {isCommandListCollapsed ? (
+              <div className="qb-launcher-command-panel__collapsed">
+                命令已收起，仍可搜索、按 Enter 执行，或直接打开上方快捷工具。
+              </div>
+            ) : (
+              <List
+                className="qb-launcher-list"
+                ref={commandListRef}
+                emptyState={
+                  <EmptyState
+                    icon={<Icon icon={PackageSearch} size={20} tone="muted" />}
+                    title="没有匹配的命令"
+                    description="换一个更宽泛的关键词，或稍后启用更多内置工具。"
+                  />
+                }
+              >
+                {groupedResults.map((section) => (
+                  <List.Section
+                    key={section.source}
+                    title={`${getSourceLabel(section.source)}命令`}
+                  >
+                    {section.items.map(({ result, index }) => (
+                      <ListItem
+                        key={result.command.id}
+                        id={result.command.id}
+                        data-qb-command-selected={index === selectedIndex ? 'true' : undefined}
+                        selected={index === selectedIndex}
+                        height={result.command.description ? 'comfortable' : 'compact'}
+                        onClick={() => {
+                          void selectResult(index)
+                        }}
+                        icon={
+                          <Icon
+                            icon={result.command.executeMode === 'view' ? AppWindow : Command}
+                            size={18}
+                            tone={index === selectedIndex ? 'primary' : 'muted'}
+                          />
+                        }
+                        title={
+                          <span className="qb-launcher-list-item__title">
+                            <span className="qb-launcher-list-item__title-text">
+                              {result.command.title}
+                            </span>
+                            {quickCommandIds.includes(result.command.id) ? (
+                              <Icon icon={Star} size={13} tone="warning" />
+                            ) : null}
+                          </span>
+                        }
+                        subtitle={
+                          result.command.description ? (
+                            <span className="qb-launcher-list-item__subtitle">
+                              <span>{result.command.description}</span>
+                            </span>
+                          ) : undefined
+                        }
+                        accessory={
+                          index === selectedIndex ? (
+                            <span className="qb-launcher-list-item__accessory">
+                              <Tag tone="primary">当前</Tag>
+                              <KeyboardShortcut keys="Enter" />
+                            </span>
+                          ) : (
+                            <Tag tone={getSourceTone(result.command.source)}>
+                              <span className="qb-launcher-list-item__source">
+                                {getSourceLabel(result.command.source)}
+                              </span>
+                            </Tag>
+                          )
+                        }
+                      />
+                    ))}
+                  </List.Section>
+                ))}
+              </List>
+            )}
+          </section>
         </aside>
 
         <section className="qb-launcher-page__detail qb-scrollbar">
@@ -566,8 +970,14 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
             <ResultDetail
               result={selectedResult}
               totalCommands={allCommands.length}
+              isQuick={selectedIsQuick}
               onRun={() => {
                 void launchSelected()
+              }}
+              onToggleQuick={() => {
+                if (selectedResult) {
+                  toggleQuickCommand(selectedResult.command)
+                }
               }}
               onOpenActions={() => setIsActionPanelOpen(true)}
             />

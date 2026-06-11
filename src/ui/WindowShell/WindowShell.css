@@ -33,6 +33,7 @@
 .qb-window-shell__body {
   position: relative;
   z-index: 1;
+  display: grid;
   min-height: 0;
   overflow: hidden;
 }

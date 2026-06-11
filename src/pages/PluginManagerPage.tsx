@@ -21,13 +21,24 @@ function formatPermissions(permissions: string[]) {
 
 export default function PluginManagerPage({ currentPage, onPageChange }: PageNavigationProps) {
   const plugins = pluginRegistry.listPlugins()
-  const { enabledPluginIds, setEnabledPluginIds } = usePluginStore()
+  const { enabledPluginIds, status, error, setPluginEnabled } = usePluginStore()
 
-  const resolvedEnabledIds = enabledPluginIds.length
-    ? enabledPluginIds
-    : plugins.map((plugin) => plugin.id)
+  const resolvedEnabledIds =
+    status === 'idle' || status === 'loading'
+      ? plugins.map((plugin) => plugin.id)
+      : enabledPluginIds
 
   const isEnabled = (pluginId: string) => resolvedEnabledIds.includes(pluginId)
+  const statusLabel =
+    status === 'loading'
+      ? '读取中'
+      : status === 'saving'
+        ? '保存中'
+        : status === 'error'
+          ? '保存失败'
+          : '已同步'
+  const statusTone =
+    status === 'error' ? 'danger' : status === 'saving' || status === 'loading' ? 'warning' : 'success'
 
   return (
     <WindowShell
@@ -46,6 +57,7 @@ export default function PluginManagerPage({ currentPage, onPageChange }: PageNav
           <div className="qb-page-footer__left">
             <span className="qb-page-footer__label">已安装</span>
             <Tag tone="primary">{plugins.length} 个官方工具</Tag>
+            <Tag tone={statusTone}>{statusLabel}</Tag>
           </div>
           <div className="qb-page-footer__right">
             <KeyboardShortcut keys={['Up', 'Down']} />
@@ -122,18 +134,18 @@ export default function PluginManagerPage({ currentPage, onPageChange }: PageNav
                       <div className="qb-page-toggle__copy">
                         <div className="qb-page-toggle__title">启用插件</div>
                         <div className="qb-page-toggle__description">
-                          当前由内存中的插件状态驱动，后续会接入持久化配置。
+                          状态会保存到本地数据库，并立即影响启动器搜索结果。
                         </div>
                       </div>
                       <input
+                        id={`plugin-enabled-${plugin.id}`}
+                        name={`plugin-enabled-${plugin.id}`}
                         className="qb-page-checkbox"
                         type="checkbox"
+                        aria-label={`启用 ${plugin.name}`}
                         checked={isEnabled(plugin.id)}
                         onChange={(event) => {
-                          const next = event.target.checked
-                            ? Array.from(new Set([...resolvedEnabledIds, plugin.id]))
-                            : resolvedEnabledIds.filter((id) => id !== plugin.id)
-                          setEnabledPluginIds(next)
+                          void setPluginEnabled(plugin, event.target.checked, plugins)
                         }}
                       />
                     </div>
@@ -144,11 +156,11 @@ export default function PluginManagerPage({ currentPage, onPageChange }: PageNav
 
             <Detail
               title="权限摘要"
-              markdown="- 当前插件全部来自官方内置集合。\n- 权限仍由插件 metadata 显式声明，方便后续治理。\n- 这个页面会继续扩展为更完整的插件能力管理界面。"
+              markdown="- 当前插件全部来自官方内置集合。\n- 权限仍由插件 metadata 显式声明，方便后续治理。\n- 启用状态已经接入本地持久化，并会影响启动器命令搜索。"
               metadata={plugins.slice(0, 4).map((plugin) => ({
                 label: plugin.name,
                 value: formatPermissions(plugin.permissions),
-              }))}
+              })).concat(error ? [{ label: '同步错误', value: error }] : [])}
             />
           </div>
         </div>

@@ -40,3 +40,9 @@ impl From<rusqlite::Error> for CommandError {
         Self::with_details("SQLITE_ERROR", "SQLite operation failed", error.to_string())
     }
 }
+
+impl From<std::io::Error> for CommandError {
+    fn from(error: std::io::Error) -> Self {
+        Self::with_details("IO_ERROR", "Filesystem operation failed", error.to_string())
+    }
+}

@@ -24,8 +24,13 @@ html {
 body {
   overflow: hidden;
   background:
-    radial-gradient(circle at top, rgba(124, 92, 255, 0.14), transparent 36%),
-    linear-gradient(180deg, #11131a 0%, var(--qb-bg-app) 48%, #090b10 100%);
+    radial-gradient(circle at top, var(--qb-bg-app-glow), transparent 36%),
+    linear-gradient(
+      180deg,
+      var(--qb-bg-app-top) 0%,
+      var(--qb-bg-app) 48%,
+      var(--qb-bg-app-bottom) 100%
+    );
   color: var(--qb-text-primary);
   font-family: var(--qb-font-sans);
   user-select: none;

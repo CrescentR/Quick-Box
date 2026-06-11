@@ -1,5 +1,6 @@
 import { MonitorCog, Palette } from 'lucide-react'
 import type { QuickBoxConfig } from '../core/config/config-types'
+import { useResolvedTheme } from '../hooks/useResolvedTheme'
 import { useConfigStore } from '../stores/config-store'
 import { Detail, Icon, KeyboardShortcut, Tag, WindowShell } from '../ui'
 import PageHeader from './PageHeader'
@@ -10,9 +11,44 @@ function getThemeLabel(theme: QuickBoxConfig['theme']) {
   return theme === 'light' ? '浅色' : theme === 'system' ? '跟随系统' : '暗色'
 }
 
+const themeOptions: Array<{
+  value: QuickBoxConfig['theme']
+  label: string
+  description: string
+}> = [
+  { value: 'dark', label: '暗色', description: '默认验收模式' },
+  { value: 'light', label: '浅色', description: '明亮桌面环境' },
+  { value: 'system', label: '跟随系统', description: '自动同步系统' },
+]
+
+const hotkeyOptions: Array<{
+  value: string
+  label: string
+  description: string
+}> = [
+  { value: 'Ctrl+Alt+Space', label: '推荐', description: '避开输入法与系统搜索' },
+  { value: 'Ctrl+Alt+K', label: '键盘流', description: '适合高频呼出' },
+  { value: 'Ctrl+Alt+Q', label: 'QuickBox', description: '记忆成本低' },
+  { value: 'Ctrl+Shift+Space', label: '备用', description: '保留空格手感' },
+  { value: 'Alt+Space', label: '经典', description: '沿用当前默认值' },
+]
+
 export default function SettingsPage({ currentPage, onPageChange }: PageNavigationProps) {
-  const { config, setConfig } = useConfigStore()
+  const { config, status, error, setConfig } = useConfigStore()
+  const resolvedTheme = useResolvedTheme(config.theme)
   const themeLabel = getThemeLabel(config.theme)
+  const resolvedThemeLabel = getThemeLabel(resolvedTheme)
+  const isPresetHotkey = hotkeyOptions.some((option) => option.value === config.hotkey)
+  const statusLabel =
+    status === 'loading'
+      ? '读取中'
+      : status === 'saving'
+        ? '保存中'
+        : status === 'error'
+          ? '保存失败'
+          : '已保存'
+  const statusTone =
+    status === 'error' ? 'danger' : status === 'loading' || status === 'saving' ? 'warning' : 'success'
 
   return (
     <WindowShell
@@ -33,7 +69,11 @@ export default function SettingsPage({ currentPage, onPageChange }: PageNavigati
             <KeyboardShortcut keys={['Ctrl', ',']} />
           </div>
           <div className="qb-page-footer__right">
-            <span className="qb-page-footer__label">主题：{themeLabel}</span>
+            <Tag tone={statusTone}>{statusLabel}</Tag>
+            <span className="qb-page-footer__label">
+              主题：{themeLabel}
+              {config.theme === 'system' ? `（当前${resolvedThemeLabel}）` : ''}
+            </span>
           </div>
         </div>
       }
@@ -44,7 +84,10 @@ export default function SettingsPage({ currentPage, onPageChange }: PageNavigati
             <div className="qb-page-grid qb-page-grid--three">
               <div className="qb-page-stat">
                 <div className="qb-page-stat__label">主题</div>
-                <div className="qb-page-stat__value">{themeLabel}</div>
+                <div className="qb-page-stat__value">
+                  {themeLabel}
+                  {config.theme === 'system' ? ` / ${resolvedThemeLabel}` : ''}
+                </div>
               </div>
               <div className="qb-page-stat">
                 <div className="qb-page-stat__label">热键</div>
@@ -68,26 +111,36 @@ export default function SettingsPage({ currentPage, onPageChange }: PageNavigati
                   <Icon icon={Palette} size={18} tone="primary" />
                 </div>
 
-                <label className="qb-page-field">
+                <div className="qb-page-field">
                   <span className="qb-page-label">主题模式</span>
-                  <select
-                    className="qb-page-select"
-                    value={config.theme}
-                    onChange={(event) =>
-                      setConfig({
-                        ...config,
-                        theme: event.target.value as typeof config.theme,
-                      })
-                    }
-                  >
-                    <option value="dark">暗色</option>
-                    <option value="light">浅色</option>
-                    <option value="system">跟随系统</option>
-                  </select>
-                </label>
+                  <div className="qb-page-segmented" role="radiogroup" aria-label="主题模式">
+                    {themeOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        className="qb-page-segmented__item"
+                        type="button"
+                        role="radio"
+                        aria-checked={config.theme === option.value}
+                        data-active={config.theme === option.value}
+                        onClick={() =>
+                          void setConfig({
+                            ...config,
+                            theme: option.value,
+                          })
+                        }
+                      >
+                        <span className="qb-page-segmented__label">{option.label}</span>
+                        <span className="qb-page-segmented__description">
+                          {option.description}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
                 <div className="qb-page-card__meta">
                   <Tag tone="primary">暗色优先</Tag>
+                  <Tag tone="default">当前{resolvedThemeLabel}</Tag>
                   <Tag tone="default">Mica-like</Tag>
                 </div>
               </section>
@@ -103,13 +156,46 @@ export default function SettingsPage({ currentPage, onPageChange }: PageNavigati
                   <Icon icon={MonitorCog} size={18} tone="primary" />
                 </div>
 
-                <label className="qb-page-field">
+                <div className="qb-page-field">
                   <span className="qb-page-label">启动器热键</span>
+                  <div className="qb-page-hotkey-options" role="radiogroup" aria-label="启动器热键">
+                    {hotkeyOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        className="qb-page-hotkey-option qb-focus-ring"
+                        type="button"
+                        role="radio"
+                        aria-checked={config.hotkey === option.value}
+                        data-active={config.hotkey === option.value}
+                        onClick={() =>
+                          void setConfig({
+                            ...config,
+                            hotkey: option.value,
+                          })
+                        }
+                      >
+                        <span className="qb-page-hotkey-option__top">
+                          <span className="qb-page-hotkey-option__label">{option.label}</span>
+                          <KeyboardShortcut keys={option.value} />
+                        </span>
+                        <span className="qb-page-hotkey-option__description">
+                          {option.description}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <label className="qb-page-field">
+                  <span className="qb-page-label">自定义热键</span>
                   <input
+                    id="quickbox-hotkey"
+                    name="quickbox-hotkey"
                     className="qb-page-input"
                     value={config.hotkey}
+                    data-custom={!isPresetHotkey}
                     onChange={(event) =>
-                      setConfig({
+                      void setConfig({
                         ...config,
                         hotkey: event.target.value,
                       })
@@ -125,11 +211,14 @@ export default function SettingsPage({ currentPage, onPageChange }: PageNavigati
                     </div>
                   </div>
                   <input
+                    id="quickbox-enable-tray"
+                    name="quickbox-enable-tray"
                     className="qb-page-checkbox"
                     type="checkbox"
+                    aria-label="显示托盘入口"
                     checked={config.enableTray}
                     onChange={(event) =>
-                      setConfig({
+                      void setConfig({
                         ...config,
                         enableTray: event.target.checked,
                       })
@@ -143,9 +232,10 @@ export default function SettingsPage({ currentPage, onPageChange }: PageNavigati
               title="设置路线"
               markdown="- 主题、热键和托盘选项已经与启动器保持同一套视觉语言。\n- 后续扩展配置读写流程后，这里可以直接接入持久化。\n- 键盘提示会持续可见，让设置页仍然像 QuickBox 的一部分，而不是独立后台。"
               metadata={[
-                { label: '状态', value: '交互原型' },
-                { label: '状态来源', value: 'Zustand 配置 Store' },
-                { label: '下一步', value: '持久化到桌面配置' },
+                { label: '状态', value: statusLabel },
+                { label: '状态来源', value: 'Zustand + Rust SQLite' },
+                { label: '热键模式', value: isPresetHotkey ? '预设组合' : '自定义组合' },
+                ...(error ? [{ label: '保存错误', value: error }] : []),
               ]}
             />
           </div>

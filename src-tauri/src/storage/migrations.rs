@@ -28,6 +28,12 @@ pub fn run_migrations(app: &tauri::AppHandle) -> Result<(), Box<dyn std::error::
                 metadata TEXT NOT NULL DEFAULT '{}',
                 updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
+
+            CREATE TABLE IF NOT EXISTS command_usage (
+                command_id TEXT PRIMARY KEY,
+                run_count INTEGER NOT NULL DEFAULT 0,
+                last_run_at TEXT
+            );
             "#,
         )
         ?;

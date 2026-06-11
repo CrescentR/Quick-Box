@@ -24,6 +24,9 @@ export default function PageHeader({
   return (
     <div className="qb-page-title" data-tauri-drag-region>
       <div className="qb-page-title__brand">
+        <div className="qb-page-title__controls">
+          <WindowControls />
+        </div>
         <div className="qb-page-title__badge">
           <Icon icon={Sparkles} size={16} />
         </div>
@@ -49,7 +52,6 @@ export default function PageHeader({
         </div>
         <Tag tone="primary">QuickBox</Tag>
         <KeyboardShortcut keys={currentPage === 'settings' ? ['Ctrl', ','] : ['Alt', 'Space']} />
-        <WindowControls />
       </div>
     </div>
   )

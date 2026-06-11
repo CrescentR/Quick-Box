@@ -34,6 +34,12 @@ export class PluginRegistry {
     return this.views.get(viewId)
   }
 
+  getPluginByView(viewId: string) {
+    return Array.from(this.plugins.values()).find((plugin) =>
+      plugin.views?.some((view) => view.id === viewId),
+    )
+  }
+
   clear() {
     this.plugins.clear()
     this.views.clear()

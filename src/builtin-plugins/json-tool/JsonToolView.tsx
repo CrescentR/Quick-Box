@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react'
-import { writeClipboardText } from '../../api/clipboard-api'
+import { useClipboardToast } from '../../hooks/useClipboardToast'
 import { CodeBlock, Detail, Tag } from '../../ui'
 
 export default function JsonToolView() {
   const [input, setInput] = useState('{\n  "name": "QuickBox",\n  "mode": "design-system"\n}')
+  const { copyText, clipboardToast } = useClipboardToast()
 
   const formatted = useMemo(() => {
     try {
@@ -41,6 +42,8 @@ export default function JsonToolView() {
         <label className="qb-tool-field">
           <span className="qb-tool-label">输入</span>
           <textarea
+            id="json-tool-input"
+            name="json-tool-input"
             className="qb-tool-textarea qb-mono"
             value={input}
             onChange={(event) => setInput(event.target.value)}
@@ -62,11 +65,11 @@ export default function JsonToolView() {
         <button
           className="qb-tool-button qb-tool-button--primary"
           type="button"
-          onClick={() => void writeClipboardText(formatted)}
+          onClick={() => void copyText(formatted, 'Formatted JSON result')}
         >
           复制格式化结果
         </button>
-        <button className="qb-tool-button" type="button" onClick={() => void writeClipboardText(minified)}>
+        <button className="qb-tool-button" type="button" onClick={() => void copyText(minified, 'Minified JSON result')}>
           复制压缩结果
         </button>
       </div>
@@ -80,6 +83,7 @@ export default function JsonToolView() {
           { label: '操作', value: '支持复制到剪贴板' },
         ]}
       />
+      {clipboardToast}
     </section>
   )
 }
