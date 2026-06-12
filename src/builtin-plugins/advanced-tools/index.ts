@@ -4,6 +4,7 @@ import {
   BatchRenameToolView,
   CronToolView,
   CssClampToolView,
+  FileContentSearchToolView,
   HmacToolView,
   PasswordStrengthToolView,
   SensitiveMaskToolView,
@@ -78,10 +79,17 @@ const tools = [
   },
   {
     id: 'batch-rename',
-    title: '文件批量重命名预演',
-    description: '按正则替换和序号规则预览批量重命名结果',
+    title: '批量文件重命名',
+    description: '按正则替换、序号和日期规则重命名文件',
     keywords: ['文件', '批量', '重命名', 'rename', '正则'],
     component: BatchRenameToolView,
+  },
+  {
+    id: 'file-content-search',
+    title: '文件内容搜索',
+    description: '递归搜索目录中的文本内容并返回文件行号',
+    keywords: ['文件', '内容', '搜索', 'grep', 'todo', 'java', 'ts', 'rs'],
+    component: FileContentSearchToolView,
   },
 ]
 
@@ -89,7 +97,7 @@ const plugin: ToolPlugin = {
   id: 'official.advanced-tools',
   name: '进阶工具集',
   version: '0.1.0',
-  description: '来自 QuickBox 工具规划的 10 个中高难度内置工具',
+  description: '来自 QuickBox 工具规划的中高难度内置工具',
   author: 'QuickBox',
   source: 'builtin',
   permissions: ['clipboard.write'],

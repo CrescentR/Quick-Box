@@ -1,7 +1,7 @@
 💻 运维与系统辅助 (System & DevOps)
 这部分可以充分利用你后端的 Rust 能力，调用系统底层 API，这是纯 Web 工具做不到的。
 
-端口占用清理 (Port Killer)
+端口占用清理 (Port Killer) done
 
 痛点：本地开发时经常遇到 EADDRINUSE 端口被占用，手动查 PID 再杀进程非常繁琐。
 
@@ -13,19 +13,19 @@ Hosts 快捷切换 (Hosts Switcher)
 
 实现：通过 Rust 读取并修改 /etc/hosts 或 C:\Windows\System32\drivers\etc\hosts。提供简单的开关界面。
 
-Linux 命令速查与解释 (tldr/Command Cheat Sheet)
+Linux 命令速查与解释 (tldr/Command Cheat Sheet) done
 
 痛点：tar 怎么解压来着？find 怎么排除目录？看 man 手册太长。
     
 实现：集成开源的 tldr 静态 JSON/Markdown 库，输入命令直接看最常用的几条示例。
 
-Linux 权限计算器 (Chmod Calculator)
+Linux 权限计算器 (Chmod Calculator) done
 
 痛点：经常忘记 rwx 对应的数字（比如 755, 644）。
 
 实现：纯前端组件，提供勾选框（Owner/Group/Public 的 Read/Write/Execute），实时双向生成命令代码（如 chmod 777）。
 
-🌐 网络与开发接口 (Network & Web)
+🌐 网络与开发接口 (Network & Web) 
 IP 与归属地查询 (IP Checker)
 
 痛点：需要快速知道自己的局域网 IP、公网 IP 或排查某个域名的解析地址。

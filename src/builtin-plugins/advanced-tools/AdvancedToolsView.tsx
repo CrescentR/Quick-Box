@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { writeClipboardText } from '../../api/clipboard-api'
+import { applyBatchRename, listDirectoryFiles, searchFileContents } from '../../api/file-tools-api'
+import type { DirectoryFileItem, RenameOperation, RenameResultItem, FileSearchResult } from '../../api/file-tools-api'
 import { CodeBlock, Detail, Tag } from '../../ui'
 
 interface ToolShellProps {
@@ -12,6 +14,7 @@ interface ToolShellProps {
 }
 
 type HmacAlgorithm = 'SHA-256' | 'SHA-384' | 'SHA-512'
+type RenamePreviewRow = RenameOperation & { unchanged: boolean }
 
 function ToolShell({ title, level, description, children, notes }: ToolShellProps) {
   return (
@@ -452,82 +455,225 @@ export function AstVisualizerToolView() {
   )
 }
 
-function previewRename(files: string, pattern: string, replacement: string, start: number) {
+function formatRenameDate(value: string) {
+  return value.replace(/-/g, '')
+}
+
+function previewRename(
+  files: DirectoryFileItem[],
+  pattern: string,
+  replacement: string,
+  start: number,
+  separator: string,
+  includeDate: boolean,
+  dateText: string,
+) {
   let regex: RegExp | null = null
   try {
     regex = pattern ? new RegExp(pattern, 'g') : null
   } catch (error) {
     return {
-      rows: [],
+      rows: [] as RenamePreviewRow[],
       report: error instanceof Error ? `正则无效：${error.message}` : '正则无效',
     }
   }
-  const rows = files
-    .split('\n')
-    .map((file) => file.trim())
-    .filter(Boolean)
-    .map((file, index) => {
-      const dot = file.lastIndexOf('.')
-      const base = dot > 0 ? file.slice(0, dot) : file
-      const ext = dot > 0 ? file.slice(dot) : ''
+
+  const normalizedSeparator = separator || '_'
+  const datePart = includeDate ? `${normalizedSeparator}${formatRenameDate(dateText)}` : ''
+  const rows = files.map((file, index) => {
+      const dot = file.name.lastIndexOf('.')
+      const base = dot > 0 ? file.name.slice(0, dot) : file.name
+      const ext = dot > 0 ? file.name.slice(dot) : ''
       const sequence = String(start + index).padStart(3, '0')
       const replaced = regex ? base.replace(regex, replacement) : base
-      return { 原文件: file, 新文件: `${replaced}-${sequence}${ext}` }
+      const newName = `${replaced}${datePart}${normalizedSeparator}${sequence}${ext}`
+      return { old_name: file.name, new_name: newName, unchanged: file.name === newName }
     })
-  const names = rows.map((row) => row.新文件)
+  const names = rows.map((row) => row.new_name)
   const duplicates = names.filter((name, index) => names.indexOf(name) !== index)
   return {
     rows,
-    report: duplicates.length ? `存在重复目标文件：${Array.from(new Set(duplicates)).join('、')}` : `预演通过，共 ${rows.length} 个文件`,
+    report: duplicates.length
+      ? `存在重复目标文件：${Array.from(new Set(duplicates)).join('、')}`
+      : `预演通过，共 ${rows.length} 个文件`,
   }
 }
 
 export function BatchRenameToolView() {
-  const [files, setFiles] = useState('IMG_1001.png\nIMG_1002.png\nIMG_1003.png')
-  const [pattern, setPattern] = useState('IMG')
-  const [replacement, setReplacement] = useState('quickbox')
+  const [directoryPath, setDirectoryPath] = useState('')
+  const [files, setFiles] = useState<DirectoryFileItem[]>([])
+  const [pattern, setPattern] = useState('IMG_\\d+')
+  const [replacement, setReplacement] = useState('毕业照')
   const [start, setStart] = useState(1)
-  const result = useMemo(() => previewRename(files, pattern, replacement, start), [files, pattern, replacement, start])
+  const [separator, setSeparator] = useState('_')
+  const [includeDate, setIncludeDate] = useState(false)
+  const [dateText, setDateText] = useState('2026-06-12')
+  const [status, setStatus] = useState('输入目录后点击扫描文件。')
+  const [renameResult, setRenameResult] = useState<RenameResultItem[]>([])
+  const result = useMemo(
+    () => previewRename(files, pattern, replacement, start, separator, includeDate, dateText),
+    [dateText, files, includeDate, pattern, replacement, separator, start],
+  )
+  const operations = useMemo(
+    () => result.rows.filter((row) => !row.unchanged).map(({ old_name, new_name }) => ({ old_name, new_name })),
+    [result.rows],
+  )
   const output = JSON.stringify(result.rows, null, 2)
+
+  const scanFiles = async () => {
+    try {
+      const nextFiles = await listDirectoryFiles(directoryPath)
+      setFiles(nextFiles)
+      setRenameResult([])
+      setStatus(`已扫描 ${nextFiles.length} 个文件`)
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : '扫描目录失败')
+    }
+  }
+
+  const applyRename = async () => {
+    try {
+      const nextResult = await applyBatchRename(directoryPath, operations)
+      setRenameResult(nextResult)
+      setStatus(`执行完成：成功 ${nextResult.filter((item) => item.ok).length} 个，失败 ${nextResult.filter((item) => !item.ok).length} 个`)
+      const nextFiles = await listDirectoryFiles(directoryPath)
+      setFiles(nextFiles)
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : '批量重命名失败')
+    }
+  }
 
   return (
     <ToolShell
-      title="文件批量重命名预演"
+      title="批量文件重命名"
       level="L4"
-      description="按正则替换和序号规则预览批量重命名结果，并检测重复目标文件。"
-      notes="- 该版本先做安全预演，不直接改动本地文件。\n- 后续接入 Tauri 文件系统权限后，可以把预演规则升级为真实批量重命名。"
+      description="扫描目录文件，按正则替换、序号和日期规则预演并执行重命名。"
+      notes="- 点击执行前请先查看预演结果。\n- Rust 后端会阻止包含路径分隔符的目标文件名，并跳过已存在的目标文件。"
     >
       <div className="qb-tool-grid">
-        <label className="qb-tool-field">
-          <span className="qb-tool-label">文件列表</span>
-          <textarea className="qb-tool-textarea qb-mono" value={files} onChange={(event) => setFiles(event.target.value)} />
+        <label className="qb-tool-field qb-tool-field--full">
+          <span className="qb-tool-label">目录路径</span>
+          <input className="qb-tool-input qb-mono" value={directoryPath} onChange={(event) => setDirectoryPath(event.target.value)} />
         </label>
-        <div className="qb-tool-field">
-          <label className="qb-tool-field">
-            <span className="qb-tool-label">匹配正则</span>
-            <input className="qb-tool-input qb-mono" value={pattern} onChange={(event) => setPattern(event.target.value)} />
-          </label>
-          <label className="qb-tool-field">
-            <span className="qb-tool-label">替换为</span>
-            <input className="qb-tool-input qb-mono" value={replacement} onChange={(event) => setReplacement(event.target.value)} />
-          </label>
-          <label className="qb-tool-field">
-            <span className="qb-tool-label">起始序号</span>
-            <input className="qb-tool-input" type="number" value={start} onChange={(event) => setStart(Number(event.target.value))} />
-          </label>
-        </div>
-        <div className="qb-tool-field">
+        <label className="qb-tool-field">
+          <span className="qb-tool-label">匹配正则</span>
+          <input className="qb-tool-input qb-mono" value={pattern} onChange={(event) => setPattern(event.target.value)} />
+        </label>
+        <label className="qb-tool-field">
+          <span className="qb-tool-label">替换为</span>
+          <input className="qb-tool-input qb-mono" value={replacement} onChange={(event) => setReplacement(event.target.value)} />
+        </label>
+        <label className="qb-tool-field">
+          <span className="qb-tool-label">起始序号</span>
+          <input className="qb-tool-input" type="number" min={0} value={start} onChange={(event) => setStart(Number(event.target.value))} />
+        </label>
+        <label className="qb-tool-field">
+          <span className="qb-tool-label">分隔符</span>
+          <input className="qb-tool-input qb-mono" value={separator} onChange={(event) => setSeparator(event.target.value)} />
+        </label>
+        <label className="qb-tool-checkbox">
+          <input type="checkbox" checked={includeDate} onChange={(event) => setIncludeDate(event.target.checked)} />
+          <span>加入日期</span>
+        </label>
+        <label className="qb-tool-field">
+          <span className="qb-tool-label">日期</span>
+          <input className="qb-tool-input" type="date" value={dateText} onChange={(event) => setDateText(event.target.value)} />
+        </label>
+        <div className="qb-tool-field qb-tool-field--full">
           <span className="qb-tool-label">预演结果</span>
           <CodeBlock code={output} language="json" wrap copyable />
         </div>
         <div className="qb-tool-field">
           <span className="qb-tool-label">检查报告</span>
-          <CodeBlock code={result.report} language="txt" wrap copyable />
+          <CodeBlock code={`${status}\n${result.report}`} language="txt" wrap copyable />
+        </div>
+        <div className="qb-tool-field">
+          <span className="qb-tool-label">执行结果</span>
+          <CodeBlock code={renameResult.length ? JSON.stringify(renameResult, null, 2) : '// 尚未执行'} language={renameResult.length ? 'json' : 'txt'} wrap copyable />
         </div>
       </div>
       <div className="qb-tool-actions">
+        <button className="qb-tool-button" type="button" onClick={() => void scanFiles()} disabled={!directoryPath.trim()}>
+          扫描文件
+        </button>
         <button className="qb-tool-button qb-tool-button--primary" type="button" onClick={() => void writeClipboardText(output)}>
           复制预演结果
+        </button>
+        <button
+          className="qb-tool-button"
+          type="button"
+          onClick={() => void applyRename()}
+          disabled={!directoryPath.trim() || !operations.length || result.report.includes('存在重复目标文件')}
+        >
+          执行重命名
+        </button>
+      </div>
+    </ToolShell>
+  )
+}
+
+function parseSearchPatterns(input: string) {
+  return input
+    .split(/[\n,;]+/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+}
+
+export function FileContentSearchToolView() {
+  const [rootPath, setRootPath] = useState('')
+  const [query, setQuery] = useState('TODO')
+  const [patterns, setPatterns] = useState('*.java\n*.ts\n*.rs')
+  const [maxResults, setMaxResults] = useState(100)
+  const [results, setResults] = useState<FileSearchResult[]>([])
+  const [status, setStatus] = useState('输入目录和搜索内容后点击搜索。')
+
+  const search = async () => {
+    try {
+      const nextResults = await searchFileContents(rootPath, query, parseSearchPatterns(patterns), maxResults)
+      setResults(nextResults)
+      setStatus(`搜索完成，共 ${nextResults.length} 条结果`)
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : '文件内容搜索失败')
+    }
+  }
+
+  const output = useMemo(() => JSON.stringify(results, null, 2), [results])
+
+  return (
+    <ToolShell
+      title="文件内容搜索"
+      level="L4"
+      description="在指定目录递归搜索文本内容，并按通配符限制文件类型。"
+      notes="- 文件名通配符支持 `*` 和 `?`，例如 `*.ts`。\n- 当前版本跳过无法以 UTF-8 文本读取的文件。"
+    >
+      <div className="qb-tool-grid">
+        <label className="qb-tool-field qb-tool-field--full">
+          <span className="qb-tool-label">根目录</span>
+          <input className="qb-tool-input qb-mono" value={rootPath} onChange={(event) => setRootPath(event.target.value)} />
+        </label>
+        <label className="qb-tool-field">
+          <span className="qb-tool-label">搜索文本</span>
+          <input className="qb-tool-input qb-mono" value={query} onChange={(event) => setQuery(event.target.value)} />
+        </label>
+        <label className="qb-tool-field">
+          <span className="qb-tool-label">最多结果</span>
+          <input className="qb-tool-input" type="number" min={1} max={1000} value={maxResults} onChange={(event) => setMaxResults(Number(event.target.value))} />
+        </label>
+        <label className="qb-tool-field qb-tool-field--full">
+          <span className="qb-tool-label">文件匹配，每行一个</span>
+          <textarea className="qb-tool-textarea qb-mono" value={patterns} onChange={(event) => setPatterns(event.target.value)} />
+        </label>
+        <div className="qb-tool-field qb-tool-field--full">
+          <span className="qb-tool-label">搜索结果</span>
+          <CodeBlock code={results.length ? output : status} language={results.length ? 'json' : 'txt'} showLineNumbers={results.length > 0} copyable />
+        </div>
+      </div>
+      <div className="qb-tool-actions">
+        <button className="qb-tool-button qb-tool-button--primary" type="button" onClick={() => void search()} disabled={!rootPath.trim() || !query.trim()}>
+          搜索
+        </button>
+        <button className="qb-tool-button" type="button" onClick={() => void writeClipboardText(output)} disabled={!results.length}>
+          复制结果
         </button>
       </div>
     </ToolShell>

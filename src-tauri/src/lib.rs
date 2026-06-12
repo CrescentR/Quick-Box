@@ -44,6 +44,10 @@ pub fn run() {
             commands::usage::record_command_usage,
             commands::process::scan_port_occupants,
             commands::process::kill_port_occupants,
+            commands::files::list_directory_files,
+            commands::files::apply_batch_rename,
+            commands::files::search_file_contents,
+            commands::screen::pick_screen_color,
         ])
         .setup(|app| {
             storage::migrations::run_migrations(app.handle())?;

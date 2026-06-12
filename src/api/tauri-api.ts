@@ -97,6 +97,22 @@ async function invokePreviewCommand<TResponse>(
           },
         ],
       } as TResponse
+    case 'list_directory_files':
+      return [] as TResponse
+    case 'apply_batch_rename':
+      return [] as TResponse
+    case 'search_file_contents':
+      return [] as TResponse
+    case 'pick_screen_color':
+      return {
+        x: 0,
+        y: 0,
+        r: 59,
+        g: 130,
+        b: 246,
+        hex: '#3b82f6',
+        rgb: 'rgb(59, 130, 246)',
+      } as TResponse
     default:
       throw {
         code: 'PREVIEW_COMMAND_UNSUPPORTED',

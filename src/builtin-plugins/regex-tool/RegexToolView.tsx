@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { writeClipboardText } from '../../api/clipboard-api'
+import type { PluginViewProps } from '../../core/plugin/plugin-types'
 import { CodeBlock, Detail, Tag } from '../../ui'
 
 const supportedFlags = new Set(['g', 'i', 'm', 's', 'u', 'y'])
@@ -61,10 +62,17 @@ function collectMatches(pattern: string, flags: string, text: string) {
   }
 }
 
-export default function RegexToolView() {
-  const [pattern, setPattern] = useState('\\b\\w+box\\b')
-  const [flags, setFlags] = useState('gi')
-  const [text, setText] = useState('QuickBox is a focused desktop toolbox.\nquickbox keeps tools close.')
+function getStringParam(params: PluginViewProps['params'], key: string, fallback: string) {
+  const value = params?.[key]
+  return typeof value === 'string' ? value : fallback
+}
+
+export default function RegexToolView({ params }: PluginViewProps) {
+  const [pattern, setPattern] = useState(() => getStringParam(params, 'pattern', '\\b\\w+box\\b'))
+  const [flags, setFlags] = useState(() => getStringParam(params, 'flags', 'gi'))
+  const [text, setText] = useState(() =>
+    getStringParam(params, 'text', 'QuickBox is a focused desktop toolbox.\nquickbox keeps tools close.'),
+  )
   const result = useMemo(() => collectMatches(pattern, flags, text), [flags, pattern, text])
 
   return (
