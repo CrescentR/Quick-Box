@@ -5,5 +5,6 @@ export type PluginPermission =
   | 'fs.write'
   | 'network.request'
   | 'notification.send'
+  | 'process.manage'
   | 'storage.read'
   | 'storage.write'

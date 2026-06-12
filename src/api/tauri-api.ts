@@ -84,6 +84,19 @@ async function invokePreviewCommand<TResponse>(
     case 'close_launcher_window':
     case 'reset_launcher_window':
       return undefined as TResponse
+    case 'scan_port_occupants':
+      return [] as TResponse
+    case 'kill_port_occupants':
+      return {
+        port: Number(args?.port ?? 0),
+        killedPids: [],
+        failedPids: [
+          {
+            pid: 0,
+            message: 'Preview mode does not support terminating processes.',
+          },
+        ],
+      } as TResponse
     default:
       throw {
         code: 'PREVIEW_COMMAND_UNSUPPORTED',

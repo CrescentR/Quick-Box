@@ -42,6 +42,8 @@ pub fn run() {
             commands::plugins::save_plugin_states,
             commands::usage::load_command_usage,
             commands::usage::record_command_usage,
+            commands::process::scan_port_occupants,
+            commands::process::kill_port_occupants,
         ])
         .setup(|app| {
             storage::migrations::run_migrations(app.handle())?;

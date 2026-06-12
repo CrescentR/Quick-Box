@@ -52,11 +52,13 @@ async function main() {
     process.exit(1)
   }
 
-  const command = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm'
-  const child = spawn(command, ['dev', '--host', host, '--port', String(port), '--strictPort'], {
-    cwd: rootDir,
-    stdio: 'inherit',
-  })
+  const viteArgs = ['dev', '--host', host, '--port', String(port), '--strictPort']
+  const spawnOptions = { cwd: rootDir, stdio: 'inherit' }
+  // Windows 上直接 spawn pnpm.cmd 在 Node 20+ 会触发 EINVAL，需经 cmd.exe 调用
+  const child =
+    process.platform === 'win32'
+      ? spawn('cmd.exe', ['/d', '/s', '/c', 'pnpm', ...viteArgs], spawnOptions)
+      : spawn('pnpm', viteArgs, spawnOptions)
 
   for (const signal of ['SIGINT', 'SIGTERM']) {
     process.on(signal, () => {

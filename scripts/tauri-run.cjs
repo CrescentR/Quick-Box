@@ -10,11 +10,15 @@ const isWindows = process.platform === 'win32'
 const command = isWindows ? path.join(__dirname, 'tauri-env.cmd') : 'pnpm'
 const commandArgs = isWindows ? args : ['exec', 'tauri', ...args]
 
-const child = spawn(command, commandArgs, {
-  cwd: rootDir,
-  stdio: 'inherit',
-  shell: isWindows,
-})
+const child = isWindows
+  ? spawn('cmd.exe', ['/d', '/s', '/c', command, ...commandArgs], {
+      cwd: rootDir,
+      stdio: 'inherit',
+    })
+  : spawn(command, commandArgs, {
+      cwd: rootDir,
+      stdio: 'inherit',
+    })
 
 child.on('exit', (code, signal) => {
   if (signal) {

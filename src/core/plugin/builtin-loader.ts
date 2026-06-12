@@ -2,6 +2,7 @@ import advancedTools from '../../builtin-plugins/advanced-tools'
 import base64Tool from '../../builtin-plugins/base64-tool'
 import hashTool from '../../builtin-plugins/hash-tool'
 import jsonTool from '../../builtin-plugins/json-tool'
+import portKillerTool from '../../builtin-plugins/port-killer-tool'
 import regexTool from '../../builtin-plugins/regex-tool'
 import timestampTool from '../../builtin-plugins/timestamp-tool'
 import urlTool from '../../builtin-plugins/url-tool'
@@ -21,6 +22,7 @@ export function loadBuiltinPlugins() {
     base64Tool,
     uuidTool,
     hashTool,
+    portKillerTool,
     urlTool,
     regexTool,
     utilityTools,
