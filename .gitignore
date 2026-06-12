@@ -8,3 +8,4 @@ src-tauri/gen/
 _tmp_*
 .env
 .env.*
+docs/*
