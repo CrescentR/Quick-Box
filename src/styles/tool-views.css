@@ -184,8 +184,52 @@
   background-size: 16px 16px;
 }
 
+.qb-chmod-matrix {
+  display: grid;
+  gap: var(--qb-space-2);
+}
+
+.qb-chmod-matrix__header,
+.qb-chmod-matrix__row {
+  display: grid;
+  grid-template-columns: minmax(140px, 1.4fr) repeat(3, minmax(88px, 1fr));
+  gap: var(--qb-space-2);
+  align-items: center;
+}
+
+.qb-chmod-matrix__head-cell {
+  display: grid;
+  gap: 2px;
+  color: var(--qb-text-secondary);
+  font-size: var(--qb-font-size-caption);
+}
+
+.qb-chmod-matrix__head-cell em {
+  color: var(--qb-text-muted);
+  font-style: normal;
+}
+
+.qb-chmod-matrix__row-label {
+  color: var(--qb-text-primary);
+  font-size: var(--qb-font-size-body);
+}
+
+.qb-chmod-matrix__cell {
+  justify-content: center;
+  min-height: 36px;
+  padding: var(--qb-space-2);
+  border: 1px solid var(--qb-border-subtle);
+  border-radius: var(--qb-radius-control);
+  background: rgba(255, 255, 255, 0.02);
+}
+
 @media (max-width: 860px) {
   .qb-tool-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .qb-chmod-matrix__header,
+  .qb-chmod-matrix__row {
     grid-template-columns: 1fr;
   }
 }

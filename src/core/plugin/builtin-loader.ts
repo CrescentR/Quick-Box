@@ -1,5 +1,7 @@
 import advancedTools from '../../builtin-plugins/advanced-tools'
 import base64Tool from '../../builtin-plugins/base64-tool'
+import chmodCalculatorTool from '../../builtin-plugins/chmod-calculator-tool'
+import commandCheatsheetTool from '../../builtin-plugins/command-cheatsheet-tool'
 import hashTool from '../../builtin-plugins/hash-tool'
 import jsonTool from '../../builtin-plugins/json-tool'
 import portKillerTool from '../../builtin-plugins/port-killer-tool'
@@ -23,6 +25,8 @@ export function loadBuiltinPlugins() {
     uuidTool,
     hashTool,
     portKillerTool,
+    commandCheatsheetTool,
+    chmodCalculatorTool,
     urlTool,
     regexTool,
     utilityTools,

@@ -3,6 +3,7 @@ dist/
 target/
 src-tauri/target/
 src-tauri/gen/
+.sccache/
 .DS_Store
 *.log
 _tmp_*

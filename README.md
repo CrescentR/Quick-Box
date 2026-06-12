@@ -45,22 +45,37 @@ QuickBox 是一个键盘优先的桌面工具启动器，灵感来自 Raycast / 
 ## 快速开始
 
 ```bash
-# 安装依赖
+# 安装依赖（首次或更新 .npmrc 后建议重装）
 pnpm install
 
-# 仅启动前端（浏览器调试 UI）
+# 仅启动前端（浏览器调试 UI，改 UI 时最快）
 pnpm dev
 
-# 启动完整桌面应用（推荐）
+# 启动完整桌面应用（首次会编译 Rust，较慢）
 pnpm tauri:dev
 ```
+
+### 更快的日常开发（推荐）
+
+前端改动频繁时，用**双终端**分离 Vite 与 Tauri，避免反复触发 Rust 编译：
+
+```bash
+# 终端 1：只跑前端热更新
+pnpm dev
+
+# 终端 2：只附加桌面壳（要求 1420 端口已有 Vite）
+pnpm tauri:dev:attach
+```
+
+仅改 `src/` 时保持终端 1 运行即可；只有改 `src-tauri/` 时才需要重启终端 2。
 
 ## 常用脚本
 
 | 命令 | 说明 |
 | --- | --- |
-| `pnpm dev` | Vite 开发服务器（`http://127.0.0.1:1420`） |
-| `pnpm tauri:dev` | Tauri 开发模式，热更新前端 |
+| `pnpm dev` / `pnpm dev:web` | Vite 开发服务器（`http://127.0.0.1:1420`） |
+| `pnpm tauri:dev` | Tauri 开发模式（自动启动或复用 Vite） |
+| `pnpm tauri:dev:attach` | 仅启动 Tauri，复用已运行的 Vite（更快） |
 | `pnpm build` | 前端生产构建 |
 | `pnpm typecheck` | TypeScript 类型检查 |
 | `pnpm check:rust` | Rust `cargo check` |
@@ -70,6 +85,24 @@ pnpm tauri:dev
 | `pnpm tauri:build:linux` | Linux：AppImage + deb |
 | `pnpm tauri:build:mac` | macOS：app + dmg |
 | `pnpm tauri:build:mac:universal` | macOS Universal 二进制 |
+
+## 构建加速
+
+| 优化项 | 项目配置 | 说明 |
+| --- | --- | --- |
+| Vite 依赖预构建 | `vite.config.ts` → `optimizeDeps.include` | 首次 `pnpm dev` 预打包核心依赖，后续启动更快 |
+| pnpm 扁平化 | `.npmrc` → `shamefully-hoist` | 减少深层 `node_modules`，加快模块解析 |
+| Rust 增量编译 | `src-tauri/.cargo/config.toml` | 默认开启 `incremental` |
+| Rust 编译缓存 | 安装 [sccache](https://github.com/mozilla/sccache) | `tauri:dev` 会自动检测并启用 `RUSTC_WRAPPER=sccache` |
+| 前端热更新 | `pnpm dev` + `pnpm tauri:dev:attach` | 改 UI 不触发 Rust 全量重编译 |
+| Windows 文件系统 | 项目放 SSD，避开 OneDrive 同步目录 | 减少 `cargo` / Vite 文件监控与 I/O 开销 |
+
+内存较小的机器若 Rust 编译 OOM，可限制并行度：
+
+```powershell
+$env:CARGO_BUILD_JOBS=1
+pnpm tauri:dev
+```
 
 ## 发布
 

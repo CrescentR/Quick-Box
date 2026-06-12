@@ -1,2 +1,8 @@
 [build]
-jobs = 1
+# 默认使用 CPU 核心数并行编译；内存不足时可执行：
+# PowerShell: $env:CARGO_BUILD_JOBS=1
+# Bash: export CARGO_BUILD_JOBS=1
+incremental = true
+
+# 安装 sccache 后，scripts/tauri-run.cjs 会在 dev 模式自动启用 RUSTC_WRAPPER=sccache
+# cargo install sccache
