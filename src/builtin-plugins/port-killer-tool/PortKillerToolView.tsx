@@ -63,6 +63,10 @@ export default function PortKillerToolView() {
       return
     }
 
+    if (scanning) {
+      return
+    }
+
     setScanning(true)
     setLastKillResult(null)
 
@@ -85,7 +89,7 @@ export default function PortKillerToolView() {
     } finally {
       setScanning(false)
     }
-  }, [parsedPort])
+  }, [parsedPort, scanning])
 
   const handleKill = useCallback(
     async (pids?: number[]) => {
@@ -242,7 +246,7 @@ export default function PortKillerToolView() {
 
       <Detail
         title="使用说明"
-        markdown={`- Windows 使用 \`netstat\` 扫描、\`taskkill\` 终止进程。\n- macOS / Linux 使用 \`lsof\` 扫描、\`kill -9\` 终止进程。\n- 系统关键进程（如 PID 0-4）不会被终止。\n- 终止后建议重新扫描，确认端口已释放。`}
+        markdown={`- Windows 使用系统 API 查询端口与终止进程，不会弹出 PowerShell / CMD 窗口。\n- macOS / Linux 使用 \`lsof\` 扫描、\`kill -9\` 终止进程。\n- 系统关键进程（如 PID 0-4）不会被终止。\n- 终止后建议重新扫描，确认端口已释放。`}
         metadata={[
           { label: '典型场景', value: 'Vite / Node / Docker 端口冲突' },
           { label: '权限', value: 'process.manage' },

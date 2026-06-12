@@ -26,7 +26,7 @@ if not exist "%TAURI_BIN%" (
 )
 
 if /I "%1"=="dev" (
-  start "" /b powershell -ExecutionPolicy Bypass -File "%~dp0patch-taskbar-icon.ps1"
+  start "" /b powershell -NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File "%~dp0patch-taskbar-icon.ps1"
 )
 
 call "%TAURI_BIN%" %*
