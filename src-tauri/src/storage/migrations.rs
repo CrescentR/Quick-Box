@@ -7,9 +7,8 @@ pub fn run_migrations(app: &tauri::AppHandle) -> Result<(), Box<dyn std::error::
     let db_path = app_data_dir.join("quickbox.sqlite3");
     let connection = Connection::open(db_path)?;
 
-    connection
-        .execute_batch(
-            r#"
+    connection.execute_batch(
+        r#"
             CREATE TABLE IF NOT EXISTS schema_migrations (
                 version INTEGER PRIMARY KEY,
                 applied_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -34,9 +33,14 @@ pub fn run_migrations(app: &tauri::AppHandle) -> Result<(), Box<dyn std::error::
                 run_count INTEGER NOT NULL DEFAULT 0,
                 last_run_at TEXT
             );
+
+            CREATE TABLE IF NOT EXISTS clipboard_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                text TEXT NOT NULL UNIQUE,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
             "#,
-        )
-        ?;
+    )?;
 
     Ok(())
 }

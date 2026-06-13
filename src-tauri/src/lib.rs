@@ -1,5 +1,5 @@
-mod commands;
 mod command_usage;
+mod commands;
 mod config;
 mod errors;
 mod platform;
@@ -36,6 +36,10 @@ pub fn run() {
             commands::window::is_launcher_window_maximized,
             commands::clipboard::read_clipboard_text,
             commands::clipboard::write_clipboard_text,
+            commands::clipboard_history::load_clipboard_history,
+            commands::clipboard_history::record_clipboard_text,
+            commands::clipboard_history::delete_clipboard_history_item,
+            commands::clipboard_history::clear_clipboard_history,
             commands::config::load_config,
             commands::config::save_config,
             commands::plugins::load_plugin_states,

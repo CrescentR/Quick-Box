@@ -51,7 +51,7 @@ HTTP 状态码速查表 (Status Code Dictionary)
 
 实现：利用你的 SQLite，前端做一个简单的标题+内容的 CRUD，点击条目直接写入系统剪贴板。
 
-文本/代码差异对比 (Text Diff)
+文本/代码差异对比 (Text Diff) 
 
 痛点：想对比两段 JSON 或文本的差异，不想专门开一个 VS Code。
 

@@ -1,4 +1,5 @@
 pub mod clipboard;
+pub mod clipboard_history;
 pub mod config;
 pub mod files;
 pub mod plugins;

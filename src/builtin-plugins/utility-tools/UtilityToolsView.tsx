@@ -1,9 +1,17 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import ReactDiffViewer, { DiffMethod } from 'react-diff-viewer-continued'
 import { QRCodeCanvas } from 'qrcode.react'
 import jsQR from 'jsqr'
-import { writeClipboardText } from '../../api/clipboard-api'
+import {
+  clearClipboardHistory,
+  deleteClipboardHistoryItem,
+  loadClipboardHistory,
+  readClipboardText,
+  recordClipboardText,
+  writeClipboardText,
+} from '../../api/clipboard-api'
+import type { ClipboardHistoryItem } from '../../api/clipboard-api'
 import { pickScreenColor } from '../../api/file-tools-api'
 import type { ScreenColor } from '../../api/file-tools-api'
 import type { PluginViewProps } from '../../core/plugin/plugin-types'
@@ -24,6 +32,7 @@ type JwtAlgorithm = 'HS256'
 type FileHashAlgorithm = 'MD5' | 'SHA-1' | 'SHA-256' | 'SHA-512'
 type DiffMode = 'lines' | 'words' | 'json'
 type CommitType = 'feat' | 'fix' | 'docs' | 'style' | 'refactor' | 'perf' | 'test' | 'build' | 'ci' | 'chore' | 'revert'
+type PlaceholderMode = 'latin' | 'chinese'
 
 const sampleJson = `{
   "id": 1001,
@@ -926,6 +935,247 @@ export function MarkdownPreviewToolView() {
   )
 }
 
+const httpStatusRows = [
+  { code: 100, phrase: 'Continue', category: '1xx', description: '客户端可以继续发送请求。' },
+  { code: 101, phrase: 'Switching Protocols', category: '1xx', description: '服务器同意切换协议。' },
+  { code: 200, phrase: 'OK', category: '2xx', description: '请求成功。' },
+  { code: 201, phrase: 'Created', category: '2xx', description: '请求成功并创建了资源。' },
+  { code: 202, phrase: 'Accepted', category: '2xx', description: '请求已接受，但处理尚未完成。' },
+  { code: 204, phrase: 'No Content', category: '2xx', description: '请求成功，响应体为空。' },
+  { code: 301, phrase: 'Moved Permanently', category: '3xx', description: '资源已永久移动到新地址。' },
+  { code: 302, phrase: 'Found', category: '3xx', description: '资源临时位于其他地址。' },
+  { code: 304, phrase: 'Not Modified', category: '3xx', description: '缓存资源仍可使用。' },
+  { code: 307, phrase: 'Temporary Redirect', category: '3xx', description: '临时重定向，方法和请求体保持不变。' },
+  { code: 308, phrase: 'Permanent Redirect', category: '3xx', description: '永久重定向，方法和请求体保持不变。' },
+  { code: 400, phrase: 'Bad Request', category: '4xx', description: '请求语法或参数无效。' },
+  { code: 401, phrase: 'Unauthorized', category: '4xx', description: '缺少有效认证信息。' },
+  { code: 403, phrase: 'Forbidden', category: '4xx', description: '服务器拒绝执行请求。' },
+  { code: 404, phrase: 'Not Found', category: '4xx', description: '目标资源不存在。' },
+  { code: 405, phrase: 'Method Not Allowed', category: '4xx', description: '资源不支持当前 HTTP 方法。' },
+  { code: 409, phrase: 'Conflict', category: '4xx', description: '请求与资源当前状态冲突。' },
+  { code: 410, phrase: 'Gone', category: '4xx', description: '资源曾经存在，但现在已不可用。' },
+  { code: 415, phrase: 'Unsupported Media Type', category: '4xx', description: '请求体媒体类型不被支持。' },
+  { code: 422, phrase: 'Unprocessable Entity', category: '4xx', description: '语法正确，但语义校验失败。' },
+  { code: 429, phrase: 'Too Many Requests', category: '4xx', description: '请求频率超过限制。' },
+  { code: 500, phrase: 'Internal Server Error', category: '5xx', description: '服务器内部错误。' },
+  { code: 501, phrase: 'Not Implemented', category: '5xx', description: '服务器不支持请求所需功能。' },
+  { code: 502, phrase: 'Bad Gateway', category: '5xx', description: '网关从上游收到无效响应。' },
+  { code: 503, phrase: 'Service Unavailable', category: '5xx', description: '服务暂时不可用。' },
+  { code: 504, phrase: 'Gateway Timeout', category: '5xx', description: '网关等待上游响应超时。' },
+] as const
+
+export function HttpStatusToolView() {
+  const [query, setQuery] = useState('422')
+  const filtered = useMemo(() => {
+    const keyword = query.trim().toLowerCase()
+    if (!keyword) return httpStatusRows
+    return httpStatusRows.filter((row) =>
+      [String(row.code), row.phrase, row.category, row.description].some((value) => value.toLowerCase().includes(keyword)),
+    )
+  }, [query])
+  const output = useMemo(() => JSON.stringify(filtered, null, 2), [filtered])
+
+  return (
+    <ToolShell title="HTTP 状态码速查表" level="L1" description="按状态码、英文短语或说明快速查询常见 HTTP 响应含义。">
+      <div className="qb-tool-grid">
+        <label className="qb-tool-field qb-tool-field--full">
+          <span className="qb-tool-label">搜索</span>
+          <input className="qb-tool-input qb-mono" value={query} onChange={(event) => setQuery(event.target.value)} />
+        </label>
+        <div className="qb-tool-field qb-tool-field--full">
+          <span className="qb-tool-label">匹配结果</span>
+          <div className="qb-tool-template-list">
+            {filtered.map((row) => (
+              <section className="qb-tool-template" key={row.code}>
+                <div className="qb-tool-template__head">
+                  <div>
+                    <div className="qb-tool-template__title">
+                      {row.code} {row.phrase}
+                    </div>
+                    <div className="qb-tool-template__meta">{row.description}</div>
+                  </div>
+                  <Tag tone="default">{row.category}</Tag>
+                </div>
+              </section>
+            ))}
+          </div>
+        </div>
+        <div className="qb-tool-field qb-tool-field--full">
+          <span className="qb-tool-label">JSON</span>
+          <CodeBlock code={output} language="json" wrap copyable />
+        </div>
+      </div>
+    </ToolShell>
+  )
+}
+
+function parseBigIntWithRadix(value: string, radix: number) {
+  const normalized = value.trim().replace(/_/g, '')
+  if (!normalized) return null
+  const patterns: Record<number, RegExp> = {
+    2: /^[+-]?[01]+$/,
+    8: /^[+-]?[0-7]+$/,
+    10: /^[+-]?\d+$/,
+    16: /^[+-]?(?:0x)?[0-9a-fA-F]+$/,
+  }
+  if (!patterns[radix].test(normalized)) return null
+  const sign = normalized.startsWith('-') ? -1n : 1n
+  const unsigned = normalized.replace(/^[+-]/, '').replace(/^0x/i, '')
+  let result = 0n
+  for (const char of unsigned) {
+    const digit = Number.parseInt(char, radix)
+    result = result * BigInt(radix) + BigInt(digit)
+  }
+  return sign * result
+}
+
+function formatRadix(value: bigint | null) {
+  if (value === null) {
+    return {
+      binary: '',
+      octal: '',
+      decimal: '',
+      hexadecimal: '',
+      report: '输入内容与所选进制不匹配',
+    }
+  }
+
+  const sign = value < 0n ? '-' : ''
+  const absValue = value < 0n ? -value : value
+  return {
+    binary: `${sign}${absValue.toString(2)}`,
+    octal: `${sign}${absValue.toString(8)}`,
+    decimal: value.toString(10),
+    hexadecimal: `${sign}${absValue.toString(16).toUpperCase()}`,
+    report: '转换成功',
+  }
+}
+
+export function RadixConverterToolView() {
+  const [radix, setRadix] = useState(10)
+  const [input, setInput] = useState('255')
+  const output = useMemo(() => formatRadix(parseBigIntWithRadix(input, radix)), [input, radix])
+
+  return (
+    <ToolShell title="进制/基数转换器" level="L1" description="在二进制、八进制、十进制和十六进制之间转换整数。">
+      <div className="qb-tool-grid">
+        <label className="qb-tool-field">
+          <span className="qb-tool-label">输入进制</span>
+          <select className="qb-tool-input" value={radix} onChange={(event) => setRadix(Number(event.target.value))}>
+            <option value={2}>二进制</option>
+            <option value={8}>八进制</option>
+            <option value={10}>十进制</option>
+            <option value={16}>十六进制</option>
+          </select>
+        </label>
+        <label className="qb-tool-field">
+          <span className="qb-tool-label">数值</span>
+          <input className="qb-tool-input qb-mono" value={input} onChange={(event) => setInput(event.target.value)} />
+        </label>
+        <div className="qb-tool-field">
+          <span className="qb-tool-label">二进制</span>
+          <CodeBlock code={output.binary || output.report} language="txt" wrap copyable />
+        </div>
+        <div className="qb-tool-field">
+          <span className="qb-tool-label">八进制</span>
+          <CodeBlock code={output.octal || output.report} language="txt" wrap copyable />
+        </div>
+        <div className="qb-tool-field">
+          <span className="qb-tool-label">十进制</span>
+          <CodeBlock code={output.decimal || output.report} language="txt" wrap copyable />
+        </div>
+        <div className="qb-tool-field">
+          <span className="qb-tool-label">十六进制</span>
+          <CodeBlock code={output.hexadecimal || output.report} language="txt" wrap copyable />
+        </div>
+      </div>
+    </ToolShell>
+  )
+}
+
+function parseDelimitedRows(input: string) {
+  const delimiter = input.includes('\t') ? '\t' : ','
+  const rows: string[][] = []
+  let cell = ''
+  let row: string[] = []
+  let quoted = false
+
+  for (let index = 0; index < input.length; index += 1) {
+    const char = input[index]
+    const next = input[index + 1]
+    if (char === '"' && quoted && next === '"') {
+      cell += '"'
+      index += 1
+    } else if (char === '"') {
+      quoted = !quoted
+    } else if (char === delimiter && !quoted) {
+      row.push(cell)
+      cell = ''
+    } else if ((char === '\n' || char === '\r') && !quoted) {
+      if (char === '\r' && next === '\n') index += 1
+      row.push(cell)
+      rows.push(row)
+      row = []
+      cell = ''
+    } else {
+      cell += char
+    }
+  }
+
+  row.push(cell)
+  rows.push(row)
+  return rows.filter((item) => item.some((value) => value.trim()))
+}
+
+function escapeMarkdownCell(value: string) {
+  return value.trim().replace(/\|/g, '\\|').replace(/\n/g, '<br>')
+}
+
+function toMarkdownTable(input: string, hasHeader: boolean) {
+  const rows = parseDelimitedRows(input).map((row) => row.map(escapeMarkdownCell))
+  if (!rows.length) return ''
+  const columnCount = Math.max(...rows.map((row) => row.length))
+  const normalizedRows = rows.map((row) => Array.from({ length: columnCount }, (_, index) => row[index] ?? ''))
+  const header = hasHeader ? normalizedRows[0] : normalizedRows[0].map((_, index) => `列 ${index + 1}`)
+  const body = hasHeader ? normalizedRows.slice(1) : normalizedRows
+  const widths = header.map((cell, index) =>
+    Math.max(cell.length, 3, ...body.map((row) => row[index].length)),
+  )
+  const formatRow = (row: string[]) => `| ${row.map((cell, index) => cell.padEnd(widths[index], ' ')).join(' | ')} |`
+  const divider = `| ${widths.map((width) => '-'.repeat(width)).join(' | ')} |`
+  return [formatRow(header), divider, ...body.map(formatRow)].join('\n')
+}
+
+export function MarkdownTableToolView() {
+  const [input, setInput] = useState('name\trole\nQuickBox\tlauncher\nPlugin\ttool view')
+  const [hasHeader, setHasHeader] = useState(true)
+  const output = useMemo(() => toMarkdownTable(input, hasHeader), [hasHeader, input])
+
+  return (
+    <ToolShell title="Markdown 表格转换器" level="L1" description="把 Excel 粘贴文本、TSV 或 CSV 转成对齐的 Markdown 表格。">
+      <div className="qb-tool-grid">
+        <label className="qb-tool-field qb-tool-field--full">
+          <span className="qb-tool-label">表格文本</span>
+          <textarea className="qb-tool-textarea qb-mono" value={input} onChange={(event) => setInput(event.target.value)} />
+        </label>
+        <label className="qb-tool-checkbox">
+          <input type="checkbox" checked={hasHeader} onChange={(event) => setHasHeader(event.target.checked)} />
+          <span>第一行作为表头</span>
+        </label>
+        <div className="qb-tool-field qb-tool-field--full">
+          <span className="qb-tool-label">Markdown</span>
+          <CodeBlock code={output || '// 等待表格输入'} language="md" showLineNumbers copyable />
+        </div>
+      </div>
+      <div className="qb-tool-actions">
+        <button className="qb-tool-button qb-tool-button--primary" type="button" onClick={() => void writeClipboardText(output)} disabled={!output}>
+          复制 Markdown 表格
+        </button>
+      </div>
+    </ToolShell>
+  )
+}
+
 function rotateLeft(value: number, count: number) {
   return (value << count) | (value >>> (32 - count))
 }
@@ -1322,6 +1572,176 @@ export function QrCodeStudioToolView() {
   )
 }
 
+function formatHistoryTime(value: string) {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value
+  return date.toLocaleString()
+}
+
+function summarizeClipboardText(value: string) {
+  const normalized = value.replace(/\s+/g, ' ').trim()
+  if (normalized.length <= 96) return normalized
+  return `${normalized.slice(0, 96)}...`
+}
+
+export function ClipboardHistoryToolView() {
+  const [items, setItems] = useState<ClipboardHistoryItem[]>([])
+  const [query, setQuery] = useState('')
+  const [listening, setListening] = useState(true)
+  const [status, setStatus] = useState('正在加载剪贴板历史。')
+  const lastRecordedRef = useRef('')
+
+  const filteredItems = useMemo(() => {
+    const keyword = query.trim().toLowerCase()
+    if (!keyword) return items
+    return items.filter((item) => item.text.toLowerCase().includes(keyword))
+  }, [items, query])
+
+  const refreshHistory = async () => {
+    try {
+      const nextItems = await loadClipboardHistory()
+      setItems(nextItems)
+      setStatus(`已加载 ${nextItems.length} 条历史。`)
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : '加载剪贴板历史失败。')
+    }
+  }
+
+  const captureClipboard = async () => {
+    try {
+      const text = await readClipboardText()
+      if (!text.trim()) {
+        setStatus('当前剪贴板没有可记录的纯文本。')
+        return
+      }
+      if (text === lastRecordedRef.current) {
+        setStatus('当前剪贴板文本已经记录。')
+        return
+      }
+      const nextItems = await recordClipboardText(text)
+      lastRecordedRef.current = text
+      setItems(nextItems)
+      setStatus(`已记录 ${nextItems.length} 条历史，最多保留 100 条。`)
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : '读取或记录剪贴板失败。')
+    }
+  }
+
+  const copyHistoryItem = async (text: string) => {
+    try {
+      await writeClipboardText(text)
+      lastRecordedRef.current = text
+      const nextItems = await recordClipboardText(text)
+      setItems(nextItems)
+      setStatus('已复制并刷新到历史顶部。')
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : '复制剪贴板历史失败。')
+    }
+  }
+
+  const deleteHistoryItem = async (id: number) => {
+    try {
+      const nextItems = await deleteClipboardHistoryItem(id)
+      setItems(nextItems)
+      setStatus(`已删除，当前 ${nextItems.length} 条历史。`)
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : '删除剪贴板历史失败。')
+    }
+  }
+
+  const clearHistory = async () => {
+    try {
+      await clearClipboardHistory()
+      setItems([])
+      setStatus('已清空剪贴板历史。')
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : '清空剪贴板历史失败。')
+    }
+  }
+
+  useEffect(() => {
+    void refreshHistory()
+  }, [])
+
+  useEffect(() => {
+    if (!listening) return undefined
+    void captureClipboard()
+    const timer = window.setInterval(() => {
+      void captureClipboard()
+    }, 2000)
+    return () => window.clearInterval(timer)
+  }, [listening])
+
+  return (
+    <ToolShell
+      title="剪贴板纯文本历史记录"
+      level="L2"
+      description="监听系统剪贴板纯文本变化，记录到本地 SQLite，并只保留最新 100 条。"
+      notes="- 仅记录纯文本，图片和文件不会进入历史。\n- 重复文本会刷新到最新位置。\n- 记录保存在本机 SQLite，不上传到网络。"
+    >
+      <div className="qb-tool-grid">
+        <label className="qb-tool-field">
+          <span className="qb-tool-label">搜索历史</span>
+          <input className="qb-tool-input" value={query} onChange={(event) => setQuery(event.target.value)} />
+        </label>
+        <div className="qb-tool-field">
+          <span className="qb-tool-label">监听状态</span>
+          <label className="qb-tool-checkbox">
+            <input type="checkbox" checked={listening} onChange={(event) => setListening(event.target.checked)} />
+            <span>{listening ? '正在监听' : '已暂停'}</span>
+          </label>
+        </div>
+        <div className="qb-tool-field qb-tool-field--full">
+          <span className="qb-tool-label">状态</span>
+          <CodeBlock code={status} language="txt" wrap copyable={false} />
+        </div>
+        <div className="qb-tool-field qb-tool-field--full">
+          <span className="qb-tool-label">历史记录</span>
+          <div className="qb-tool-template-list">
+            {filteredItems.length ? (
+              filteredItems.map((item) => (
+                <section className="qb-tool-template" key={item.id}>
+                  <div className="qb-tool-template__head">
+                    <div>
+                      <div className="qb-tool-template__title">{summarizeClipboardText(item.text)}</div>
+                      <div className="qb-tool-template__meta">
+                        {formatHistoryTime(item.createdAt)} · {item.text.length} 字符
+                      </div>
+                    </div>
+                    <Tag tone="default">文本</Tag>
+                  </div>
+                  <CodeBlock code={item.text} language="txt" wrap copyable />
+                  <div className="qb-tool-actions">
+                    <button className="qb-tool-button qb-tool-button--primary" type="button" onClick={() => void copyHistoryItem(item.text)}>
+                      复制
+                    </button>
+                    <button className="qb-tool-button" type="button" onClick={() => void deleteHistoryItem(item.id)}>
+                      删除
+                    </button>
+                  </div>
+                </section>
+              ))
+            ) : (
+              <CodeBlock code={query ? '没有匹配的剪贴板历史。' : '暂无剪贴板历史。'} language="txt" wrap copyable={false} />
+            )}
+          </div>
+        </div>
+      </div>
+      <div className="qb-tool-actions">
+        <button className="qb-tool-button qb-tool-button--primary" type="button" onClick={() => void captureClipboard()}>
+          记录当前剪贴板
+        </button>
+        <button className="qb-tool-button" type="button" onClick={() => void refreshHistory()}>
+          刷新
+        </button>
+        <button className="qb-tool-button" type="button" onClick={() => void clearHistory()} disabled={!items.length}>
+          清空历史
+        </button>
+      </div>
+    </ToolShell>
+  )
+}
+
 const commitTypes: CommitType[] = ['feat', 'fix', 'docs', 'style', 'refactor', 'perf', 'test', 'build', 'ci', 'chore', 'revert']
 
 function buildCommitMessage(type: CommitType, scope: string, subject: string, breaking: boolean, body: string) {
@@ -1381,6 +1801,112 @@ export function GitCommitFormatterToolView() {
       <div className="qb-tool-actions">
         <button className="qb-tool-button qb-tool-button--primary" type="button" onClick={() => void writeClipboardText(message)}>
           复制 Commit
+        </button>
+      </div>
+    </ToolShell>
+  )
+}
+
+const latinWords = [
+  'lorem',
+  'ipsum',
+  'dolor',
+  'sit',
+  'amet',
+  'consectetur',
+  'adipiscing',
+  'elit',
+  'integer',
+  'facilisis',
+  'nunc',
+  'vitae',
+  'semper',
+  'porta',
+  'mauris',
+  'fermentum',
+  'rhoncus',
+  'tellus',
+  'vel',
+  'finibus',
+]
+
+const chineseWords = [
+  '工具',
+  '窗口',
+  '命令',
+  '数据',
+  '调试',
+  '配置',
+  '流程',
+  '面板',
+  '本地',
+  '快速',
+  '清晰',
+  '稳定',
+  '输入',
+  '输出',
+  '预览',
+  '复制',
+  '生成',
+  '检查',
+  '转换',
+  '记录',
+]
+
+function buildPlaceholderText(mode: PlaceholderMode, paragraphs: number, wordsPerParagraph: number) {
+  const wordList = mode === 'latin' ? latinWords : chineseWords
+  const safeParagraphs = Math.max(1, Math.min(20, Math.floor(paragraphs)))
+  const safeWords = Math.max(1, Math.min(300, Math.floor(wordsPerParagraph)))
+  const lines = Array.from({ length: safeParagraphs }, (_, paragraphIndex) => {
+    const words = Array.from({ length: safeWords }, (_, wordIndex) => wordList[(paragraphIndex * 7 + wordIndex) % wordList.length])
+    if (mode === 'chinese') {
+      return `${words.join('')}。`
+    }
+    const sentence = words.join(' ')
+    return `${sentence.charAt(0).toUpperCase()}${sentence.slice(1)}.`
+  })
+  return lines.join('\n\n')
+}
+
+export function LoremIpsumToolView() {
+  const [mode, setMode] = useState<PlaceholderMode>('latin')
+  const [paragraphs, setParagraphs] = useState(2)
+  const [wordsPerParagraph, setWordsPerParagraph] = useState(48)
+  const output = useMemo(() => buildPlaceholderText(mode, paragraphs, wordsPerParagraph), [mode, paragraphs, wordsPerParagraph])
+
+  return (
+    <ToolShell title="占位文本生成器" level="L1" description="生成拉丁或中文占位文本，用于原型、静态页面和排版测试。">
+      <div className="qb-tool-grid">
+        <label className="qb-tool-field">
+          <span className="qb-tool-label">文本类型</span>
+          <select className="qb-tool-input" value={mode} onChange={(event) => setMode(event.target.value as PlaceholderMode)}>
+            <option value="latin">Lorem Ipsum</option>
+            <option value="chinese">中文假文</option>
+          </select>
+        </label>
+        <label className="qb-tool-field">
+          <span className="qb-tool-label">段落数</span>
+          <input className="qb-tool-input" type="number" min={1} max={20} value={paragraphs} onChange={(event) => setParagraphs(Number(event.target.value))} />
+        </label>
+        <label className="qb-tool-field qb-tool-field--full">
+          <span className="qb-tool-label">每段词数</span>
+          <input
+            className="qb-tool-input"
+            type="number"
+            min={1}
+            max={300}
+            value={wordsPerParagraph}
+            onChange={(event) => setWordsPerParagraph(Number(event.target.value))}
+          />
+        </label>
+        <div className="qb-tool-field qb-tool-field--full">
+          <span className="qb-tool-label">生成结果</span>
+          <CodeBlock code={output} language="txt" wrap copyable />
+        </div>
+      </div>
+      <div className="qb-tool-actions">
+        <button className="qb-tool-button qb-tool-button--primary" type="button" onClick={() => void writeClipboardText(output)}>
+          复制占位文本
         </button>
       </div>
     </ToolShell>

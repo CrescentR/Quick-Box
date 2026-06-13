@@ -2,8 +2,9 @@ use crate::errors::CommandError;
 use rusqlite::Connection;
 use tauri::Manager;
 
-pub mod config_store;
+pub mod clipboard_history_store;
 pub mod command_usage_store;
+pub mod config_store;
 pub mod migrations;
 pub mod plugin_store;
 

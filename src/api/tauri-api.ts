@@ -9,6 +9,7 @@ export interface CommandError {
 const previewConfigKey = 'quickbox.preview.config'
 const previewPluginStatesKey = 'quickbox.preview.pluginStates'
 const previewCommandUsageKey = 'quickbox.preview.commandUsage'
+const previewClipboardHistoryKey = 'quickbox.preview.clipboardHistory'
 
 const previewDefaultConfig = {
   hotkey: 'Alt+Space',
@@ -72,6 +73,39 @@ async function invokePreviewCommand<TResponse>(
       return ((await navigator.clipboard?.readText?.()) ?? '') as TResponse
     case 'write_clipboard_text':
       await navigator.clipboard?.writeText?.(String(args?.text ?? ''))
+      return undefined as TResponse
+    case 'load_clipboard_history':
+      return readLocalStorageJson(previewClipboardHistoryKey, []) as TResponse
+    case 'record_clipboard_text': {
+      const text = String(args?.text ?? '')
+      if (!text.trim()) {
+        return readLocalStorageJson(previewClipboardHistoryKey, []) as TResponse
+      }
+      const items = readLocalStorageJson<Array<{ id: number; text: string; createdAt: string }>>(
+        previewClipboardHistoryKey,
+        [],
+      )
+      const nextItem = {
+        id: Date.now(),
+        text,
+        createdAt: new Date().toISOString(),
+      }
+      const nextItems = [nextItem, ...items.filter((item) => item.text !== text)].slice(0, 100)
+      window.localStorage.setItem(previewClipboardHistoryKey, JSON.stringify(nextItems))
+      return nextItems as TResponse
+    }
+    case 'delete_clipboard_history_item': {
+      const id = Number(args?.id ?? 0)
+      const items = readLocalStorageJson<Array<{ id: number; text: string; createdAt: string }>>(
+        previewClipboardHistoryKey,
+        [],
+      )
+      const nextItems = items.filter((item) => item.id !== id)
+      window.localStorage.setItem(previewClipboardHistoryKey, JSON.stringify(nextItems))
+      return nextItems as TResponse
+    }
+    case 'clear_clipboard_history':
+      window.localStorage.setItem(previewClipboardHistoryKey, JSON.stringify([]))
       return undefined as TResponse
     case 'is_launcher_window_maximized':
       return false as TResponse
