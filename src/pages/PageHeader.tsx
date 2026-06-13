@@ -4,7 +4,9 @@ import type { AppPage, PageNavigationProps } from './page-types'
 
 const pageLabels: Record<AppPage, string> = {
   launcher: '启动器',
+  market: '市场',
   plugins: '插件',
+  account: '账户',
   settings: '设置',
 }
 
@@ -39,7 +41,7 @@ export default function PageHeader({
 
       <div className="qb-page-title__meta">
         <div className="qb-page-nav">
-          {(['launcher', 'plugins', 'settings'] as AppPage[]).map((page) => (
+          {(['launcher', 'market', 'plugins', 'account', 'settings'] as AppPage[]).map((page) => (
             <button
               key={page}
               type="button"
