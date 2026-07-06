@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent } from 'react'
 import {
   AppWindow,
@@ -315,6 +315,8 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
   const [usageByCommandId, setUsageByCommandId] = useState<Record<string, { runCount: number; lastRunAt?: string }>>({})
   const commandListRef = useRef<HTMLDivElement>(null)
   const quickDropRef = useRef<HTMLElement>(null)
+  const dragGhostRef = useRef<HTMLDivElement | null>(null)
+  const dragPointerRef = useRef({ x: 0, y: 0 })
   const selectedCommandIdRef = useRef<string>()
   const draggedCommandIdRef = useRef<string | null>(null)
   const pendingCommandDragRef = useRef<PendingCommandDrag | null>(null)
@@ -461,6 +463,13 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
       }
 
       event.preventDefault()
+
+      dragPointerRef.current = { x: event.clientX, y: event.clientY }
+      const ghost = dragGhostRef.current
+      if (ghost) {
+        ghost.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0) translate(-50%, -50%)`
+      }
+
       setIsQuickDropActive(isPointInsideElement(quickDropRef.current, event.clientX, event.clientY))
     }
 
@@ -502,6 +511,16 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
       window.removeEventListener('pointercancel', onPointerCancel)
     }
   }, [addQuickCommand, commandById])
+
+  // Position the drag ghost the moment it mounts so it never flashes at (0, 0).
+  useLayoutEffect(() => {
+    const ghost = dragGhostRef.current
+    if (!ghost) {
+      return
+    }
+    const { x, y } = dragPointerRef.current
+    ghost.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`
+  }, [draggedCommandId])
 
   const launchQuickCommand = useCallback(
     async (command: QuickBoxCommand) => {
@@ -919,7 +938,7 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
         </div>
       }
     >
-      <div className="qb-launcher-page">
+      <div className={`qb-launcher-page${draggedCommandId ? ' qb-launcher-page--dragging' : ''}`}>
         <aside className="qb-launcher-page__rail">
           <div className="qb-launcher-search">
             <div className="qb-launcher-search__meta">
@@ -1040,6 +1059,7 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
                         key={result.command.id}
                         id={result.command.id}
                         data-qb-command-selected={index === selectedIndex ? 'true' : undefined}
+                        className={draggedCommandId === result.command.id ? 'qb-launcher-list-item--dragging' : undefined}
                         selected={index === selectedIndex}
                         height={result.command.description ? 'comfortable' : 'compact'}
                         onClick={() => {
@@ -1139,6 +1159,20 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
               description={toast.description}
               onDismiss={() => setToast(null)}
             />
+          </div>
+        ) : null}
+
+        {draggedCommand ? (
+          <div ref={dragGhostRef} className="qb-launcher-drag-ghost" aria-hidden="true">
+            <div className="qb-launcher-drag-ghost__card">
+              <span className="qb-launcher-drag-ghost__icon">
+                <Icon icon={draggedCommand.executeMode === 'view' ? AppWindow : Command} size={16} tone="primary" />
+              </span>
+              <span className="qb-launcher-drag-ghost__title">{draggedCommand.title}</span>
+              <span className="qb-launcher-drag-ghost__badge">
+                <Icon icon={Star} size={13} tone="warning" />
+              </span>
+            </div>
           </div>
         ) : null}
       </div>
