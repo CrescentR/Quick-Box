@@ -81,7 +81,7 @@ export default function SettingsPage({ currentPage, onPageChange }: PageNavigati
       <div className="qb-page-shell">
         <div className="qb-page-body qb-scrollbar">
           <div className="qb-page-stack">
-            <div className="qb-page-grid qb-page-grid--three">
+            <div className="qb-page-grid qb-page-grid--four">
               <div className="qb-page-stat">
                 <div className="qb-page-stat__label">主题</div>
                 <div className="qb-page-stat__value">
@@ -96,6 +96,10 @@ export default function SettingsPage({ currentPage, onPageChange }: PageNavigati
               <div className="qb-page-stat">
                 <div className="qb-page-stat__label">托盘</div>
                 <div className="qb-page-stat__value">{config.enableTray ? '已启用' : '已停用'}</div>
+              </div>
+              <div className="qb-page-stat">
+                <div className="qb-page-stat__label">置顶</div>
+                <div className="qb-page-stat__value">{config.alwaysOnTop ? '已启用' : '未启用'}</div>
               </div>
             </div>
 
@@ -221,6 +225,29 @@ export default function SettingsPage({ currentPage, onPageChange }: PageNavigati
                       void setConfig({
                         ...config,
                         enableTray: event.target.checked,
+                      })
+                    }
+                  />
+                </div>
+
+                <div className="qb-page-toggle">
+                  <div className="qb-page-toggle__copy">
+                    <div className="qb-page-toggle__title">窗口保持置顶</div>
+                    <div className="qb-page-toggle__description">
+                      开启后 QuickBox 会停留在其他窗口上方；默认关闭，由你按当前工作流决定。
+                    </div>
+                  </div>
+                  <input
+                    id="quickbox-always-on-top"
+                    name="quickbox-always-on-top"
+                    className="qb-page-checkbox"
+                    type="checkbox"
+                    aria-label="窗口保持置顶"
+                    checked={config.alwaysOnTop}
+                    onChange={(event) =>
+                      void setConfig({
+                        ...config,
+                        alwaysOnTop: event.target.checked,
                       })
                     }
                   />

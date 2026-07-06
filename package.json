@@ -8,6 +8,7 @@
     "dev:web": "vite",
     "tauri:dev:attach": "node scripts/tauri-run.cjs dev --config src-tauri/tauri.dev.json",
     "typecheck": "tsc --noEmit",
+    "prebuild": "node scripts/ensure-deps.cjs",
     "build": "tsc && vite build",
     "check:rust": "cd src-tauri && cargo check",
     "verify": "pnpm typecheck && pnpm build && pnpm check:rust",

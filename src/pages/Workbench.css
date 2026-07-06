@@ -134,6 +134,10 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.qb-page-grid--four {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .qb-page-card {
   display: grid;
   gap: var(--qb-space-3);
@@ -416,7 +420,8 @@
 
 @media (max-width: 920px) {
   .qb-page-grid,
-  .qb-page-grid--three {
+  .qb-page-grid--three,
+  .qb-page-grid--four {
     grid-template-columns: 1fr;
   }
 

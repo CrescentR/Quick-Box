@@ -6,6 +6,7 @@ mod platform;
 mod plugin_state;
 mod shortcuts;
 mod storage;
+mod tray;
 
 use tauri::Manager;
 use tauri_plugin_global_shortcut::ShortcutState;
@@ -59,9 +60,13 @@ pub fn run() {
             let config = storage::config_store::load_config(app.handle()).unwrap_or_default();
             let shortcut_registered =
                 shortcuts::register_initial_launcher_hotkey(app.handle(), &config.hotkey);
+            if config.enable_tray {
+                tray::register(app.handle())?;
+            }
 
             if let Some(window) = app.get_webview_window("main") {
                 platform::configure_launcher_window(&window)?;
+                window.set_always_on_top(config.always_on_top)?;
 
                 if cfg!(debug_assertions) || !shortcut_registered {
                     window.center()?;

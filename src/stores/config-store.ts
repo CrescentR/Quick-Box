@@ -40,7 +40,7 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
 
     try {
       const config = await loadConfig()
-      set({ config, status: 'ready', error: undefined })
+      set({ config: { ...defaultConfig, ...config }, status: 'ready', error: undefined })
     } catch (error) {
       set({
         config: defaultConfig,

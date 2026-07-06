@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
+import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent } from 'react'
 import {
   AppWindow,
   ArrowRight,
@@ -169,14 +169,14 @@ function ResultDetail({
               <span>执行命令</span>
             </button>
             <button
-              className="qb-launcher-detail__action qb-launcher-detail__action--secondary"
+              className="qb-launcher-detail__action qb-launcher-detail__favorite-action"
               type="button"
               onClick={onToggleQuick}
               aria-pressed={isQuick}
               title={isQuick ? '从快捷工具移除' : '加入快捷工具'}
             >
-              <Icon icon={isQuick ? StarOff : Star} size={15} tone={isQuick ? 'warning' : 'muted'} />
-              <span>{isQuick ? '移出快捷' : '设为快捷'}</span>
+              <Icon icon={isQuick ? StarOff : Star} size={18} tone="warning" />
+              <span>{isQuick ? '已在快捷工具' : '加入快捷工具'}</span>
             </button>
           </div>
           <div className="qb-launcher-detail__action-copy">
@@ -253,8 +253,16 @@ interface LauncherToastState {
   description: string
 }
 
+interface PendingCommandDrag {
+  commandId: string
+  startX: number
+  startY: number
+  isDragging: boolean
+}
+
 const COMMAND_LIST_COLLAPSED_STORAGE_KEY = 'quickbox.launcher.commandListCollapsed'
 const QUICK_COMMAND_IDS_STORAGE_KEY = 'quickbox.launcher.quickCommandIds'
+const COMMAND_DRAG_THRESHOLD = 6
 
 function readBooleanPreference(key: string, fallback: boolean) {
   if (typeof window === 'undefined') return fallback
@@ -274,6 +282,12 @@ function readStringArrayPreference(key: string) {
 function writePreference(key: string, value: unknown) {
   if (typeof window === 'undefined') return
   window.localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value))
+}
+
+function isPointInsideElement(element: HTMLElement | null, x: number, y: number) {
+  if (!element) return false
+  const rect = element.getBoundingClientRect()
+  return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
 }
 
 export default function LauncherPage({ currentPage, onPageChange }: PageNavigationProps) {
@@ -296,9 +310,15 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
   const [quickCommandIds, setQuickCommandIds] = useState<string[]>(() =>
     readStringArrayPreference(QUICK_COMMAND_IDS_STORAGE_KEY),
   )
+  const [draggedCommandId, setDraggedCommandId] = useState<string | null>(null)
+  const [isQuickDropActive, setIsQuickDropActive] = useState(false)
   const [usageByCommandId, setUsageByCommandId] = useState<Record<string, { runCount: number; lastRunAt?: string }>>({})
   const commandListRef = useRef<HTMLDivElement>(null)
+  const quickDropRef = useRef<HTMLElement>(null)
   const selectedCommandIdRef = useRef<string>()
+  const draggedCommandIdRef = useRef<string | null>(null)
+  const pendingCommandDragRef = useRef<PendingCommandDrag | null>(null)
+  const suppressCommandClickRef = useRef(false)
   const { enabledPluginIds, status: pluginStatus } = usePluginStore()
 
   const allCommands = useMemo(() => {
@@ -334,6 +354,7 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
 
   const selectedResult = results[selectedIndex]
   const selectedIsQuick = selectedResult ? quickCommandIds.includes(selectedResult.command.id) : false
+  const draggedCommand = draggedCommandId ? commandById.get(draggedCommandId) : undefined
 
   const launchCommand = useCallback(
     async (command: QuickBoxCommand) => {
@@ -364,6 +385,23 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
     [launchCommand],
   )
 
+  const addQuickCommand = useCallback(
+    (command: QuickBoxCommand) => {
+      const isQuickCommand = quickCommandIds.includes(command.id)
+
+      if (!isQuickCommand) {
+        setQuickCommandIds([command.id, ...quickCommandIds.filter((commandId) => commandId !== command.id)].slice(0, 12))
+      }
+
+      setToast({
+        tone: isQuickCommand ? 'warning' : 'success',
+        title: isQuickCommand ? '已经在快捷工具里' : '已加入快捷工具',
+        description: command.title,
+      })
+    },
+    [quickCommandIds],
+  )
+
   const toggleQuickCommand = useCallback(
     (command: QuickBoxCommand) => {
       const isQuickCommand = quickCommandIds.includes(command.id)
@@ -380,6 +418,90 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
     },
     [quickCommandIds],
   )
+
+  const startCommandPointerDrag = useCallback((event: ReactPointerEvent<HTMLElement>, command: QuickBoxCommand) => {
+    if (event.button !== 0) {
+      return
+    }
+
+    pendingCommandDragRef.current = {
+      commandId: command.id,
+      startX: event.clientX,
+      startY: event.clientY,
+      isDragging: false,
+    }
+  }, [])
+
+  useEffect(() => {
+    const cleanupPointerDrag = () => {
+      pendingCommandDragRef.current = null
+      draggedCommandIdRef.current = null
+      setDraggedCommandId(null)
+      setIsQuickDropActive(false)
+    }
+
+    const onPointerMove = (event: PointerEvent) => {
+      const drag = pendingCommandDragRef.current
+      if (!drag) {
+        return
+      }
+
+      const deltaX = event.clientX - drag.startX
+      const deltaY = event.clientY - drag.startY
+      const distance = Math.hypot(deltaX, deltaY)
+
+      if (!drag.isDragging && distance < COMMAND_DRAG_THRESHOLD) {
+        return
+      }
+
+      if (!drag.isDragging) {
+        drag.isDragging = true
+        draggedCommandIdRef.current = drag.commandId
+        setDraggedCommandId(drag.commandId)
+      }
+
+      event.preventDefault()
+      setIsQuickDropActive(isPointInsideElement(quickDropRef.current, event.clientX, event.clientY))
+    }
+
+    const onPointerUp = (event: PointerEvent) => {
+      const drag = pendingCommandDragRef.current
+      if (!drag) {
+        return
+      }
+
+      const shouldDrop =
+        drag.isDragging && isPointInsideElement(quickDropRef.current, event.clientX, event.clientY)
+      const command = shouldDrop ? commandById.get(drag.commandId) : undefined
+
+      if (drag.isDragging) {
+        suppressCommandClickRef.current = true
+        window.setTimeout(() => {
+          suppressCommandClickRef.current = false
+        }, 0)
+      }
+
+      cleanupPointerDrag()
+
+      if (command) {
+        addQuickCommand(command)
+      }
+    }
+
+    const onPointerCancel = () => {
+      cleanupPointerDrag()
+    }
+
+    window.addEventListener('pointermove', onPointerMove)
+    window.addEventListener('pointerup', onPointerUp)
+    window.addEventListener('pointercancel', onPointerCancel)
+
+    return () => {
+      window.removeEventListener('pointermove', onPointerMove)
+      window.removeEventListener('pointerup', onPointerUp)
+      window.removeEventListener('pointercancel', onPointerCancel)
+    }
+  }, [addQuickCommand, commandById])
 
   const launchQuickCommand = useCallback(
     async (command: QuickBoxCommand) => {
@@ -823,11 +945,18 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
           />
           </div>
 
-          <section className="qb-launcher-quick">
+          <section
+            ref={quickDropRef}
+            className={`qb-launcher-quick${isQuickDropActive ? ' qb-launcher-quick--drop-active' : ''}`}
+          >
             <header className="qb-launcher-section-header">
               <div className="qb-launcher-section-header__copy">
                 <span className="qb-launcher-search__label">快捷工具</span>
                 <Tag tone={quickCommands.length ? 'success' : 'default'}>{quickCommands.length} 个</Tag>
+              </div>
+              <div className="qb-launcher-quick__hint" aria-live="polite">
+                <Icon icon={Star} size={14} tone="warning" />
+                <span>{draggedCommand ? `松手加入：${draggedCommand.title}` : '拖入或点星标'}</span>
               </div>
             </header>
             {quickCommands.length ? (
@@ -862,7 +991,7 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
               </div>
             ) : (
               <div className="qb-launcher-quick__empty">
-                选中命令后点击星标，把常用工具放在这里。
+                从下方命令列表拖进来，或选中命令后点击右侧醒目的星标。
               </div>
             )}
           </section>
@@ -914,8 +1043,13 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
                         selected={index === selectedIndex}
                         height={result.command.description ? 'comfortable' : 'compact'}
                         onClick={() => {
+                          if (suppressCommandClickRef.current) {
+                            return
+                          }
+
                           void selectResult(index)
                         }}
+                        onPointerDown={(event) => startCommandPointerDrag(event, result.command)}
                         icon={
                           <Icon
                             icon={result.command.executeMode === 'view' ? AppWindow : Command}

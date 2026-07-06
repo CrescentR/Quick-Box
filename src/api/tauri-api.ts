@@ -15,6 +15,7 @@ const previewDefaultConfig = {
   hotkey: 'Alt+Space',
   theme: 'dark',
   enableTray: true,
+  alwaysOnTop: false,
 }
 
 interface PreviewWindow extends Window {
