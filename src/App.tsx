@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { ensureAppBootstrapped } from './app/bootstrap'
+import { ensureAppBootstrapped, ensureMarketPluginsLoaded } from './app/bootstrap'
 import { useAppShortcuts } from './app/useAppShortcuts'
 import { useAppTheme } from './app/useAppTheme'
 import MainLayout from './layouts/MainLayout'
@@ -23,7 +23,10 @@ export default function App() {
 
   useEffect(() => {
     void hydrateConfig()
-    void hydratePluginState(pluginRegistry.listPlugins())
+    void (async () => {
+      await ensureMarketPluginsLoaded()
+      void hydratePluginState(pluginRegistry.listPlugins())
+    })()
   }, [hydrateConfig, hydratePluginState])
 
   const renderPage = () => {

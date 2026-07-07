@@ -10,6 +10,62 @@ const previewConfigKey = 'quickbox.preview.config'
 const previewPluginStatesKey = 'quickbox.preview.pluginStates'
 const previewCommandUsageKey = 'quickbox.preview.commandUsage'
 const previewClipboardHistoryKey = 'quickbox.preview.clipboardHistory'
+const previewMarketSourceUrlKey = 'quickbox.preview.marketSourceUrl'
+const previewInstalledPluginsKey = 'quickbox.preview.installedPlugins'
+
+const defaultMarketSourceUrl = 'https://raw.githubusercontent.com/quickbox/quickbox-plugins/main/release/plugins.json'
+
+const previewMarketIndex = {
+  version: '1.0.0',
+  updatedAt: new Date().toISOString(),
+  plugins: [
+    {
+      id: 'com.quickbox.json-formatter',
+      name: 'JSON 格式化工具',
+      version: '1.0.0',
+      description: '格式化、压缩并校验 JSON 内容，支持大文件。',
+      author: 'QuickBox',
+      icon: 'icon.png',
+      categories: ['developer'],
+      downloadUrl: 'https://example.com/json-formatter-1.0.0.zip',
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000',
+      size: 15234,
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      permissions: ['clipboard:read', 'clipboard:write'],
+    },
+    {
+      id: 'com.quickbox.timestamp-converter',
+      name: '时间戳转换器',
+      version: '1.1.0',
+      description: '在 Unix 时间戳与日期之间转换，支持毫秒与秒。',
+      author: 'QuickBox',
+      icon: 'icon.png',
+      categories: ['developer', 'utility'],
+      downloadUrl: 'https://example.com/timestamp-converter-1.1.0.zip',
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000',
+      size: 9876,
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-06-01T00:00:00Z',
+      permissions: ['clipboard:read', 'clipboard:write'],
+    },
+    {
+      id: 'com.quickbox.color-picker',
+      name: '颜色选择器',
+      version: '0.9.0',
+      description: '屏幕取色与调色板工具，支持 HEX / RGB / HSL 互转。',
+      author: 'Community',
+      icon: 'icon.png',
+      categories: ['frontend', 'image'],
+      downloadUrl: 'https://example.com/color-picker-0.9.0.zip',
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000',
+      size: 22341,
+      createdAt: '2025-03-15T00:00:00Z',
+      updatedAt: '2025-03-15T00:00:00Z',
+      permissions: ['clipboard:write', 'storage'],
+    },
+  ],
+}
 
 const previewDefaultConfig = {
   hotkey: 'Alt+Space',
@@ -148,6 +204,72 @@ async function invokePreviewCommand<TResponse>(
         hex: '#3b82f6',
         rgb: 'rgb(59, 130, 246)',
       } as TResponse
+    // ---- 插件市场预览模式桩 ----
+    case 'get_market_source_url':
+      return readLocalStorageJson(previewMarketSourceUrlKey, defaultMarketSourceUrl) as TResponse
+    case 'set_market_source_url':
+      window.localStorage.setItem(previewMarketSourceUrlKey, String(args?.url ?? defaultMarketSourceUrl))
+      return undefined as TResponse
+    case 'fetch_market_index':
+      return previewMarketIndex as TResponse
+    case 'load_installed_plugins':
+      return readLocalStorageJson(previewInstalledPluginsKey, []) as TResponse
+    case 'install_plugin':
+    case 'update_plugin': {
+      const pluginId = String(args?.pluginId ?? '')
+      const marketPlugin = previewMarketIndex.plugins.find((p) => p.id === pluginId)
+      if (!marketPlugin) {
+        throw { code: 'PLUGIN_NOT_FOUND', message: `Preview: plugin ${pluginId} not in mock index` } satisfies CommandError
+      }
+      const installed = readLocalStorageJson<Array<Record<string, unknown>>>(previewInstalledPluginsKey, [])
+      const now = new Date().toISOString()
+      const record = {
+        id: marketPlugin.id,
+        name: marketPlugin.name,
+        version: marketPlugin.version,
+        path: `/preview/${marketPlugin.id}/versions/${marketPlugin.version}`,
+        enabled: true,
+        installedAt: now,
+        updatedAt: now,
+        manifest: {
+          id: marketPlugin.id,
+          name: marketPlugin.name,
+          version: marketPlugin.version,
+          description: marketPlugin.description,
+          author: marketPlugin.author,
+          icon: marketPlugin.icon,
+          main: 'index.html',
+          commands: [{ code: 'open', title: marketPlugin.name, description: marketPlugin.description, keywords: [marketPlugin.name] }],
+          permissions: marketPlugin.permissions ?? [],
+          categories: marketPlugin.categories,
+        },
+      }
+      const nextInstalled = [record, ...installed.filter((p) => p.id !== pluginId)]
+      window.localStorage.setItem(previewInstalledPluginsKey, JSON.stringify(nextInstalled))
+      return record as TResponse
+    }
+    case 'uninstall_plugin': {
+      const pluginId = String(args?.pluginId ?? '')
+      const installed = readLocalStorageJson<Array<Record<string, unknown>>>(previewInstalledPluginsKey, [])
+      window.localStorage.setItem(
+        previewInstalledPluginsKey,
+        JSON.stringify(installed.filter((p) => p.id !== pluginId)),
+      )
+      return undefined as TResponse
+    }
+    case 'enable_plugin':
+    case 'disable_plugin': {
+      const pluginId = String(args?.pluginId ?? '')
+      const enabled = command === 'enable_plugin'
+      const installed = readLocalStorageJson<Array<Record<string, unknown>>>(previewInstalledPluginsKey, [])
+      const nextInstalled = installed.map((p) =>
+        p.id === pluginId ? { ...p, enabled, updatedAt: new Date().toISOString() } : p,
+      )
+      window.localStorage.setItem(previewInstalledPluginsKey, JSON.stringify(nextInstalled))
+      return undefined as TResponse
+    }
+    case 'open_plugin_window':
+      return undefined as TResponse
     default:
       throw {
         code: 'PREVIEW_COMMAND_UNSUPPORTED',

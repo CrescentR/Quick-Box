@@ -14,6 +14,9 @@ use tauri_plugin_global_shortcut::ShortcutState;
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_clipboard_manager::init())
+        .register_uri_scheme_protocol("plugin-resource", move |app, request| {
+            commands::plugin_market::handle_plugin_resource_protocol(app, &request)
+        })
         .plugin(
             tauri_plugin_global_shortcut::Builder::new()
                 .with_handler(|app, _shortcut, event| {
@@ -45,6 +48,16 @@ pub fn run() {
             commands::config::save_config,
             commands::plugins::load_plugin_states,
             commands::plugins::save_plugin_states,
+            commands::plugin_market::get_market_source_url,
+            commands::plugin_market::set_market_source_url,
+            commands::plugin_market::fetch_market_index,
+            commands::plugin_market::load_installed_plugins,
+            commands::plugin_market::install_plugin,
+            commands::plugin_market::update_plugin,
+            commands::plugin_market::uninstall_plugin,
+            commands::plugin_market::enable_plugin,
+            commands::plugin_market::disable_plugin,
+            commands::plugin_market::open_plugin_window,
             commands::usage::load_command_usage,
             commands::usage::record_command_usage,
             commands::process::scan_port_occupants,

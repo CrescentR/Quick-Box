@@ -46,6 +46,27 @@ pub fn run_migrations(app: &tauri::AppHandle) -> Result<(), Box<dyn std::error::
                 kill_count INTEGER NOT NULL DEFAULT 0,
                 last_used_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
+
+            CREATE TABLE IF NOT EXISTS installed_plugins (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                version TEXT NOT NULL,
+                path TEXT NOT NULL,
+                enabled INTEGER NOT NULL DEFAULT 1,
+                manifest TEXT NOT NULL DEFAULT '{}',
+                installed_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
+
+            CREATE TABLE IF NOT EXISTS plugin_commands (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                plugin_id TEXT NOT NULL,
+                command_code TEXT NOT NULL,
+                title TEXT NOT NULL,
+                keywords TEXT NOT NULL DEFAULT '[]',
+                enabled INTEGER NOT NULL DEFAULT 1,
+                FOREIGN KEY (plugin_id) REFERENCES installed_plugins(id) ON DELETE CASCADE
+            );
             "#,
     )?;
 

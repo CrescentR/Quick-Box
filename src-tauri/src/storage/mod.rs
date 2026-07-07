@@ -6,6 +6,7 @@ pub mod clipboard_history_store;
 pub mod command_usage_store;
 pub mod config_store;
 pub mod migrations;
+pub mod plugin_market_store;
 pub mod plugin_store;
 pub mod port_usage_store;
 
