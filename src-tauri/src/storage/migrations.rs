@@ -39,6 +39,13 @@ pub fn run_migrations(app: &tauri::AppHandle) -> Result<(), Box<dyn std::error::
                 text TEXT NOT NULL UNIQUE,
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
+
+            CREATE TABLE IF NOT EXISTS port_usage (
+                port INTEGER PRIMARY KEY,
+                use_count INTEGER NOT NULL DEFAULT 0,
+                kill_count INTEGER NOT NULL DEFAULT 0,
+                last_used_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
             "#,
     )?;
 

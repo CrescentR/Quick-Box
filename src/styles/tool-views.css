@@ -285,6 +285,100 @@
   background: rgba(255, 255, 255, 0.02);
 }
 
+.qb-tool-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--qb-space-2);
+  padding: var(--qb-space-3);
+  border: 1px solid var(--qb-border-subtle);
+  border-radius: var(--qb-radius-control);
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.qb-tool-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--qb-space-2);
+  min-height: 32px;
+  padding: 0 var(--qb-space-3);
+  border: 1px solid var(--qb-border-subtle);
+  border-radius: var(--qb-radius-control);
+  background: var(--qb-bg-surface);
+  color: var(--qb-text-secondary);
+  font-size: var(--qb-font-size-caption);
+  line-height: var(--qb-line-height-caption);
+  cursor: pointer;
+  transition:
+    border-color var(--qb-motion-fast) var(--qb-ease-out),
+    background-color var(--qb-motion-fast) var(--qb-ease-out),
+    color var(--qb-motion-fast) var(--qb-ease-out),
+    transform var(--qb-motion-fast) var(--qb-ease-out);
+}
+
+.qb-tool-chip:hover {
+  border-color: var(--qb-border-strong);
+  background: var(--qb-bg-focus);
+  color: var(--qb-text-primary);
+}
+
+.qb-tool-chip:active {
+  transform: translateY(1px);
+}
+
+.qb-tool-chip--active {
+  border-color: var(--qb-border-focus);
+  background: var(--qb-accent-primary-soft);
+  color: var(--qb-text-primary);
+}
+
+.qb-tool-chip--active:hover {
+  background: var(--qb-accent-primary-soft);
+}
+
+.qb-tool-chip__port {
+  font-weight: var(--qb-font-weight-semibold);
+  color: inherit;
+}
+
+.qb-tool-chip__desc {
+  color: var(--qb-text-muted);
+}
+
+.qb-tool-chip--active .qb-tool-chip__desc {
+  color: var(--qb-text-secondary);
+}
+
+.qb-tool-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--qb-space-2);
+}
+
+.qb-tool-link-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--qb-space-1);
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--qb-text-muted);
+  font-size: var(--qb-font-size-caption);
+  line-height: var(--qb-line-height-caption);
+  cursor: pointer;
+  transition: color var(--qb-motion-fast) var(--qb-ease-out);
+}
+
+.qb-tool-link-button:hover {
+  color: var(--qb-text-primary);
+}
+
+.qb-tool-hint {
+  color: var(--qb-text-muted);
+  font-size: var(--qb-font-size-caption);
+  line-height: var(--qb-line-height-caption);
+}
+
 @media (max-width: 860px) {
   .qb-tool-grid {
     grid-template-columns: 1fr;
