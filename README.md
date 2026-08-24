@@ -21,6 +21,7 @@ QuickBox 是一个键盘优先的桌面工具启动器，灵感来自 Raycast / 
 | 通用工具集 | Unicode / HTML Entity 编解码、文本大小写转换、日期差值、时区转换、随机字符串、Query 构建、JSON 转 TypeScript、JWT 解析、颜色转换、Mongo ObjectId 解析、SVG 清理、单位换算 |
 | 开发工作流 | JSON 字符串转义、文本清洗/去重、正则替换、CSV ↔ JSON、JSON 转 Rust Struct、JSONPath 测试、AES-GCM 加解密、cURL ↔ fetch、.env 解析、Gitignore 生成、SemVer 助手 |
 | 进阶工具 | YAML / XML / SQL 格式化、HMAC 生成、Cron 解析、密码强度检测、敏感信息脱敏、CSS Clamp 计算、AST 可视化、批量重命名预演 |
+| 新增独立工具 | JWT 密钥生成、YAML ↔ Properties 互转、CIDR 子网计算、Cookie / Set-Cookie 解析、JSON Schema 生成 |
 
 ## 技术栈
 
