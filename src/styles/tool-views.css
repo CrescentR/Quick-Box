@@ -389,3 +389,20 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* 工作台数据操作与小屏布局。 */
+.qb-clipboard-suggestion { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 12px; border-bottom: 1px solid var(--qb-border-subtle); }
+.qb-quick-order { display: flex; gap: 4px; margin-top: 3px; }
+.qb-quick-order button { background: transparent; color: var(--qb-text-muted); border: 1px solid var(--qb-border-subtle); border-radius: 4px; font: inherit; font-size: 10px; cursor: pointer; }
+.qb-quick-order button:disabled { opacity: .4; cursor: default; }
+.qb-launcher-tile { width: 100%; }
+.qb-snippet-list { display: flex; flex-wrap: wrap; gap: 6px; max-height: 150px; overflow: auto; margin: 12px 0; }
+.qb-workspace-import { border: 1px solid var(--qb-border-strong); border-radius: 8px; padding: 12px; margin-top: 12px; overflow-wrap: anywhere; }
+.qb-release-notes { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 240px; overflow: auto; }
+.qb-code-block .qb-tool-actions { padding: 8px 12px; }
+.qb-tool-actions label { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.qb-tool-view input, .qb-tool-view textarea, .qb-tool-view select { max-width: 100%; }
+@media (max-width: 1050px) {
+  .qb-tool-grid { grid-template-columns: minmax(0, 1fr); }
+  .qb-page-grid--four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

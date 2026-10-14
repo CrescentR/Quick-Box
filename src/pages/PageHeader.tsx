@@ -1,5 +1,5 @@
-import { Sparkles } from 'lucide-react'
-import { Icon, KeyboardShortcut, Tag, WindowControls } from '../ui'
+import type { ReactNode } from 'react'
+import { WindowControls } from '../ui'
 import type { AppPage, PageNavigationProps } from './page-types'
 
 const pageLabels: Record<AppPage, string> = {
@@ -9,9 +9,12 @@ const pageLabels: Record<AppPage, string> = {
 }
 
 export interface PageHeaderProps extends PageNavigationProps {
-  eyebrow: string
-  title: string
-  description: string
+  eyebrow?: string
+  title?: string
+  description?: string
+  /** 启动器顶栏：窗口按钮 + 名称 + 搜索 + 页面切换 */
+  compact?: boolean
+  children?: ReactNode
 }
 
 export default function PageHeader({
@@ -20,15 +23,44 @@ export default function PageHeader({
   eyebrow,
   title,
   description,
+  compact = false,
+  children,
 }: PageHeaderProps) {
+  const pageNav = (
+    <div className="qb-page-nav">
+      {(['launcher', 'plugins', 'settings'] as AppPage[]).map((page) => (
+        <button
+          key={page}
+          type="button"
+          className={`qb-page-nav__button${page === currentPage ? ' is-active' : ''}`}
+          onClick={() => onPageChange(page)}
+        >
+          {pageLabels[page]}
+        </button>
+      ))}
+    </div>
+  )
+
+  if (compact) {
+    return (
+      <div className="qb-page-title qb-page-title--compact" data-tauri-drag-region>
+        <div className="qb-page-title__lead">
+          <div className="qb-page-title__controls">
+            <WindowControls />
+          </div>
+          <span className="qb-page-title__mark">QuickBox</span>
+        </div>
+        {children ? <div className="qb-page-title__search">{children}</div> : null}
+        {pageNav}
+      </div>
+    )
+  }
+
   return (
     <div className="qb-page-title" data-tauri-drag-region>
       <div className="qb-page-title__brand">
         <div className="qb-page-title__controls">
           <WindowControls />
-        </div>
-        <div className="qb-page-title__badge">
-          <Icon icon={Sparkles} size={16} />
         </div>
         <div className="qb-page-title__copy">
           <div className="qb-page-title__eyebrow">{eyebrow}</div>
@@ -36,23 +68,7 @@ export default function PageHeader({
           <div className="qb-page-title__hint">{description}</div>
         </div>
       </div>
-
-      <div className="qb-page-title__meta">
-        <div className="qb-page-nav">
-          {(['launcher', 'plugins', 'settings'] as AppPage[]).map((page) => (
-            <button
-              key={page}
-              type="button"
-              className={`qb-page-nav__button${page === currentPage ? ' is-active' : ''}`}
-              onClick={() => onPageChange(page)}
-            >
-              {pageLabels[page]}
-            </button>
-          ))}
-        </div>
-        <Tag tone="primary">QuickBox</Tag>
-        <KeyboardShortcut keys={currentPage === 'settings' ? ['Ctrl', ','] : ['Alt', 'Space']} />
-      </div>
+      <div className="qb-page-title__meta">{pageNav}</div>
     </div>
   )
 }

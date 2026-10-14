@@ -1,17 +1,16 @@
 import type { ToolPlugin } from '../../core/plugin/plugin-types'
-import {
-  AstVisualizerToolView,
-  BatchRenameToolView,
-  CronToolView,
-  CssClampToolView,
-  FileContentSearchToolView,
-  HmacToolView,
-  PasswordStrengthToolView,
-  SensitiveMaskToolView,
-  SqlFormatterToolView,
-  XmlToolView,
-  YamlToolView,
-} from './AdvancedToolsView'
+import { lazy } from 'react'
+const AstVisualizerToolView = lazy(() => import('./AdvancedToolsView').then((module) => ({ default: module.AstVisualizerToolView })))
+const BatchRenameToolView = lazy(() => import('./AdvancedToolsView').then((module) => ({ default: module.BatchRenameToolView })))
+const CronToolView = lazy(() => import('./AdvancedToolsView').then((module) => ({ default: module.CronToolView })))
+const CssClampToolView = lazy(() => import('./AdvancedToolsView').then((module) => ({ default: module.CssClampToolView })))
+const FileContentSearchToolView = lazy(() => import('./FileContentSearchToolView'))
+const HmacToolView = lazy(() => import('./AdvancedToolsView').then((module) => ({ default: module.HmacToolView })))
+const PasswordStrengthToolView = lazy(() => import('./AdvancedToolsView').then((module) => ({ default: module.PasswordStrengthToolView })))
+const SensitiveMaskToolView = lazy(() => import('./AdvancedToolsView').then((module) => ({ default: module.SensitiveMaskToolView })))
+const SqlFormatterToolView = lazy(() => import('./AdvancedToolsView').then((module) => ({ default: module.SqlFormatterToolView })))
+const XmlToolView = lazy(() => import('./AdvancedToolsView').then((module) => ({ default: module.XmlToolView })))
+const YamlToolView = lazy(() => import('./AdvancedToolsView').then((module) => ({ default: module.YamlToolView })))
 
 const tools = [
   {

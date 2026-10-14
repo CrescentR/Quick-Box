@@ -1,5 +1,6 @@
 import type { ToolPlugin } from '../../core/plugin/plugin-types'
-import UrlToolView from './UrlToolView'
+import { lazy } from 'react'
+const UrlToolView = lazy(() => import('./UrlToolView'))
 
 const plugin: ToolPlugin = {
   id: 'official.url-tool',

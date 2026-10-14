@@ -1,10 +1,11 @@
+import { useToolInput } from '../../core/tool/tool-context'
 import { useMemo, useState } from 'react'
 import { useClipboardToast } from '../../hooks/useClipboardToast'
 import { CodeBlock, Detail, Tag } from '../../ui'
 import { analyzeCidr, isIpInCidr } from './cidr-utils'
 
 export default function CidrToolView() {
-  const [input, setInput] = useState('192.168.1.42/24')
+  const [input, setInput] = useToolInput('192.168.1.42/24')
   const [checkIp, setCheckIp] = useState('192.168.1.88')
   const { copyText, clipboardToast } = useClipboardToast()
 

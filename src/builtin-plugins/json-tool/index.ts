@@ -1,5 +1,6 @@
 import type { ToolPlugin } from '../../core/plugin/plugin-types'
-import JsonToolView from './JsonToolView'
+import { lazy } from 'react'
+const JsonToolView = lazy(() => import('./JsonToolView'))
 
 const plugin: ToolPlugin = {
   id: 'official.json-tool',

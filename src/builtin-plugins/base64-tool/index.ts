@@ -1,5 +1,6 @@
 import type { ToolPlugin } from '../../core/plugin/plugin-types'
-import Base64ToolView from './Base64ToolView'
+import { lazy } from 'react'
+const Base64ToolView = lazy(() => import('./Base64ToolView'))
 
 const plugin: ToolPlugin = {
   id: 'official.base64-tool',

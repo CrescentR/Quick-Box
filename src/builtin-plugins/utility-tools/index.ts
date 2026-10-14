@@ -1,33 +1,32 @@
 import type { ToolPlugin } from '../../core/plugin/plugin-types'
-import {
-  ClipboardHistoryToolView,
-  ColorConverterToolView,
-  DateDiffToolView,
-  FileHashToolView,
-  GitCommitFormatterToolView,
-  HtmlEntityToolView,
-  HttpStatusToolView,
-  JsonToTypeScriptToolView,
-  JwtDecoderToolView,
-  JwtGeneratorToolView,
-  LoremIpsumToolView,
-  MarkdownTableToolView,
-  MarkdownPreviewToolView,
-  QrCodeStudioToolView,
-  MongoObjectIdToolView,
-  QueryBuilderToolView,
-  RadixConverterToolView,
-  RandomStringToolView,
-  RegexLibraryToolView,
-  RedisTtlToolView,
-  ScreenColorPickerToolView,
-  SvgCleanerToolView,
-  TextCaseToolView,
-  TextDiffToolView,
-  TimezoneConverterToolView,
-  UnitConverterToolView,
-  UnicodeToolView,
-} from './UtilityToolsView'
+import { lazy } from 'react'
+const ClipboardHistoryToolView = lazy(() => import('./UtilityToolsView').then((module) => ({ default: module.ClipboardHistoryToolView })))
+const ColorConverterToolView = lazy(() => import('./UtilityToolsView').then((module) => ({ default: module.ColorConverterToolView })))
+const DateDiffToolView = lazy(() => import('./UtilityToolsView').then((module) => ({ default: module.DateDiffToolView })))
+const FileHashToolView = lazy(() => import('./UtilityToolsView').then((module) => ({ default: module.FileHashToolView })))
+const GitCommitFormatterToolView = lazy(() => import('./UtilityToolsView').then((module) => ({ default: module.GitCommitFormatterToolView })))
+const HtmlEntityToolView = lazy(() => import('./UtilityToolsView').then((module) => ({ default: module.HtmlEntityToolView })))
+const HttpStatusToolView = lazy(() => import('./UtilityToolsView').then((module) => ({ default: module.HttpStatusToolView })))
+const JsonToTypeScriptToolView = lazy(() => import('./UtilityToolsView').then((module) => ({ default: module.JsonToTypeScriptToolView })))
+const JwtDecoderToolView = lazy(() => import('./UtilityToolsView').then((module) => ({ default: module.JwtDecoderToolView })))
+const JwtGeneratorToolView = lazy(() => import('./UtilityToolsView').then((module) => ({ default: module.JwtGeneratorToolView })))
+const LoremIpsumToolView = lazy(() => import('./UtilityToolsView').then((module) => ({ default: module.LoremIpsumToolView })))
+const MarkdownTableToolView = lazy(() => import('./UtilityToolsView').then((module) => ({ default: module.MarkdownTableToolView })))
+const MarkdownPreviewToolView = lazy(() => import('./UtilityToolsView').then((module) => ({ default: module.MarkdownPreviewToolView })))
+const QrCodeStudioToolView = lazy(() => import('./QrCodeStudioToolView'))
+const MongoObjectIdToolView = lazy(() => import('./UtilityToolsView').then((module) => ({ default: module.MongoObjectIdToolView })))
+const QueryBuilderToolView = lazy(() => import('./UtilityToolsView').then((module) => ({ default: module.QueryBuilderToolView })))
+const RadixConverterToolView = lazy(() => import('./UtilityToolsView').then((module) => ({ default: module.RadixConverterToolView })))
+const RandomStringToolView = lazy(() => import('./UtilityToolsView').then((module) => ({ default: module.RandomStringToolView })))
+const RegexLibraryToolView = lazy(() => import('./UtilityToolsView').then((module) => ({ default: module.RegexLibraryToolView })))
+const RedisTtlToolView = lazy(() => import('./UtilityToolsView').then((module) => ({ default: module.RedisTtlToolView })))
+const ScreenColorPickerToolView = lazy(() => import('./UtilityToolsView').then((module) => ({ default: module.ScreenColorPickerToolView })))
+const SvgCleanerToolView = lazy(() => import('./UtilityToolsView').then((module) => ({ default: module.SvgCleanerToolView })))
+const TextCaseToolView = lazy(() => import('./UtilityToolsView').then((module) => ({ default: module.TextCaseToolView })))
+const TextDiffToolView = lazy(() => import('./TextDiffToolView'))
+const TimezoneConverterToolView = lazy(() => import('./UtilityToolsView').then((module) => ({ default: module.TimezoneConverterToolView })))
+const UnitConverterToolView = lazy(() => import('./UtilityToolsView').then((module) => ({ default: module.UnitConverterToolView })))
+const UnicodeToolView = lazy(() => import('./UtilityToolsView').then((module) => ({ default: module.UnicodeToolView })))
 
 const tools = [
   {

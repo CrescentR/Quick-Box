@@ -1,5 +1,6 @@
 import type { ToolPlugin } from '../../core/plugin/plugin-types'
-import CidrToolView from './CidrToolView'
+import { lazy } from 'react'
+const CidrToolView = lazy(() => import('./CidrToolView'))
 
 const plugin: ToolPlugin = {
   id: 'official.cidr-tool',

@@ -1,5 +1,6 @@
 import type { ToolPlugin } from '../../core/plugin/plugin-types'
-import CommandCheatsheetToolView from './CommandCheatsheetToolView'
+import { lazy } from 'react'
+const CommandCheatsheetToolView = lazy(() => import('./CommandCheatsheetToolView'))
 
 const plugin: ToolPlugin = {
   id: 'official.command-cheatsheet-tool',

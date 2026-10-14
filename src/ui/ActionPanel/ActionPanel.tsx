@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { HTMLAttributes, ReactNode } from 'react'
 import clsx from 'clsx'
 import { Search } from 'lucide-react'
@@ -51,6 +51,7 @@ export function ActionPanel({
 }: ActionPanelProps) {
   const [internalQuery, setInternalQuery] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(0)
+  const panelRef = useRef<HTMLElement>(null)
   const resolvedQuery = query ?? internalQuery
 
   const filteredActions = useMemo(
@@ -68,6 +69,13 @@ export function ActionPanel({
     }
 
     const onKeyDown = (event: KeyboardEvent) => {
+      if (event.isComposing || event.keyCode === 229) return
+      if (event.key === 'Tab') {
+        const controls = Array.from(panelRef.current?.querySelectorAll<HTMLElement>('input, button:not(:disabled), [tabindex="0"]') ?? [])
+        const current = controls.indexOf(document.activeElement as HTMLElement)
+        if (controls.length) { event.preventDefault(); controls[(current + (event.shiftKey ? -1 : 1) + controls.length) % controls.length].focus() }
+        return
+      }
       if (event.key === 'Escape') {
         event.preventDefault()
         event.stopPropagation()
@@ -92,13 +100,19 @@ export function ActionPanel({
       if (event.key === 'Enter') {
         event.preventDefault()
         event.stopPropagation()
-        filteredActions[selectedIndex]?.onAction?.()
+        const action = filteredActions[selectedIndex]
+        if (action && !action.disabled) action.onAction?.()
       }
     }
 
     window.addEventListener('keydown', onKeyDown, { capture: true })
     return () => window.removeEventListener('keydown', onKeyDown, { capture: true })
   }, [filteredActions, onClose, open, selectedIndex])
+
+  useEffect(() => {
+    if (!open) return
+    return () => document.querySelector<HTMLInputElement>('[data-qb-launcher-search="true"]')?.focus()
+  }, [open])
 
   if (!open) {
     return null
@@ -107,6 +121,10 @@ export function ActionPanel({
   return (
     <div className="qb-action-panel-overlay" onClick={onClose}>
       <section
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
         className={clsx('qb-action-panel', className)}
         onClick={(event) => event.stopPropagation()}
         {...props}

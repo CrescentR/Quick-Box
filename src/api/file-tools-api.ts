@@ -43,9 +43,12 @@ export function applyBatchRename(directoryPath: string, operations: RenameOperat
   return invokeCommand<RenameResultItem[]>('apply_batch_rename', { directoryPath, operations })
 }
 
-export function searchFileContents(rootPath: string, query: string, patterns: string[], maxResults: number) {
-  return invokeCommand<FileSearchResult[]>('search_file_contents', { rootPath, query, patterns, maxResults })
+export interface FileSearchReport { results: FileSearchResult[]; scanned: number; skipped: number; cancelled: boolean; truncated: boolean }
+export function searchFileContents(rootPath: string, query: string, patterns: string[], maxResults: number, jobId: string, excluded: string[]) {
+  return invokeCommand<FileSearchReport>('search_file_contents', { rootPath, query, patterns, maxResults, jobId, excluded })
 }
+export const cancelFileSearch = (jobId: string) => invokeCommand<void>('cancel_file_search', { jobId })
+export const fileSearchProgress = (jobId: string) => invokeCommand<{ scanned: number; skipped: number } | null>('file_search_progress', { jobId })
 
 export function pickScreenColor() {
   return invokeCommand<ScreenColor>('pick_screen_color')

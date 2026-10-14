@@ -45,10 +45,13 @@ fn normalize_directory(path: &str) -> Result<PathBuf, CommandError> {
 
 fn file_name_only(value: &str) -> bool {
     let path = Path::new(value);
-    path.file_name().and_then(|name| name.to_str()) == Some(value)
+    !value.is_empty() && value != "." && value != ".."
+        && !value.chars().any(|c| c.is_control() || "/\\:<>\"|?*".contains(c))
+        && !value.ends_with('.') && !value.ends_with(' ')
+        && path.file_name().and_then(|name| name.to_str()) == Some(value)
 }
 
-fn wildcard_matches(pattern: &str, value: &str) -> bool {
+pub(super) fn wildcard_matches(pattern: &str, value: &str) -> bool {
     let pattern = pattern.as_bytes();
     let value = value.as_bytes();
     let mut pattern_index = 0;
@@ -80,37 +83,6 @@ fn wildcard_matches(pattern: &str, value: &str) -> bool {
     }
 
     pattern_index == pattern.len()
-}
-
-fn collect_files(
-    root: &Path,
-    patterns: &[String],
-    results: &mut Vec<PathBuf>,
-    max_files: usize,
-) -> Result<(), CommandError> {
-    if results.len() >= max_files {
-        return Ok(());
-    }
-
-    for entry in fs::read_dir(root)? {
-        let entry = entry?;
-        let path = entry.path();
-        let file_type = entry.file_type()?;
-
-        if file_type.is_dir() {
-            collect_files(&path, patterns, results, max_files)?;
-        } else if file_type.is_file() {
-            let file_name = entry.file_name().to_string_lossy().to_string();
-            if patterns.is_empty() || patterns.iter().any(|pattern| wildcard_matches(pattern, &file_name)) {
-                results.push(path);
-                if results.len() >= max_files {
-                    return Ok(());
-                }
-            }
-        }
-    }
-
-    Ok(())
 }
 
 #[tauri::command]
@@ -153,7 +125,7 @@ pub async fn apply_batch_rename(
     tauri::async_runtime::spawn_blocking(move || {
         let directory = normalize_directory(&directory_path)?;
         let mut results = Vec::new();
-
+        preflight_rename(&directory, &operations)?;
         for operation in operations {
             if !file_name_only(&operation.old_name) || !file_name_only(&operation.new_name) {
                 results.push(RenameResultItem {
@@ -188,7 +160,7 @@ pub async fn apply_batch_rename(
                 continue;
             }
 
-            match fs::rename(&source, &target) {
+            match rename_without_overwrite(&source, &target) {
                 Ok(()) => results.push(RenameResultItem {
                     old_name: operation.old_name,
                     new_name: operation.new_name,
@@ -210,53 +182,61 @@ pub async fn apply_batch_rename(
     .map_err(|_| CommandError::new("BATCH_RENAME_CANCELLED", "批量重命名任务已取消"))?
 }
 
-#[tauri::command]
-pub async fn search_file_contents(
-    root_path: String,
-    query: String,
-    patterns: Vec<String>,
-    max_results: usize,
-) -> Result<Vec<FileSearchResult>, CommandError> {
-    tauri::async_runtime::spawn_blocking(move || {
-        let root = normalize_directory(&root_path)?;
-        let query = query.trim().to_string();
-        if query.is_empty() {
-            return Ok(Vec::new());
+
+/// 同目录移动；Unix 用排他创建硬链接避免 rename 覆盖竞态。
+fn rename_without_overwrite(source: &Path, target: &Path) -> std::io::Result<()> {
+    if source == target { return Ok(()); }
+    #[cfg(windows)]
+    { fs::rename(source, target) }
+    #[cfg(not(windows))]
+    {
+        fs::hard_link(source, target)?;
+        if let Err(error) = fs::remove_file(source) {
+            let _ = fs::remove_file(target);
+            return Err(error);
         }
+        Ok(())
+    }
+}
 
-        let patterns = patterns
-            .into_iter()
-            .map(|pattern| pattern.trim().to_string())
-            .filter(|pattern| !pattern.is_empty())
-            .collect::<Vec<_>>();
-        let mut files = Vec::new();
-        collect_files(&root, &patterns, &mut files, 20_000)?;
-
-        let max_results = max_results.clamp(1, 1_000);
-        let mut results = Vec::new();
-
-        for file in files {
-            let Ok(content) = fs::read_to_string(&file) else {
-                continue;
-            };
-
-            for (index, line) in content.lines().enumerate() {
-                if line.contains(&query) {
-                    results.push(FileSearchResult {
-                        path: file.to_string_lossy().to_string(),
-                        line_number: index + 1,
-                        line_text: line.trim().to_string(),
-                    });
-
-                    if results.len() >= max_results {
-                        return Ok(results);
-                    }
-                }
-            }
+fn preflight_rename(directory: &Path, operations: &[RenameOperation]) -> Result<(), CommandError> {
+    if operations.len() > 1000 { return Err(CommandError::new("RENAME_TOO_LARGE", "每批最多 1000 个文件")); }
+    let mut sources = std::collections::HashSet::new();
+    let mut targets = std::collections::HashSet::new();
+    let key = |name: &str| if cfg!(windows) { name.to_lowercase() } else { name.to_string() };
+    for operation in operations {
+        if !file_name_only(&operation.old_name) || !file_name_only(&operation.new_name)
+            || !sources.insert(key(&operation.old_name)) || !targets.insert(key(&operation.new_name)) {
+            return Err(CommandError::new("RENAME_CONFLICT", "预检失败：文件名无效或批次中有重复源/目标，未执行任何修改"));
         }
+        let source = directory.join(&operation.old_name);
+        let target = directory.join(&operation.new_name);
+        let regular = fs::symlink_metadata(&source).map(|m| m.file_type().is_file()).unwrap_or(false);
+        if !regular || (target.exists() && source != target) {
+            return Err(CommandError::new("RENAME_CONFLICT", "预检失败：源文件变化或目标已存在，请重新扫描；未执行任何修改"));
+        }
+    }
+    Ok(())
+}
 
-        Ok(results)
-    })
-    .await
-    .map_err(|_| CommandError::new("FILE_SEARCH_CANCELLED", "文件内容搜索任务已取消"))?
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn refuses_path_traversal_and_duplicate_targets() {
+        assert!(!file_name_only("../escape")); assert!(!file_name_only(".."));
+        assert!(!file_name_only("a/b")); assert!(!file_name_only("C:\\x"));
+        assert!(file_name_only("有效文件.txt"));
+        assert!(wildcard_matches("*.ts", "file.ts"));
+        let directory = std::env::temp_dir().join(format!("quickbox-rename-test-{}", std::process::id()));
+        fs::create_dir_all(&directory).unwrap();
+        fs::write(directory.join("a.txt"), "keep").unwrap();
+        fs::write(directory.join("b.txt"), "keep too").unwrap();
+        let operations = vec![RenameOperation { old_name: "a.txt".into(), new_name: "same.txt".into() }, RenameOperation { old_name: "b.txt".into(), new_name: "same.txt".into() }];
+        assert!(preflight_rename(&directory, &operations).is_err());
+        assert!(directory.join("a.txt").exists()); assert!(directory.join("b.txt").exists());
+        assert_eq!(directory.parent().unwrap().canonicalize().unwrap(), std::env::temp_dir().canonicalize().unwrap());
+        assert!(directory.file_name().unwrap().to_string_lossy().starts_with("quickbox-rename-test-"));
+        fs::remove_dir_all(&directory).unwrap();
+    }
 }

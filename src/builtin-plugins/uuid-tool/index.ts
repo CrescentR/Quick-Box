@@ -1,5 +1,6 @@
 import type { ToolPlugin } from '../../core/plugin/plugin-types'
-import UuidToolView from './UuidToolView'
+import { lazy } from 'react'
+const UuidToolView = lazy(() => import('./UuidToolView'))
 
 const plugin: ToolPlugin = {
   id: 'official.uuid-tool',

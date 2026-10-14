@@ -1,3 +1,4 @@
+import { useToolInput, useToolContext } from '../../core/tool/tool-context'
 import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { CodeBlock, Detail, Tag } from '../../ui'
@@ -100,7 +101,7 @@ function cleanText(input: string, trimLines: boolean, collapseSpaces: boolean, r
 }
 
 export function TextCleanerToolView() {
-  const [input, setInput] = useState('  QuickBox    工具箱  \n\n  清理复制文本\t\t很方便  ')
+  const [input, setInput] = useToolInput('  QuickBox    工具箱  \n\n  清理复制文本\t\t很方便  ')
   const [trimLines, setTrimLines] = useState(true)
   const [collapseSpaces, setCollapseSpaces] = useState(true)
   const [removeBlankLines, setRemoveBlankLines] = useState(true)
@@ -135,7 +136,7 @@ export function TextCleanerToolView() {
         </div>
         <div className="qb-tool-field qb-tool-field--full">
           <span className="qb-tool-label">清洗结果</span>
-          <CodeBlock code={output || '// 清洗后为空'} language="txt" wrap copyable />
+          <CodeBlock resultType="text" code={output || '// 清洗后为空'} language="txt" wrap copyable />
         </div>
       </div>
     </ToolShell>
@@ -175,7 +176,7 @@ function uniqueLines(input: string, caseSensitive: boolean, sortLines: boolean) 
 }
 
 export function TextDeduplicateToolView() {
-  const [input, setInput] = useState('json\nxml\nJSON\ncsv\nxml\nrust')
+  const [input, setInput] = useToolInput('json\nxml\nJSON\ncsv\nxml\nrust')
   const [caseSensitive, setCaseSensitive] = useState(false)
   const [sortLines, setSortLines] = useState(true)
   const result = useMemo(() => uniqueLines(input, caseSensitive, sortLines), [caseSensitive, input, sortLines])
@@ -202,7 +203,7 @@ export function TextDeduplicateToolView() {
         </div>
         <div className="qb-tool-field">
           <span className="qb-tool-label">输出</span>
-          <CodeBlock code={result.output || '// 无有效行'} language="txt" wrap copyable />
+          <CodeBlock resultType="text" code={result.output || '// 无有效行'} language="txt" wrap copyable />
         </div>
         <div className="qb-tool-field">
           <span className="qb-tool-label">统计</span>
@@ -325,7 +326,7 @@ function csvToJson(input: string, delimiter: string, firstRowHeader: boolean) {
 }
 
 export function CsvToJsonToolView() {
-  const [input, setInput] = useState('id,name,enabled\n1,QuickBox,true\n2,Toolkit,false')
+  const [input, setInput] = useToolInput('id,name,enabled\n1,QuickBox,true\n2,Toolkit,false')
   const [delimiter, setDelimiter] = useState(',')
   const [firstRowHeader, setFirstRowHeader] = useState(true)
   const output = useMemo(() => csvToJson(input, delimiter, firstRowHeader), [delimiter, firstRowHeader, input])
@@ -353,7 +354,7 @@ export function CsvToJsonToolView() {
         </div>
         <div className="qb-tool-field qb-tool-field--full">
           <span className="qb-tool-label">JSON 输出</span>
-          <CodeBlock code={output} language="json" showLineNumbers copyable />
+          <CodeBlock resultType="json" code={output} language="json" showLineNumbers copyable />
         </div>
       </div>
     </ToolShell>
@@ -392,7 +393,7 @@ function jsonToCsv(input: string, flatten: boolean) {
 }
 
 export function JsonToCsvToolView() {
-  const [input, setInput] = useState(sampleObjectJson)
+  const [input, setInput] = useToolInput(sampleObjectJson)
   const [flatten, setFlatten] = useState(true)
   const output = useMemo(() => jsonToCsv(input, flatten), [flatten, input])
 

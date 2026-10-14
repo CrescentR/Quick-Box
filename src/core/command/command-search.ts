@@ -56,7 +56,7 @@ export function searchCommands(
   query: string,
   usageByCommandId: Record<string, CommandUsageInfo> = {},
 ): CommandSearchResult[] {
-  const normalizedQuery = normalize(query)
+  const normalizedQuery = normalize(query).replace(/^\//, '')
 
   if (!normalizedQuery) {
     return commands.map((command, index) => ({
@@ -75,6 +75,6 @@ export function searchCommands(
         matchedText: result.matchedText,
       }
     })
-    .filter((result) => result.score > 0)
+    .filter((result) => Boolean(result.matchedText))
     .sort((left, right) => right.score - left.score)
 }

@@ -1,21 +1,25 @@
+import { useToolOption } from '../../core/tool/use-tool-option'
+import { useToolInput } from '../../core/tool/tool-context'
 import { useMemo, useState } from 'react'
 import { useClipboardToast } from '../../hooks/useClipboardToast'
 import { Detail, Tag } from '../../ui'
 import { unixSeconds } from '../../utils/time'
 
 export default function TimestampToolView() {
-  const [timestamp, setTimestamp] = useState(String(unixSeconds()))
+  const [timestamp, setTimestamp] = useToolInput(String(unixSeconds()))
   const { copyText, clipboardToast } = useClipboardToast()
 
+  const [unit, setUnit] = useToolOption<string>('timestamp.unit', 'auto')
   const dateText = useMemo(() => {
     const value = Number(timestamp)
-    if (!Number.isFinite(value)) {
+    if (!timestamp.trim() || !Number.isFinite(value)) {
       return '时间戳无效'
     }
 
-    const milliseconds = timestamp.length <= 10 ? value * 1000 : value
-    return new Date(milliseconds).toISOString()
-  }, [timestamp])
+    const milliseconds = (unit === 'seconds' || (unit !== 'milliseconds' && timestamp.length <= 10)) ? value * 1000 : value
+    const date = new Date(milliseconds)
+    return Number.isNaN(date.getTime()) ? '时间戳超出有效范围' : date.toISOString()
+  }, [timestamp, unit])
 
   return (
     <section className="qb-tool-view">
@@ -33,6 +37,7 @@ export default function TimestampToolView() {
         </div>
       </header>
 
+      <label className="qb-tool-field">时间戳单位<select className="qb-tool-input" value={unit} onChange={(event) => setUnit(event.target.value)}><option value="auto">自动</option><option value="seconds">秒</option><option value="milliseconds">毫秒</option></select></label>
       <div className="qb-tool-grid">
         <label className="qb-tool-field">
           <span className="qb-tool-label">时间戳</span>

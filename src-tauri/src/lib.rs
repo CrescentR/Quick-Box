@@ -13,6 +13,7 @@ use tauri_plugin_global_shortcut::ShortcutState;
 
 pub fn run() {
     tauri::Builder::default()
+        .manage(commands::file_search::SearchJobs::default())
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(
             tauri_plugin_global_shortcut::Builder::new()
@@ -41,6 +42,9 @@ pub fn run() {
             commands::clipboard_history::record_clipboard_text,
             commands::clipboard_history::delete_clipboard_history_item,
             commands::clipboard_history::clear_clipboard_history,
+            commands::release::open_release_page,
+            commands::workspace::load_workspace,
+            commands::workspace::save_workspace,
             commands::config::load_config,
             commands::config::save_config,
             commands::plugins::load_plugin_states,
@@ -54,7 +58,9 @@ pub fn run() {
             commands::process::clear_port_usage,
             commands::files::list_directory_files,
             commands::files::apply_batch_rename,
-            commands::files::search_file_contents,
+            commands::file_search::search_file_contents,
+            commands::file_search::cancel_file_search,
+            commands::file_search::file_search_progress,
             commands::screen::pick_screen_color,
         ])
         .setup(|app| {

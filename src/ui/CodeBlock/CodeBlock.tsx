@@ -3,6 +3,8 @@ import type { HTMLAttributes } from 'react'
 import clsx from 'clsx'
 import { writeClipboardText } from '../../api/clipboard-api'
 import './CodeBlock.css'
+import { ToolResultActions } from '../../core/tool/ToolResultActions'
+import type { ToolDataType } from '../../core/tool/tool-context'
 
 export interface CodeBlockProps extends HTMLAttributes<HTMLElement> {
   code: string
@@ -10,6 +12,7 @@ export interface CodeBlockProps extends HTMLAttributes<HTMLElement> {
   showLineNumbers?: boolean
   wrap?: boolean
   copyable?: boolean
+  resultType?: ToolDataType
 }
 
 export function CodeBlock({
@@ -18,6 +21,7 @@ export function CodeBlock({
   showLineNumbers = false,
   wrap = false,
   copyable = false,
+  resultType,
   className,
   ...props
 }: CodeBlockProps) {
@@ -25,8 +29,10 @@ export function CodeBlock({
   const lines = code.split('\n')
 
   const handleCopy = async () => {
-    await writeClipboardText(code)
-    setCopyLabel('已复制')
+    try {
+      await writeClipboardText(code)
+      setCopyLabel('已复制')
+    } catch { setCopyLabel('复制失败，请重试') }
     window.setTimeout(() => setCopyLabel('复制'), 1200)
   }
 
@@ -55,6 +61,7 @@ export function CodeBlock({
             ))
           : code}
       </pre>
+      {resultType && <ToolResultActions text={code} type={resultType} />}
     </section>
   )
 }

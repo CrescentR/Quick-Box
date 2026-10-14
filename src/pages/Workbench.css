@@ -29,17 +29,7 @@
 }
 
 .qb-page-title__badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 10px;
-  background:
-    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.18), transparent 36%),
-    linear-gradient(135deg, var(--qb-accent-primary), rgba(124, 92, 255, 0.5));
-  color: var(--qb-text-on-accent);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  display: none;
 }
 
 .qb-page-title__copy {
@@ -107,9 +97,9 @@
 }
 
 .qb-page-nav__button.is-active {
-  background: var(--qb-accent-primary-soft);
+  background: var(--qb-bg-surface-elevated);
   color: var(--qb-text-primary);
-  box-shadow: inset 0 0 0 1px var(--qb-border-focus);
+  box-shadow: inset 0 0 0 1px var(--qb-border-subtle);
 }
 
 .qb-page-body {
@@ -425,7 +415,7 @@
     grid-template-columns: 1fr;
   }
 
-  .qb-page-title {
+  .qb-page-title:not(.qb-page-title--compact) {
     align-items: flex-start;
     flex-direction: column;
   }

@@ -1,5 +1,6 @@
 import type { ToolPlugin } from '../../core/plugin/plugin-types'
-import YamlPropertiesToolView from './YamlPropertiesToolView'
+import { lazy } from 'react'
+const YamlPropertiesToolView = lazy(() => import('./YamlPropertiesToolView'))
 
 const plugin: ToolPlugin = {
   id: 'official.yaml-properties-tool',

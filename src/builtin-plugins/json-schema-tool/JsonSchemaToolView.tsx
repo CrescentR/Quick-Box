@@ -1,3 +1,4 @@
+import { useToolInput } from '../../core/tool/tool-context'
 import { useMemo, useState } from 'react'
 import { useClipboardToast } from '../../hooks/useClipboardToast'
 import { CodeBlock, Detail, Tag } from '../../ui'
@@ -15,7 +16,7 @@ const sampleJson = `{
 }`
 
 export default function JsonSchemaToolView() {
-  const [input, setInput] = useState(sampleJson)
+  const [input, setInput] = useToolInput(sampleJson)
   const [includeRequired, setIncludeRequired] = useState(true)
   const [includeMeta, setIncludeMeta] = useState(true)
   const { copyText, clipboardToast } = useClipboardToast()

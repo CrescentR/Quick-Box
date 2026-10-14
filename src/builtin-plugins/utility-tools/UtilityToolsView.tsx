@@ -1,8 +1,7 @@
+import { ToolShell } from './ToolShell'
+import { useToolInput, useToolContext } from '../../core/tool/tool-context'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
-import ReactDiffViewer, { DiffMethod } from 'react-diff-viewer-continued'
-import { QRCodeCanvas } from 'qrcode.react'
-import jsQR from 'jsqr'
 import {
   clearClipboardHistory,
   deleteClipboardHistoryItem,
@@ -41,25 +40,6 @@ const sampleJson = `{
   "active": true
 }`
 
-function ToolShell({ title, level, description, children, notes }: ToolShellProps) {
-  return (
-    <section className="qb-tool-view">
-      <header className="qb-tool-view__header">
-        <div className="qb-tool-view__header-copy">
-          <div className="qb-tool-view__eyebrow">官方工具</div>
-          <div className="qb-tool-view__title">{title}</div>
-          <div className="qb-tool-view__description">{description}</div>
-        </div>
-        <div className="qb-tool-view__header-meta">
-          <Tag tone="primary">内置</Tag>
-          <Tag tone="default">{level}</Tag>
-        </div>
-      </header>
-      {children}
-      {notes ? <Detail title="说明" markdown={notes} /> : null}
-    </section>
-  )
-}
 
 function getStringParam(params: PluginViewProps['params'], key: string, fallback: string) {
   const value = params?.[key]
@@ -198,64 +178,6 @@ export function TextCaseToolView() {
   )
 }
 
-function getDiffMethod(mode: DiffMode) {
-  if (mode === 'json') return DiffMethod.JSON
-  if (mode === 'words') return DiffMethod.WORDS_WITH_SPACE
-  return DiffMethod.LINES
-}
-
-export function TextDiffToolView() {
-  const [left, setLeft] = useState('{\n  "name": "QuickBox",\n  "version": "0.5",\n  "enabled": true\n}')
-  const [right, setRight] = useState('{\n  "name": "QuickBox",\n  "version": "0.6",\n  "enabled": true,\n  "tools": 50\n}')
-  const [mode, setMode] = useState<DiffMode>('json')
-  const [splitView, setSplitView] = useState(true)
-
-  return (
-    <ToolShell title="文本/代码差异对比" level="L2" description="左右粘贴 JSON 或文本，使用 React Diff 组件高亮差异。">
-      <div className="qb-tool-grid">
-        <label className="qb-tool-field">
-          <span className="qb-tool-label">左侧文本</span>
-          <textarea className="qb-tool-textarea qb-mono" value={left} onChange={(event) => setLeft(event.target.value)} />
-        </label>
-        <label className="qb-tool-field">
-          <span className="qb-tool-label">右侧文本</span>
-          <textarea className="qb-tool-textarea qb-mono" value={right} onChange={(event) => setRight(event.target.value)} />
-        </label>
-        <label className="qb-tool-field">
-          <span className="qb-tool-label">对比方式</span>
-          <select className="qb-tool-input" value={mode} onChange={(event) => setMode(event.target.value as DiffMode)}>
-            <option value="json">JSON</option>
-            <option value="lines">按行</option>
-            <option value="words">按词</option>
-          </select>
-        </label>
-        <div className="qb-tool-field">
-          <span className="qb-tool-label">视图</span>
-          <label className="qb-tool-checkbox">
-            <input type="checkbox" checked={splitView} onChange={(event) => setSplitView(event.target.checked)} />
-            <span>左右分栏</span>
-          </label>
-        </div>
-        <div className="qb-tool-field qb-tool-field--full">
-          <span className="qb-tool-label">差异</span>
-          <div className="qb-tool-diff-view">
-            <ReactDiffViewer
-              oldValue={left}
-              newValue={right}
-              splitView={splitView}
-              compareMethod={getDiffMethod(mode)}
-              showDiffOnly={false}
-              useDarkTheme
-              disableWorker
-              leftTitle="旧文本"
-              rightTitle="新文本"
-            />
-          </div>
-        </div>
-      </div>
-    </ToolShell>
-  )
-}
 
 const regexTemplates = [
   {
@@ -582,12 +504,15 @@ function buildQuery(baseUrl: string, rawParams: string) {
 
   const query = search.toString()
   if (!baseUrl.trim()) return query ? `?${query}` : ''
-  return `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}${query}`
+  const [address, ...hash] = baseUrl.split('#')
+  return `${address}${query ? `${address.includes('?') ? '&' : '?'}${query}` : ''}${hash.length ? `#${hash.join('#')}` : ''}`
 }
 
 export function QueryBuilderToolView() {
-  const [baseUrl, setBaseUrl] = useState('https://api.quickbox.local/search')
-  const [params, setParams] = useState('q=桌面工具\nsort=recent\npage=1')
+  const { input: incoming } = useToolContext()
+  const initialUrl = (() => { try { return incoming ? new URL(incoming.text) : null } catch { return null } })()
+  const [baseUrl, setBaseUrl] = useState(initialUrl ? `${initialUrl.origin}${initialUrl.pathname}${initialUrl.hash}` : 'https://api.quickbox.local/search')
+  const [params, setParams] = useState(initialUrl ? Array.from(initialUrl.searchParams).map(([key, value]) => `${key}=${value}`).join('\n') : 'q=桌面工具\nsort=recent\npage=1')
   const output = useMemo(() => buildQuery(baseUrl, params), [baseUrl, params])
 
   return (
@@ -640,7 +565,7 @@ function jsonToTypeScript(input: string, typeName: string) {
 }
 
 export function JsonToTypeScriptToolView() {
-  const [input, setInput] = useState(sampleJson)
+  const [input, setInput] = useToolInput(sampleJson)
   const [typeName, setTypeName] = useState('QuickBoxItem')
   const output = useMemo(() => jsonToTypeScript(input, typeName), [input, typeName])
 
@@ -694,13 +619,13 @@ function decodeJwt(token: string) {
 }
 
 export function JwtDecoderToolView() {
-  const [token, setToken] = useState(
+  const [token, setToken] = useToolInput(
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAxIiwibmFtZSI6IlF1aWNrQm94IiwiaWF0IjoxNzE2NDAwMDAwfQ.demo',
   )
   const output = useMemo(() => decodeJwt(token), [token])
 
   return (
-    <ToolShell title="JWT 解析器" level="L2" description="在本地解析 JWT 的 header 与 payload，不把 token 发送到网络。">
+    <ToolShell title="JWT 解析器" level="L2" description="在本地解析 JWT 的 header 与 payload，不把 token 发送到网络。这里只解析内容，未验证签名。">
       <div className="qb-tool-grid">
         <label className="qb-tool-field qb-tool-field--full">
           <span className="qb-tool-label">JWT</span>
@@ -1253,6 +1178,7 @@ function arrayBufferToHex(buffer: ArrayBuffer) {
 }
 
 async function hashFile(file: File, algorithm: FileHashAlgorithm) {
+  if (file.size > 32 * 1024 * 1024) throw new Error('当前浏览器哈希工具限制为 32 MB，请选择更小文件。')
   const buffer = await file.arrayBuffer()
   if (algorithm === 'MD5') return md5ArrayBuffer(buffer)
   const digest = await crypto.subtle.digest(algorithm, buffer)
@@ -1470,102 +1396,6 @@ export function ScreenColorPickerToolView() {
           disabled={!color}
         >
           打开颜色转换
-        </button>
-      </div>
-    </ToolShell>
-  )
-}
-
-function decodeQrFromFile(file: File) {
-  return new Promise<string>((resolve, reject) => {
-    const url = URL.createObjectURL(file)
-    const image = new Image()
-    image.onload = () => {
-      try {
-        const canvas = document.createElement('canvas')
-        canvas.width = image.naturalWidth
-        canvas.height = image.naturalHeight
-        const context = canvas.getContext('2d')
-        if (!context) {
-          reject(new Error('无法创建 Canvas 上下文'))
-          return
-        }
-
-        context.drawImage(image, 0, 0)
-        const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
-        const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'attemptBoth' })
-        resolve(code?.data ?? '未识别到二维码')
-      } catch (error) {
-        reject(error)
-      } finally {
-        URL.revokeObjectURL(url)
-      }
-    }
-    image.onerror = () => {
-      URL.revokeObjectURL(url)
-      reject(new Error('图片加载失败'))
-    }
-    image.src = url
-  })
-}
-
-export function QrCodeStudioToolView() {
-  const [value, setValue] = useState('http://127.0.0.1:1420/')
-  const [level, setLevel] = useState<'L' | 'M' | 'Q' | 'H'>('M')
-  const [decoded, setDecoded] = useState('// 选择二维码图片后显示解码结果')
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-
-  const copyQrDataUrl = async () => {
-    const dataUrl = canvasRef.current?.toDataURL('image/png') ?? ''
-    await writeClipboardText(dataUrl)
-  }
-
-  const decodeFile = async (file?: File) => {
-    if (!file) return
-    try {
-      setDecoded(await decodeQrFromFile(file))
-    } catch (error) {
-      setDecoded(error instanceof Error ? error.message : '二维码解码失败')
-    }
-  }
-
-  return (
-    <ToolShell title="二维码生成与解码" level="L2" description="生成本地服务 URL 二维码，也可上传图片解析二维码内容。">
-      <div className="qb-tool-grid">
-        <label className="qb-tool-field qb-tool-field--full">
-          <span className="qb-tool-label">二维码内容</span>
-          <textarea className="qb-tool-textarea qb-mono" value={value} onChange={(event) => setValue(event.target.value)} />
-        </label>
-        <label className="qb-tool-field">
-          <span className="qb-tool-label">纠错等级</span>
-          <select className="qb-tool-input" value={level} onChange={(event) => setLevel(event.target.value as 'L' | 'M' | 'Q' | 'H')}>
-            <option value="L">L</option>
-            <option value="M">M</option>
-            <option value="Q">Q</option>
-            <option value="H">H</option>
-          </select>
-        </label>
-        <div className="qb-tool-field">
-          <span className="qb-tool-label">生成结果</span>
-          <div className="qb-tool-qr-preview">
-            <QRCodeCanvas ref={canvasRef} value={value || ' '} size={220} level={level} marginSize={2} />
-          </div>
-        </div>
-        <label className="qb-tool-field">
-          <span className="qb-tool-label">解码图片</span>
-          <input className="qb-tool-input" type="file" accept="image/*" onChange={(event) => void decodeFile(event.target.files?.[0])} />
-        </label>
-        <div className="qb-tool-field">
-          <span className="qb-tool-label">解码结果</span>
-          <CodeBlock code={decoded} language="txt" wrap copyable />
-        </div>
-      </div>
-      <div className="qb-tool-actions">
-        <button className="qb-tool-button qb-tool-button--primary" type="button" onClick={() => void writeClipboardText(value)}>
-          复制内容
-        </button>
-        <button className="qb-tool-button" type="button" onClick={() => void copyQrDataUrl()}>
-          复制 PNG Data URL
         </button>
       </div>
     </ToolShell>

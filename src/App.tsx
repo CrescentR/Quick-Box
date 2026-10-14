@@ -1,3 +1,4 @@
+import { useWorkspaceStore } from './stores/workspace-store'
 import { useEffect, useState } from 'react'
 import { ensureAppBootstrapped } from './app/bootstrap'
 import { useAppShortcuts } from './app/useAppShortcuts'
@@ -22,6 +23,7 @@ export default function App() {
   useAppShortcuts(setCurrentPage)
 
   useEffect(() => {
+    void useWorkspaceStore.getState().hydrate().catch(() => {})
     void hydrateConfig()
     void hydratePluginState(pluginRegistry.listPlugins())
   }, [hydrateConfig, hydratePluginState])

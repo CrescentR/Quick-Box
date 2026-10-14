@@ -1,3 +1,5 @@
+import ReleaseSettings from './ReleaseSettings'
+import WorkspaceSettings from './WorkspaceSettings'
 import { MonitorCog, Palette } from 'lucide-react'
 import type { QuickBoxConfig } from '../core/config/config-types'
 import { useResolvedTheme } from '../hooks/useResolvedTheme'
@@ -255,9 +257,11 @@ export default function SettingsPage({ currentPage, onPageChange }: PageNavigati
               </section>
             </div>
 
+            <WorkspaceSettings />
+            <ReleaseSettings />
             <Detail
               title="设置路线"
-              markdown="- 主题、热键和托盘选项已经与启动器保持同一套视觉语言。\n- 后续扩展配置读写流程后，这里可以直接接入持久化。\n- 键盘提示会持续可见，让设置页仍然像 QuickBox 的一部分，而不是独立后台。"
+              markdown="- 主题、热键和托盘选项已经与启动器保持同一套视觉语言。\n- 设置已保存至本机 SQLite；工作台备份可单独导入导出。\n- 键盘提示会持续可见，让设置页仍然像 QuickBox 的一部分，而不是独立后台。"
               metadata={[
                 { label: '状态', value: statusLabel },
                 { label: '状态来源', value: 'Zustand + Rust SQLite' },

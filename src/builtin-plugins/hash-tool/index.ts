@@ -1,5 +1,6 @@
 import type { ToolPlugin } from '../../core/plugin/plugin-types'
-import HashToolView from './HashToolView'
+import { lazy } from 'react'
+const HashToolView = lazy(() => import('./HashToolView'))
 
 const plugin: ToolPlugin = {
   id: 'official.hash-tool',

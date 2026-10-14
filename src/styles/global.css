@@ -119,22 +119,8 @@ body::-webkit-scrollbar-thumb:hover,
   overflow: hidden;
   border: 1px solid var(--qb-border-subtle);
   border-radius: var(--qb-radius-window);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.015)),
-    var(--qb-bg-window);
+  background: var(--qb-bg-window);
   box-shadow: var(--qb-shadow-window);
-  backdrop-filter: blur(24px) saturate(140%);
-  -webkit-backdrop-filter: blur(24px) saturate(140%);
-}
-
-.qb-window::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at top right, rgba(124, 92, 255, 0.12), transparent 28%),
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.05), transparent 26%);
-  pointer-events: none;
 }
 
 .qb-window--launcher {

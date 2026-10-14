@@ -4,6 +4,7 @@ import type { AppPage } from '../pages/page-types'
 export function useAppShortcuts(onPageChange: (page: AppPage) => void) {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
+      if (event.isComposing || event.keyCode === 229) return
       const isCommandModifier = event.ctrlKey || event.metaKey
 
       if (isCommandModifier && event.key === ',') {

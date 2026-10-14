@@ -1,5 +1,6 @@
 import type { ToolPlugin } from '../../core/plugin/plugin-types'
-import ChmodCalculatorToolView from './ChmodCalculatorToolView'
+import { lazy } from 'react'
+const ChmodCalculatorToolView = lazy(() => import('./ChmodCalculatorToolView'))
 
 const plugin: ToolPlugin = {
   id: 'official.chmod-calculator-tool',

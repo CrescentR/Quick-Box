@@ -1,3 +1,4 @@
+import { useToolInput } from '../../core/tool/tool-context'
 import { useMemo, useState } from 'react'
 import { writeClipboardText } from '../../api/clipboard-api'
 import { CodeBlock, Detail, Tag } from '../../ui'
@@ -36,9 +37,10 @@ function parseUrl(value: string) {
 }
 
 export default function UrlToolView() {
-  const [input, setInput] = useState('https://quickbox.local/search?q=dev%20tools&sort=recent')
+  const [input, setInput] = useToolInput('https://quickbox.local/search?q=dev%20tools&sort=recent')
   const encoded = useMemo(() => encodeURIComponent(input), [input])
   const decoded = useMemo(() => safeDecode(input), [input])
+  const canDecode = useMemo(() => { try { decodeURIComponent(input); return true } catch { return false } }, [input])
   const parsed = useMemo(() => parseUrl(input), [input])
 
   return (
@@ -76,7 +78,7 @@ export default function UrlToolView() {
 
         <div className="qb-tool-field">
           <span className="qb-tool-label">解码结果</span>
-          <CodeBlock code={decoded} language="txt" wrap copyable />
+          <CodeBlock resultType={canDecode ? 'url' : undefined} code={decoded} language="txt" wrap copyable />
         </div>
 
         <div className="qb-tool-field qb-tool-field--full">

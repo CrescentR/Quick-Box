@@ -2,8 +2,8 @@ use crate::errors::CommandError;
 use crate::platform;
 use tauri::{LogicalSize, Manager, Size, WebviewWindow};
 
-const DEFAULT_WINDOW_WIDTH: f64 = 1080.0;
-const DEFAULT_WINDOW_HEIGHT: f64 = 720.0;
+const DEFAULT_WINDOW_WIDTH: f64 = 1180.0;
+const DEFAULT_WINDOW_HEIGHT: f64 = 740.0;
 
 fn main_window(app: &tauri::AppHandle) -> Result<WebviewWindow, CommandError> {
     app.get_webview_window("main")

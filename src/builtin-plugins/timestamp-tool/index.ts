@@ -1,5 +1,6 @@
 import type { ToolPlugin } from '../../core/plugin/plugin-types'
-import TimestampToolView from './TimestampToolView'
+import { lazy } from 'react'
+const TimestampToolView = lazy(() => import('./TimestampToolView'))
 
 const plugin: ToolPlugin = {
   id: 'official.timestamp-tool',

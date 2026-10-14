@@ -1,5 +1,6 @@
 import type { ToolPlugin } from '../../core/plugin/plugin-types'
-import RegexToolView from './RegexToolView'
+import { lazy } from 'react'
+const RegexToolView = lazy(() => import('./RegexToolView'))
 
 const plugin: ToolPlugin = {
   id: 'official.regex-tool',

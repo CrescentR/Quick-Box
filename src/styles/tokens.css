@@ -2,7 +2,7 @@
 [data-theme="dark"] {
   color-scheme: dark;
 
-  --qb-font-sans: system-ui, "Segoe UI", "Microsoft YaHei UI", -apple-system, sans-serif;
+  --qb-font-sans: "IBM Plex Sans", "Microsoft YaHei UI", "PingFang SC", "Noto Sans SC", sans-serif;
   --qb-font-mono: "JetBrains Mono", "Cascadia Code", "SF Mono", Consolas, monospace;
 
   --qb-font-size-search: 16px;
@@ -15,37 +15,41 @@
   --qb-font-weight-medium: 500;
   --qb-font-weight-semibold: 600;
 
-  --qb-bg-app: #0d0f14;
-  --qb-bg-app-top: #11131a;
-  --qb-bg-app-bottom: #090b10;
-  --qb-bg-app-glow: rgba(124, 92, 255, 0.14);
-  --qb-bg-window: rgba(24, 24, 30, 0.94);
-  --qb-bg-window-solid: #18181e;
-  --qb-bg-surface: rgba(255, 255, 255, 0.04);
+  /* 石墨灰底 + 琥珀强调色：琥珀只标记「按 Enter 会作用的那一项」和主操作 */
+  --qb-bg-app: #18191b;
+  --qb-bg-app-top: #18191b;
+  --qb-bg-app-bottom: #18191b;
+  --qb-bg-app-glow: transparent;
+  --qb-bg-window: #1f2023;
+  --qb-bg-window-solid: #1f2023;
+  --qb-bg-surface: rgba(255, 255, 255, 0.035);
   --qb-bg-surface-strong: rgba(255, 255, 255, 0.06);
-  --qb-bg-surface-elevated: rgba(255, 255, 255, 0.075);
+  --qb-bg-surface-elevated: rgba(255, 255, 255, 0.085);
   --qb-bg-focus: rgba(255, 255, 255, 0.07);
-  --qb-bg-overlay: rgba(0, 0, 0, 0.4);
-  --qb-bg-input: rgba(255, 255, 255, 0.05);
-  --qb-bg-code: rgba(7, 8, 12, 0.55);
-  --qb-bg-code-glint: rgba(255, 255, 255, 0.03);
-  --qb-bg-selection: rgba(124, 92, 255, 0.32);
-  --qb-bg-scrollbar: rgba(255, 255, 255, 0.14);
-  --qb-bg-scrollbar-hover: rgba(255, 255, 255, 0.22);
+  --qb-bg-overlay: rgba(0, 0, 0, 0.45);
+  --qb-bg-input: rgba(255, 255, 255, 0.04);
+  --qb-bg-code: rgba(0, 0, 0, 0.22);
+  --qb-bg-code-glint: rgba(255, 255, 255, 0.02);
+  --qb-bg-selection: rgba(240, 180, 60, 0.3);
+  --qb-bg-scrollbar: rgba(255, 255, 255, 0.12);
+  --qb-bg-scrollbar-hover: rgba(255, 255, 255, 0.2);
 
-  --qb-border-subtle: rgba(255, 255, 255, 0.08);
-  --qb-border-strong: rgba(255, 255, 255, 0.12);
-  --qb-border-focus: rgba(124, 92, 255, 0.45);
+  --qb-border-subtle: rgba(255, 255, 255, 0.075);
+  --qb-border-strong: rgba(255, 255, 255, 0.13);
+  --qb-border-focus: rgba(240, 180, 60, 0.55);
 
-  --qb-accent-primary: #7c5cff;
-  --qb-accent-primary-hover: #8e72ff;
-  --qb-accent-primary-soft: rgba(124, 92, 255, 0.18);
-  --qb-accent-primary-strong: rgba(124, 92, 255, 0.34);
+  --qb-accent-primary: #f0b43c;
+  --qb-accent-primary-hover: #f5c25c;
+  --qb-accent-primary-soft: rgba(240, 180, 60, 0.13);
+  --qb-accent-primary-strong: rgba(240, 180, 60, 0.28);
+  /* 实心琥珀填充（主按钮、键帽），上面的文字用 fill-ink */
+  --qb-accent-fill: #f0b43c;
+  --qb-accent-fill-ink: #2a1f06;
 
-  --qb-text-primary: #f1f1f4;
-  --qb-text-secondary: #a1a1aa;
-  --qb-text-muted: rgba(161, 161, 170, 0.72);
-  --qb-text-on-accent: #f8f7ff;
+  --qb-text-primary: #ecebe7;
+  --qb-text-secondary: #aaa9a4;
+  --qb-text-muted: #7f7e7a;
+  --qb-text-on-accent: #2a1f06;
 
   --qb-status-success: #34d399;
   --qb-status-success-soft: rgba(52, 211, 153, 0.16);
@@ -54,16 +58,16 @@
   --qb-status-danger: #f87171;
   --qb-status-danger-soft: rgba(248, 113, 113, 0.16);
 
-  --qb-radius-window: 18px;
-  --qb-radius-panel: 16px;
-  --qb-radius-item: 12px;
-  --qb-radius-control: 10px;
+  --qb-radius-window: 12px;
+  --qb-radius-panel: 10px;
+  --qb-radius-item: 8px;
+  --qb-radius-control: 6px;
   --qb-radius-pill: 999px;
 
-  --qb-shadow-window: 0 24px 80px rgba(0, 0, 0, 0.45);
-  --qb-shadow-panel: 0 18px 60px rgba(0, 0, 0, 0.4);
-  --qb-shadow-code: inset 0 1px 0 rgba(255, 255, 255, 0.03);
-  --qb-shadow-focus: 0 0 0 1px var(--qb-border-focus), 0 0 0 4px rgba(124, 92, 255, 0.16);
+  --qb-shadow-window: 0 20px 60px rgba(0, 0, 0, 0.45);
+  --qb-shadow-panel: 0 12px 32px rgba(0, 0, 0, 0.35);
+  --qb-shadow-code: none;
+  --qb-shadow-focus: 0 0 0 2px var(--qb-border-focus);
 
   --qb-space-0: 0;
   --qb-space-1: 4px;
@@ -83,8 +87,8 @@
 
   --qb-window-width-launcher: 760px;
   --qb-window-height-launcher: 480px;
-  --qb-window-width-split: 1080px;
-  --qb-window-height-split: 720px;
+  --qb-window-width-split: 1180px;
+  --qb-window-height-split: 740px;
   --qb-panel-width-list: 360px;
   --qb-panel-width-detail: 600px;
   --qb-search-height: 64px;
@@ -120,40 +124,45 @@
 [data-theme="light"] {
   color-scheme: light;
 
-  --qb-bg-app: #eef1f7;
-  --qb-bg-app-top: #f8f9fd;
-  --qb-bg-app-bottom: #e5e9f2;
-  --qb-bg-app-glow: rgba(124, 92, 255, 0.1);
-  --qb-bg-window: rgba(250, 250, 252, 0.94);
-  --qb-bg-window-solid: #fafafc;
-  --qb-bg-surface: rgba(17, 24, 39, 0.04);
-  --qb-bg-surface-strong: rgba(17, 24, 39, 0.07);
-  --qb-bg-surface-elevated: rgba(17, 24, 39, 0.1);
-  --qb-bg-focus: rgba(124, 92, 255, 0.12);
-  --qb-bg-overlay: rgba(15, 23, 42, 0.16);
-  --qb-bg-input: rgba(17, 24, 39, 0.04);
-  --qb-bg-code: rgba(255, 255, 255, 0.74);
-  --qb-bg-code-glint: rgba(255, 255, 255, 0.58);
-  --qb-bg-selection: rgba(124, 92, 255, 0.18);
-  --qb-bg-scrollbar: rgba(17, 24, 39, 0.14);
-  --qb-bg-scrollbar-hover: rgba(17, 24, 39, 0.24);
+  --qb-bg-app: #e6e7e9;
+  --qb-bg-app-top: #e6e7e9;
+  --qb-bg-app-bottom: #e6e7e9;
+  --qb-bg-app-glow: transparent;
+  --qb-bg-window: #f5f6f7;
+  --qb-bg-window-solid: #f5f6f7;
+  --qb-bg-surface: rgba(20, 22, 26, 0.035);
+  --qb-bg-surface-strong: rgba(20, 22, 26, 0.06);
+  --qb-bg-surface-elevated: #ffffff;
+  --qb-bg-focus: rgba(20, 22, 26, 0.06);
+  --qb-bg-overlay: rgba(20, 22, 26, 0.18);
+  --qb-bg-input: #ffffff;
+  --qb-bg-code: #ffffff;
+  --qb-bg-code-glint: transparent;
+  --qb-bg-selection: rgba(232, 165, 35, 0.3);
+  --qb-bg-scrollbar: rgba(20, 22, 26, 0.16);
+  --qb-bg-scrollbar-hover: rgba(20, 22, 26, 0.26);
 
-  --qb-border-subtle: rgba(17, 24, 39, 0.08);
-  --qb-border-strong: rgba(17, 24, 39, 0.14);
-  --qb-border-focus: rgba(124, 92, 255, 0.32);
+  --qb-border-subtle: rgba(20, 22, 26, 0.09);
+  --qb-border-strong: rgba(20, 22, 26, 0.16);
+  --qb-border-focus: rgba(176, 112, 0, 0.6);
 
-  --qb-text-primary: #151821;
-  --qb-text-secondary: #4b5563;
-  --qb-text-muted: rgba(75, 85, 99, 0.76);
-  --qb-text-on-accent: #ffffff;
+  --qb-accent-primary: #9a6200;
+  --qb-accent-primary-hover: #855400;
+  --qb-accent-primary-soft: rgba(232, 165, 35, 0.16);
+  --qb-accent-primary-strong: rgba(232, 165, 35, 0.32);
+  --qb-accent-fill: #f2b53a;
+  --qb-accent-fill-ink: #2a1f06;
+
+  --qb-text-primary: #1b1d20;
+  --qb-text-secondary: #4f535a;
+  --qb-text-muted: #73777e;
+  --qb-text-on-accent: #2a1f06;
   --qb-status-success-soft: rgba(52, 211, 153, 0.14);
   --qb-status-warning-soft: rgba(251, 191, 36, 0.14);
   --qb-status-danger-soft: rgba(248, 113, 113, 0.14);
 
-  --qb-shadow-window: 0 22px 72px rgba(15, 23, 42, 0.14);
-  --qb-shadow-panel: 0 16px 48px rgba(15, 23, 42, 0.12);
-  --qb-shadow-code:
-    inset 0 1px 0 rgba(255, 255, 255, 0.78),
-    0 10px 28px rgba(15, 23, 42, 0.06);
-  --qb-shadow-focus: 0 0 0 1px var(--qb-border-focus), 0 0 0 4px rgba(124, 92, 255, 0.12);
+  --qb-shadow-window: 0 18px 50px rgba(20, 22, 26, 0.16);
+  --qb-shadow-panel: 0 10px 28px rgba(20, 22, 26, 0.12);
+  --qb-shadow-code: none;
+  --qb-shadow-focus: 0 0 0 2px var(--qb-border-focus);
 }

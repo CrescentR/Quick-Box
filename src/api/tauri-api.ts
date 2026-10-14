@@ -40,6 +40,11 @@ async function invokePreviewCommand<TResponse>(
   args?: Record<string, unknown>,
 ): Promise<TResponse> {
   switch (command) {
+    case 'load_workspace':
+      return readLocalStorageJson('quickbox.preview.workspace', null) as TResponse
+    case 'save_workspace':
+      window.localStorage.setItem('quickbox.preview.workspace', JSON.stringify(args?.data))
+      return undefined as TResponse
     case 'load_config':
       return readLocalStorageJson(previewConfigKey, previewDefaultConfig) as TResponse
     case 'save_config':
@@ -134,10 +139,14 @@ async function invokePreviewCommand<TResponse>(
       } as TResponse
     case 'list_directory_files':
       return [] as TResponse
+    case 'open_release_page':
+      window.open('https://github.com/CrescentR/Quick-Box/releases', '_blank', 'noopener,noreferrer')
+      return undefined as TResponse
     case 'apply_batch_rename':
-      return [] as TResponse
     case 'search_file_contents':
-      return [] as TResponse
+    case 'cancel_file_search':
+    case 'file_search_progress':
+      throw new Error('此操作需要 QuickBox 桌面应用，浏览器预览无法访问本地文件系统。')
     case 'pick_screen_color':
       return {
         x: 0,

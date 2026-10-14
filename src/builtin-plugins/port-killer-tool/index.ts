@@ -1,5 +1,6 @@
 import type { ToolPlugin } from '../../core/plugin/plugin-types'
-import PortKillerToolView from './PortKillerToolView'
+import { lazy } from 'react'
+const PortKillerToolView = lazy(() => import('./PortKillerToolView'))
 
 const plugin: ToolPlugin = {
   id: 'official.port-killer-tool',

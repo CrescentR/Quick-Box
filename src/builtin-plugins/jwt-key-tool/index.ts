@@ -1,5 +1,6 @@
 import type { ToolPlugin } from '../../core/plugin/plugin-types'
-import JwtKeyToolView from './JwtKeyToolView'
+import { lazy } from 'react'
+const JwtKeyToolView = lazy(() => import('./JwtKeyToolView'))
 
 const plugin: ToolPlugin = {
   id: 'official.jwt-key-tool',

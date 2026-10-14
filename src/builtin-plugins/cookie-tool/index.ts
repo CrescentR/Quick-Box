@@ -1,5 +1,6 @@
 import type { ToolPlugin } from '../../core/plugin/plugin-types'
-import CookieToolView from './CookieToolView'
+import { lazy } from 'react'
+const CookieToolView = lazy(() => import('./CookieToolView'))
 
 const plugin: ToolPlugin = {
   id: 'official.cookie-tool',
