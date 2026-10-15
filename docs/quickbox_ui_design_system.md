@@ -1,5 +1,7 @@
 # QuickBox UI 设计系统与组件规范 V0.1
 
+> **历史设计稿**：本文保留 V0.1 阶段的视觉方向和未来插件方案，部分配色、组件与 UI Schema 设想不等同于当前实现。开发时请参阅 [核心组件规范](核心组件规范.md)、[React 插件 View 规则](React渲染插件View规则.md) 和 [开发指南](development.md)。[返回文档中心](README.md)。
+
 > 项目定位：轻量级桌面端快捷工具启动器，Windows 优先，未来兼容 macOS / Linux。  
 > 技术方向：Tauri 2 + React + TypeScript + Rust Core + SQLite。  
 > 插件方向：V0.1 支持官方内置插件；未来第三方 Standard UI 插件使用声明式 UI Schema，由主程序统一渲染。

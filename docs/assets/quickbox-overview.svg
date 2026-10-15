@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300" role="img" aria-labelledby="title description">
+  <title id="title">QuickBox：搜索、处理、留存</title>
+  <desc id="description">68 个工具入口、621 份 Linux 命令手册，本地数据与键盘优先操作。</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#202227"/>
+      <stop offset="1" stop-color="#141518"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#f0b43c"/>
+      <stop offset="1" stop-color="#f4d795"/>
+    </linearGradient>
+  </defs>
+  <rect x="1" y="1" width="1198" height="298" rx="20" fill="url(#background)" stroke="#34363c"/>
+  <g font-family="'Microsoft YaHei', 'PingFang SC', 'Noto Sans CJK SC', sans-serif">
+    <text x="44" y="48" font-size="12" letter-spacing="3" fill="#b0b0ae">YOUR EVERYDAY DEVELOPER TOOLBOX</text>
+    <text x="44" y="108" font-size="35" font-weight="700" fill="#eeece7">搜索，处理，留存。</text>
+    <text x="44" y="147" font-size="16" fill="#a9a9a5">从一个快捷键开始，把日常开发收进工作台。</text>
+    <g transform="translate(44 190)">
+      <rect width="150" height="62" rx="10" fill="#f0b43c" fill-opacity="0.08" stroke="#f0b43c" stroke-opacity="0.22"/>
+      <text x="18" y="29" font-size="25" font-weight="700" fill="#f0b43c">68</text>
+      <text x="18" y="49" font-size="12" fill="#aaa9a4">工具入口</text>
+      <rect x="164" width="150" height="62" rx="10" fill="#f0b43c" fill-opacity="0.08" stroke="#f0b43c" stroke-opacity="0.22"/>
+      <text x="182" y="29" font-size="25" font-weight="700" fill="#f0b43c">621</text>
+      <text x="182" y="49" font-size="12" fill="#aaa9a4">Linux 命令手册</text>
+      <rect x="328" width="150" height="62" rx="10" fill="#ffffff" fill-opacity="0.025" stroke="#383a40"/>
+      <text x="346" y="29" font-size="21" font-weight="600" fill="#eeece7">本地优先</text>
+      <text x="346" y="49" font-size="12" fill="#aaa9a4">数据位置由你选择</text>
+    </g>
+    <g transform="translate(665 48)">
+      <rect width="490" height="204" rx="14" fill="#1b1c20" stroke="#3a3c41"/>
+      <circle cx="19" cy="21" r="4" fill="#f0b43c"/>
+      <text x="33" y="25" font-size="12" font-weight="600" fill="#e9e7e2">QuickBox</text>
+      <rect x="344" y="10" width="50" height="24" rx="5" fill="#282a30" stroke="#44464c"/>
+      <text x="369" y="27" text-anchor="middle" font-size="12" fill="#c4c3bd">Alt</text>
+      <text x="404" y="26" text-anchor="middle" font-size="12" fill="#777b83">+</text>
+      <rect x="416" y="10" width="58" height="24" rx="5" fill="#282a30" stroke="#44464c"/>
+      <text x="445" y="27" text-anchor="middle" font-size="12" fill="#c4c3bd">Space</text>
+      <path d="M0 45H490" stroke="#34363b"/>
+      <g transform="translate(20 64)">
+        <rect width="450" height="40" rx="7" fill="#25272c" stroke="#50514d"/>
+        <circle cx="18" cy="18" r="5" fill="none" stroke="#9e9f99" stroke-width="1.5"/>
+        <path d="m22 22 4 4" stroke="#9e9f99" stroke-width="1.5"/>
+        <text x="38" y="26" font-size="14" fill="#d7d6d0">工具名 / 命令 / 中文用途</text>
+        <rect y="53" width="450" height="34" rx="6" fill="#f0b43c" fill-opacity="0.12"/>
+        <text x="12" y="76" font-size="13" fill="#eddfbf">找到常用工具</text>
+        <text x="420" y="76" text-anchor="end" font-size="11" fill="#c3af84">Enter</text>
+        <text x="12" y="113" font-size="12" fill="#9b9b95">JSON 格式化</text>
+        <text x="135" y="113" font-size="12" fill="#9b9b95">Linux 命令大全</text>
+        <text x="275" y="113" font-size="12" fill="#9b9b95">命令与文件</text>
+      </g>
+    </g>
+  </g>
+</svg>

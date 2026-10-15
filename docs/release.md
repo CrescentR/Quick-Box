@@ -1,6 +1,15 @@
-# QuickBox 发布
+# 构建与发布指南
+
+[返回首页](../README.md) · [文档中心](README.md) · [开发指南](development.md) · [安装与使用](usage.md)
 
 `.github/workflows/release.yml` 会检查、打包并自动发布 GitHub Release。安装包包含 Windows x64 的 NSIS `.exe`、MSI `.msi`，以及 Linux x64 的 `.AppImage`、`.deb`，同时提供 `SHA256SUMS.txt` 校验文件。
+
+| 触发方式 | 结果 |
+| --- | --- |
+| Pull Request | Check 工作流执行验证，不创建发行版 |
+| 推送 `main` / `master` | 检查与打包通过后，发布带提交标识的预览版 |
+| 推送 `vX.Y.Z` 标签 | 版本校验通过后，发布正式版 |
+| 手动运行 Release | 按所选分支或正式标签执行对应发布流程 |
 
 ## 推送代码自动发布预览版
 
