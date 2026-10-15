@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="src-tauri/app-icon.svg" width="76" height="76" alt="QuickBox 图标" />
+<img src="src-tauri/app-icon.png" width="76" height="76" alt="QuickBox 图标" />
 
 # QuickBox
 
@@ -43,14 +43,14 @@ QuickBox 面向经常处理 JSON、排查端口、查找命令、整理代码与
 
 **左侧找到工具，右侧直接处理。** Linux 命令大全支持正文搜索、分类筛选和完整 Markdown 阅读。
 
-![Linux 命令大全：在 QuickBox 中搜索并阅读 systemctl 手册](docs/assets/screenshots/linux-command-reference.jpg)
+![Linux 命令大全：在 QuickBox 中搜索并阅读 systemctl 手册](docs/assets/screenshots/linux-command-reference.png)
 
 <details>
 <summary><strong>查看命令与文件工作台</strong></summary>
 
 保存多行命令、添加标签、检索和复制内容，也可以收藏文件的独立副本。
 
-![命令与文件：记录 Git 命令，并保存文件副本](docs/assets/screenshots/command-library.jpg)
+![命令与文件：记录 Git 命令，并保存文件副本](docs/assets/screenshots/command-library.png)
 
 </details>
 

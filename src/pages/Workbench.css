@@ -95,6 +95,22 @@
   flex: none;
 }
 
+.qb-page-title__mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+.qb-page-title__icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+  flex: none;
+  object-fit: contain;
+  user-select: none;
+}
+
 .qb-page-title__badge {
   display: none;
 }

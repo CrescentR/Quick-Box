@@ -48,7 +48,10 @@ export default function PageHeader({
           <div className="qb-page-title__controls">
             <WindowControls />
           </div>
-          <span className="qb-page-title__mark">QuickBox</span>
+          <span className="qb-page-title__mark">
+            <img className="qb-page-title__icon" src="/app-icon.png" width="24" height="24" alt="" draggable={false} />
+            QuickBox
+          </span>
         </div>
         {children ? <div className="qb-page-title__search">{children}</div> : null}
         {pageNav}
@@ -62,6 +65,7 @@ export default function PageHeader({
         <div className="qb-page-title__controls">
           <WindowControls />
         </div>
+        <img className="qb-page-title__icon" src="/app-icon.png" width="24" height="24" alt="QuickBox" draggable={false} />
         <div className="qb-page-title__copy">
           <div className="qb-page-title__eyebrow">{eyebrow}</div>
           <div className="qb-page-title__name">{title}</div>

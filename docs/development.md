@@ -230,6 +230,23 @@ pnpm tauri:build:win
 
 推送 `main` / `master` 会自动构建预览版；正式版使用与三处应用版本一致的 `vX.Y.Z` 标签。版本同步、权限、产物和失败重试流程见 [构建与发布指南](release.md)。
 
+### 更新应用图标
+
+图标母版为 [`src-tauri/app-icon.png`](../src-tauri/app-icon.png)。更换时使用正方形、带透明圆角的 PNG，再重新生成整套桌面资源：
+
+```bash
+pnpm tauri icon src-tauri/app-icon.png
+```
+
+此命令生成 Windows ICO、macOS ICNS 和各尺寸 PNG。不要只更新一个尺寸；窗口、托盘、安装器、卸载器及快捷方式都会使用这套资源。网页与应用标题栏使用 `public/app-icon.png`，浏览器 favicon 使用 `public/favicon.ico`，Windows 下可同步如下：
+
+```powershell
+Copy-Item 'src-tauri/icons/128x128@2x.png' 'public/app-icon.png' -Force
+Copy-Item 'src-tauri/icons/icon.ico' 'public/favicon.ico' -Force
+```
+
+README 顶部直接展示图标母版。更新后运行桌面打包，并检查标题栏、网页图标及安装包资源。
+
 ## 7. 常见问题
 
 | 现象 | 排查方式 |
