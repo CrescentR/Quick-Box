@@ -6,6 +6,7 @@ mod platform;
 mod plugin_state;
 mod shortcuts;
 mod storage;
+mod task_reminders;
 mod tray;
 
 use tauri::Manager;
@@ -54,6 +55,31 @@ pub fn run() {
             commands::backups::export_backup_file,
             commands::backups::delete_backup_file,
             commands::backups::open_backup_directory,
+            commands::tasks::task_query,
+            commands::tasks::task_get,
+            commands::tasks::task_create,
+            commands::tasks::task_update,
+            commands::tasks::task_toggle,
+            commands::tasks::task_delete,
+            commands::tasks::task_restore,
+            commands::tasks::task_purge,
+            commands::tasks::task_reorder,
+            commands::tasks::task_lists,
+            commands::tasks::task_create_list,
+            commands::tasks::task_delete_list,
+            commands::tasks::task_tags,
+            commands::tasks::task_create_tag,
+            commands::tasks::task_delete_tag,
+            commands::tasks::task_overview,
+            commands::tasks::task_import,
+            commands::tasks::task_export,
+            commands::tasks::task_get_setting,
+            commands::tasks::task_set_setting,
+            commands::tasks::task_due_reminders,
+            commands::tasks::task_acknowledge_reminders,
+            task_reminders::task_show_reminder,
+            task_reminders::task_hide_reminder,
+            task_reminders::task_open_from_reminder,
             storage::location::get_storage_location,
             storage::location::pick_storage_directory,
             storage::location::set_storage_location,
@@ -75,6 +101,12 @@ pub fn run() {
             commands::file_search::file_search_progress,
             commands::screen::pick_screen_color,
         ])
+        .on_window_event(|window, event| {
+            // 主窗口关闭仍表示退出；隐藏的提醒窗口不能让进程残留且无法再次打开。
+            if window.label() == "main" && matches!(event, tauri::WindowEvent::CloseRequested { .. }) {
+                window.app_handle().exit(0);
+            }
+        })
         .setup(|app| {
             let directory = storage::location::initialize(app.handle())
                 .map_err(|error| std::io::Error::other(error.message))?;
@@ -114,6 +146,8 @@ pub fn run() {
                     platform::ensure_taskbar_icon(&window)?;
                 }
             }
+
+            task_reminders::start(app.handle().clone());
 
             Ok(())
         })

@@ -40,6 +40,29 @@ async function invokePreviewCommand<TResponse>(
   args?: Record<string, unknown>,
 ): Promise<TResponse> {
   switch (command) {
+    case 'task_query':
+    case 'task_get':
+    case 'task_create':
+    case 'task_update':
+    case 'task_toggle':
+    case 'task_delete':
+    case 'task_restore':
+    case 'task_purge':
+    case 'task_reorder':
+    case 'task_lists':
+    case 'task_create_list':
+    case 'task_delete_list':
+    case 'task_tags':
+    case 'task_create_tag':
+    case 'task_delete_tag':
+    case 'task_overview':
+    case 'task_import':
+    case 'task_export':
+    case 'task_get_setting':
+    case 'task_set_setting':
+    case 'task_due_reminders':
+    case 'task_acknowledge_reminders':
+      return (await (await import('./task-preview')).taskPreview(command, args)) as TResponse
     case 'load_library':
     case 'save_library_item':
     case 'read_library_file':

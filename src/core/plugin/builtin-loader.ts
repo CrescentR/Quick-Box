@@ -1,5 +1,6 @@
 import snippetTool from '../../builtin-plugins/snippet-tool'
 import libraryTool from '../../builtin-plugins/library-tool'
+import taskTool from '../../builtin-plugins/task-tool'
 import advancedTools from '../../builtin-plugins/advanced-tools'
 import base64Tool from '../../builtin-plugins/base64-tool'
 import chmodCalculatorTool from '../../builtin-plugins/chmod-calculator-tool'
@@ -28,6 +29,7 @@ export function loadBuiltinPlugins() {
   ;[
     snippetTool,
     libraryTool,
+    taskTool,
     jsonTool,
     timestampTool,
     base64Tool,

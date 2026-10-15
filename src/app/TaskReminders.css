@@ -1,0 +1,17 @@
+.qb-task-reminder {
+  position: fixed; right: 20px; bottom: 42px; z-index: var(--qb-z-toast);
+  width: min(370px, calc(100vw - 32px)); padding: 15px 17px;
+  border: 1px solid var(--qb-border-strong); border-left: 3px solid var(--qb-accent-primary);
+  border-radius: var(--qb-radius-panel); background: var(--qb-bg-window-solid);
+  box-shadow: var(--qb-shadow-panel); color: var(--qb-text-primary);
+}
+.qb-task-reminder header { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+.qb-task-reminder header > span { display: flex; align-items: center; gap: 7px; color: var(--qb-accent-primary); font-size: 12px; }
+.qb-task-reminder header small { margin-left: auto; font-size: 11px; color: var(--qb-text-muted); }
+.qb-task-reminder header > button { margin-left: auto; border: 0; padding: 4px; cursor: pointer; color: var(--qb-text-secondary); }
+.qb-task-reminder__title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 15px; line-height: 1.5; word-break: break-word; }
+.qb-task-reminder p { margin: 7px 0; color: var(--qb-text-secondary); font-size: 12px; }
+.qb-task-reminder footer { display: flex; gap: 8px; margin-top: 12px; }
+.qb-task-reminder .qb-task-reminder__error { color: var(--qb-status-danger); max-height: 36px; overflow: auto; }
+.qb-task-reminder-shell { width: 100%; height: 100%; padding: 8px; background: var(--qb-bg-app); }
+.qb-task-reminder--window { position: static; width: 100%; height: 100%; box-shadow: none; }

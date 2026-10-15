@@ -9,6 +9,7 @@
 | 文档 | 适合解决的问题 |
 | --- | --- |
 | [使用指南](usage.md) | 安装、快捷键、Linux 手册、个人资料、备份和数据迁移 |
+| [任务管理](task-management.md) | 待办视图、自然日期、重复提醒、任务模板和从 Task 迁移 |
 | [开发指南](development.md) | 配置开发环境、启动应用、运行检查与遵循数据约定 |
 | [构建与发布](release.md) | 生成安装包、自动预览版、正式版本标签和发行故障排查 |
 | [架构概览](../ARCHITECTURE.md) | 了解当前前端、Rust、存储与插件的职责边界 |
@@ -36,3 +37,5 @@
 | [阶段任务清单](../CODEX_TASKS.md) / [分步任务](../分步任务.md) | 历史开发任务拆解，不能作为当前功能清单 |
 
 内置 Linux 手册的固定版本、来源和许可保存在 [`command-cheatsheet-tool/data/`](../src/builtin-plugins/command-cheatsheet-tool/data)，也可以直接在应用中打开“版本与许可证”查看。
+
+任务管理的移植来源、固定提交、数据交换及宿主适配范围见 [任务管理 → 来源与合并范围](task-management.md#source)。

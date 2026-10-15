@@ -54,7 +54,7 @@ export function ToolViewPane({
 
       <div className="qb-launcher-view__body qb-scrollbar">
         {view ? (
-          <ToolErrorBoundary key={`${viewId}:${params?.requestId ?? ''}`}>
+          <ToolErrorBoundary key={viewId === 'official.task-tool.view' ? viewId : `${viewId}:${params?.requestId ?? ''}`}>
             <Suspense fallback={<p role="status">正在加载工具…</p>}>
               <ToolProvider viewId={viewId} params={params}>
                 <view.component params={params} />

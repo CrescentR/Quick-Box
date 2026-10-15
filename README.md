@@ -4,9 +4,9 @@
 
 # QuickBox
 
-**让工具、命令和文件，随叫随到。**
+**让工具、命令、任务和文件，随叫随到。**
 
-键盘优先的桌面开发工具箱，把日常处理、命令查阅与个人资料收在一个工作台里。
+键盘优先的桌面开发工具箱，把日常处理、任务安排、命令查阅与个人资料收在一个工作台里。
 
 [![CI · GitHub Actions](https://img.shields.io/badge/CI-GitHub_Actions-7c8db5?style=flat-square&labelColor=24262b)](https://github.com/CrescentR/Quick-Box/actions/workflows/check.yml)
 [![Release · Windows + Linux](https://img.shields.io/badge/Release-Windows_%2B_Linux-81b29a?style=flat-square&labelColor=24262b)](https://github.com/CrescentR/Quick-Box/actions/workflows/release.yml)
@@ -18,7 +18,7 @@
 
 </div>
 
-![QuickBox：68 个工具、621 份命令手册、本地数据与键盘操作](docs/assets/quickbox-overview.svg)
+![QuickBox：69 个工具、621 份命令手册、本地任务与个人资料](docs/assets/quickbox-overview.svg)
 
 QuickBox 面向经常处理 JSON、排查端口、查找命令、整理代码与文件的开发者。按下全局快捷键，输入工具名称或用途，就能在同一个窗口中完成操作。常用工具可以置顶，命令和文件可以留存在本机，下次需要时直接取用。
 
@@ -32,10 +32,11 @@ QuickBox 面向经常处理 JSON、排查端口、查找命令、整理代码与
 | **回忆一个命令** | 离线检索 **621 份 Linux 命令手册**，查说明、参数和示例，或切到 tldr 快速示例。 |
 | **排查本机问题** | 查看端口占用、清理占用进程、搜索文件内容、校验文件摘要、预演批量重命名。 |
 | **留住常用资料** | 记录多行命令、保存代码片段和文件副本，按标题、标签或内容查找。 |
+| **安排接下来要做的事** | 用“明天下午三点开会”快速建任务，以列表、标签、优先级和子任务整理待办，设置重复与到期提醒。 |
 | **管理零散备份** | 在设置中保存 ZIP、SQL、图片、文档等任意格式文件，保留独立副本并随时导出。 |
 | **保持操作顺手** | 中英文搜索、使用记录排序、最多 8 个常用置顶、全局热键、托盘、浅色 / 暗色 / 跟随系统主题。 |
 
-目前内置 **20 个插件、68 个工具入口**。插件页支持搜索与启停；命令手册和工具视图按需加载。
+目前内置 **21 个插件、69 个工具入口**。插件页支持搜索与启停；命令手册和工具视图按需加载。
 
 <a id="screenshots"></a>
 
@@ -79,6 +80,7 @@ Windows 界面依赖系统 WebView2。安装器会处理 WebView2 运行时检�
 2. **找到工具**：输入 `json`、`端口`、`Linux`，或在左侧选择分类，点击结果或按 `Enter` 打开。
 3. **留下常用入口**：选中工具后按 `Ctrl + D` 置顶，之后使用 `Alt + 1–8` 直接打开。
 4. **保存自己的内容**：搜索“命令与文件”或“本地代码片段”；任意格式文件备份在“设置 → 统一备份管理”中添加。
+5. **安排日常任务**：搜索“任务管理”或 `todo`，快速记录待办；已有 Task 数据可通过 JSON 导入，见 [任务管理指南](docs/task-management.md)。
 
 | 快捷键 | 操作 |
 | --- | --- |
@@ -103,7 +105,7 @@ Windows 界面依赖系统 WebView2。安装器会处理 WebView2 运行时检�
 | **编码与加密** | Base64、Unicode、HTML Entity、Hash、HMAC、AES-GCM、JWT 密钥生成 / 解析 / 生成、文件哈希、二维码 |
 | **JSON / 文本** | JSON / YAML / XML / SQL 格式化、文本差异、正则测试 / 替换 / 模板库、CSV ↔ JSON、YAML ↔ Properties、Markdown 预览与表格 |
 | **时间与生成** | 时间戳、日期差值、时区、UUID、随机字符串、Cron、占位文本 |
-| **开发与设计** | 命令与文件、代码片段、JSON → TypeScript / Rust / Schema、Git Commit、Gitignore、SemVer、颜色转换、屏幕取色、单位换算 |
+| **开发与设计** | 任务管理、命令与文件、代码片段、JSON → TypeScript / Rust / Schema、Git Commit、Gitignore、SemVer、颜色转换、屏幕取色、单位换算 |
 | **系统运维** | Linux 命令大全、chmod 权限计算、文件内容搜索、批量重命名、剪贴板纯文本历史 |
 
 ### 随应用带走的 Linux 命令手册
@@ -112,14 +114,21 @@ Windows 界面依赖系统 WebView2。安装器会处理 WebView2 运行时检�
 
 文档版本为 `1.22.0`，固定提交与内容校验信息保存在 [来源清单](src/builtin-plugins/command-cheatsheet-tool/data/source.json)。日常查阅不依赖在线文档站点。
 
+### 在工具箱里安排任务
+
+任务管理整合自 [CrescentR/Task](https://github.com/CrescentR/Task) 的基础能力：今天与逾期、收集箱、未来 30 天、完成记录和回收站；支持列表、标签、子任务、P1–P4 优先级、置顶、重复任务和最近 12 条创建模板。
+
+可以输入“明天下午三点开会”识别日期与时间，也可以在详情中精确设置。到期提醒需要日期和时间，QuickBox 运行期间每 15 秒检查一次；隐藏到托盘仍可提醒，退出程序后不提醒。已有 Task 用户可导出 JSON 再导入 QuickBox，保留主要任务字段；CSV / Markdown 适合有限字段的交换与阅读。迁移方法和具体规则见 [任务管理指南](docs/task-management.md)。
+
 <a id="data"></a>
 
 ## 内容留在本机，位置由你选择
 
-配置、插件启停、使用记录、命令和代码片段保存在 SQLite；文件与备份以独立副本保存在数据目录。当前不提供账号和云同步，核心工具在本地处理内容；检查更新、打开发行页及文档外链等操作需要网络。
+配置、插件启停、使用记录、任务、命令和代码片段保存在 SQLite；文件与备份以独立副本保存在数据目录。当前不提供账号和云同步，核心工具在本地处理内容；检查更新、打开发行页及文档外链等操作需要网络。
 
 | 保存入口 | 适合存什么 | 规则 |
 | --- | --- | --- |
+| **任务管理** | 待办、日程、重复任务、标签和子任务 | JSON 导入 / 导出主要任务字段；完整应用备份还需保留整个数据目录。 |
 | **命令与文件** | 多行命令、脚本说明、标签、经常取用的文件 | 支持搜索、编辑、复制与导出；其中的文件单个最大 **20 MB**。 |
 | **本地代码片段** | 常用代码、模板 | 可标记语言，按标题、标签和正文检索。 |
 | **统一备份管理** | ZIP、SQL、图片、文档等任意格式文件 | 原样复制，不解析内容，无 20 MB 限制；同名文件分别保留。 |
@@ -131,7 +140,7 @@ D:\Apps\QuickBox\
 ├── quickbox.exe
 ├── storage-location.json     # 自定义位置配置，迁移后保存在安装目录
 └── data\
-    ├── quickbox.sqlite3      # 配置、命令、片段、使用记录等
+    ├── quickbox.sqlite3      # 配置、任务、命令、片段、使用记录等
     ├── saved-files\          # “命令与文件”收藏的文件副本
     ├── backups\              # 设置中的统一文件备份
     └── webview\              # 界面缓存与浏览器本地状态
@@ -189,6 +198,7 @@ pnpm tauri:dev
 | 你想了解的内容 | 从这里开始 |
 | --- | --- |
 | 安装、快捷键、工具使用与数据备份 | [使用指南](docs/usage.md) |
+| 待办、重复与提醒、从 Task 迁移 | [任务管理指南](docs/task-management.md) |
 | 环境准备、日常开发、验证与排查 | [开发指南](docs/development.md) |
 | 添加工具、注册命令和视图 | [插件开发示例](docs/插件示范.md) |
 | 打包、自动预览版与正式发布 | [发布指南](docs/release.md) |
@@ -229,6 +239,7 @@ QuickBox 基于 Tauri、React、Vite、Zustand、SQLite 等开源项目构建，
 
 | 内置内容 | 来源与许可 |
 | --- | --- |
+| 任务管理基础能力 | [CrescentR/Task](https://github.com/CrescentR/Task) · 基于固定提交移植并适配 QuickBox，见 [来源与范围](docs/task-management.md#source)；该来源快照未附 `LICENSE` |
 | Linux 命令大全 | [jaywcjlove/linux-command](https://github.com/jaywcjlove/linux-command) · [MIT 许可原文](src/builtin-plugins/command-cheatsheet-tool/data/LICENSE.linux-command.txt)，保留作者署名 |
 | tldr 快速示例 | [tldr-pages/tldr](https://github.com/tldr-pages/tldr) · CC BY 4.0，整理自上游示例 |
 | IBM Plex Sans 字体 | [本地许可文件](src/assets/fonts/IBM-Plex-Sans-LICENSE.txt) |

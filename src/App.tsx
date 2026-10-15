@@ -11,6 +11,9 @@ import type { AppPage } from './pages/page-types'
 import { pluginRegistry } from './core/plugin/plugin-registry'
 import { useConfigStore } from './stores/config-store'
 import { usePluginStore } from './stores/plugin-store'
+import { listen } from '@tauri-apps/api/event'
+import { TaskReminderCenter } from './app/TaskReminders'
+import { useLauncherStore } from './stores/launcher-store'
 
 export default function App() {
   ensureAppBootstrapped()
@@ -21,6 +24,23 @@ export default function App() {
 
   useAppTheme(config.theme)
   useAppShortcuts(setCurrentPage)
+
+  const openTask = (id: string) => {
+    setCurrentPage('launcher')
+    useLauncherStore.getState().openView('official.task-tool.view', {
+      commandId: 'official.task-tool.open', taskId: id, requestId: crypto.randomUUID(),
+    })
+  }
+
+  useEffect(() => {
+    if (!(window as Window & { __TAURI_INTERNALS__?: unknown }).__TAURI_INTERNALS__) return
+    let disposed = false
+    let stop: (() => void) | undefined
+    void listen<{ id: string }>('quickbox:task-open', (event) => {
+      if (typeof event.payload?.id === 'string') openTask(event.payload.id)
+    }).then((unlisten) => { if (disposed) unlisten(); else stop = unlisten }).catch(() => {})
+    return () => { disposed = true; stop?.() }
+  }, [])
 
   useEffect(() => {
     void useWorkspaceStore.getState().hydrate().catch(() => {})
@@ -43,6 +63,7 @@ export default function App() {
   return (
     <MainLayout>
       {renderPage()}
+      <TaskReminderCenter onOpen={openTask} />
     </MainLayout>
   )
 }

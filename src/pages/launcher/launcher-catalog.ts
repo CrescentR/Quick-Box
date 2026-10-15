@@ -9,6 +9,7 @@ import {
   CalendarClock,
   CaseSensitive,
   Clipboard,
+  ClipboardList,
   Clock,
   Code,
   Command,
@@ -94,6 +95,7 @@ const CATEGORY_BY_ID = new Map(TOOL_CATEGORIES.map((category) => [category.id, c
 const BUILTIN_TOOL_META: Record<string, [ToolCategoryId, LucideIcon]> = {
   'snippet-tool.open': ['dev', FileCode],
   'library-tool.open': ['dev', Terminal],
+  'task-tool.open': ['dev', ClipboardList],
   'json-tool.open': ['text', Braces],
   'timestamp-tool.open': ['time', Clock],
   'base64-tool.open': ['codec', Binary],

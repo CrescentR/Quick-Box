@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "task-reminder",
+  "description": "Task reminder window only listens for reminder refresh events",
+  "windows": ["task-reminder"],
+  "permissions": ["core:event:allow-listen", "core:event:allow-unlisten"]
+}
