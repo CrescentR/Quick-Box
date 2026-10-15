@@ -1,15 +1,12 @@
 use rusqlite::{Connection, params};
-use tauri::Manager;
 
 pub fn run_migrations(app: &tauri::AppHandle) -> Result<(), Box<dyn std::error::Error>> {
-    let app_data_dir = app.path().app_data_dir()?;
-    std::fs::create_dir_all(&app_data_dir)?;
-    let mut connection = Connection::open(app_data_dir.join("quickbox.sqlite3"))?;
+    let mut connection = super::open_connection(app).map_err(|error| std::io::Error::other(format!("{}: {:?}", error.message, error.details)))?;
     apply_migrations(&mut connection)?;
     Ok(())
 }
 
-fn apply_migrations(connection: &mut Connection) -> rusqlite::Result<()> {
+pub(super) fn apply_migrations(connection: &mut Connection) -> rusqlite::Result<()> {
     // 兼容旧库：原表均幂等建立；DDL 与版本标记在同一事务内提交。
     let transaction = connection.transaction()?;
     transaction.execute_batch(r#"

@@ -1,0 +1,154 @@
+.qb-command-markdown {
+  width: 100%;
+  min-width: 0;
+  color: var(--qb-text-secondary);
+  font-size: var(--qb-font-size-body);
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.qb-command-markdown > :first-child {
+  margin-top: 0;
+}
+
+.qb-command-markdown > :last-child {
+  margin-bottom: 0;
+}
+
+.qb-command-markdown :where(h1, h2, h3, h4, h5, h6) {
+  margin: 1.3em 0 0.55em;
+  color: var(--qb-text-primary);
+  font-weight: var(--qb-font-weight-semibold);
+  line-height: 1.4;
+}
+
+.qb-command-markdown h1 {
+  font-size: 22px;
+}
+
+.qb-command-markdown h2 {
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--qb-border-subtle);
+  font-size: 18px;
+}
+
+.qb-command-markdown :where(h3, h4, h5, h6) {
+  font-size: 15px;
+}
+
+.qb-command-markdown :where(p, ul, ol, blockquote) {
+  margin: 0.65em 0;
+}
+
+.qb-command-markdown :where(ul, ol) {
+  padding-left: 1.5em;
+}
+
+.qb-command-markdown li + li {
+  margin-top: 0.3em;
+}
+
+.qb-command-markdown li::marker {
+  color: var(--qb-text-muted);
+}
+
+.qb-command-markdown blockquote {
+  padding: 1px 12px;
+  border-left: 3px solid var(--qb-accent-primary);
+  background: var(--qb-accent-primary-soft);
+}
+
+.qb-command-markdown :where(strong, th) {
+  color: var(--qb-text-primary);
+}
+
+.qb-command-markdown :where(a, .qb-command-markdown__command-link) {
+  color: var(--qb-accent-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.qb-command-markdown__command-link {
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  text-align: inherit;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.qb-command-markdown :where(a, .qb-command-markdown__command-link):focus-visible,
+.qb-command-markdown__table:focus-visible {
+  outline: 2px solid var(--qb-accent-primary);
+  outline-offset: 3px;
+}
+
+.qb-command-markdown code {
+  padding: 1px 4px;
+  border: 1px solid var(--qb-border-subtle);
+  border-radius: 4px;
+  background: var(--qb-bg-surface);
+  color: var(--qb-text-primary);
+  font-family: var(--qb-font-mono);
+  font-size: 0.92em;
+  white-space: break-spaces;
+}
+
+.qb-command-markdown .qb-code-block {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  margin: 12px 0;
+  gap: 8px;
+  padding: 10px 12px;
+}
+
+.qb-command-markdown .qb-code-block__body {
+  min-width: 0;
+  max-width: 100%;
+  font-size: 12px;
+  overflow-wrap: normal;
+}
+
+.qb-command-markdown__table {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  margin: 12px 0;
+  overflow-x: auto;
+}
+
+.qb-command-markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.qb-command-markdown :where(th, td) {
+  min-width: 90px;
+  padding: 6px 9px;
+  border: 1px solid var(--qb-border-subtle);
+  text-align: left;
+  vertical-align: top;
+}
+
+.qb-command-markdown th {
+  background: var(--qb-bg-surface);
+}
+
+.qb-command-markdown hr {
+  margin: 20px 0;
+  border: 0;
+  border-top: 1px solid var(--qb-border-subtle);
+}
+
+.qb-command-markdown .task-list-item {
+  list-style: none;
+}
+
+.qb-command-markdown__image-label {
+  color: var(--qb-text-muted);
+}

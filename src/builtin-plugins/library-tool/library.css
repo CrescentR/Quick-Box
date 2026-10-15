@@ -1,0 +1,24 @@
+.qb-library-heading, .qb-library-editor-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.qb-library-heading h2, .qb-library-heading p { margin: 0; }
+.qb-library-heading p, .qb-library-status, .qb-library-empty, .qb-library-editor-heading small, .qb-library-file-meta { font-size: 12px; color: var(--qb-text-muted); overflow-wrap: anywhere; }
+.qb-library-file-input { display: none; }
+.qb-library-toolbar { display: grid; grid-template-columns: minmax(0, 1fr) 120px; gap: 8px; }
+.qb-library-layout { display: grid; grid-template-columns: minmax(160px, 0.7fr) minmax(0, 1.5fr); gap: 16px; align-items: start; }
+.qb-library-list { display: grid; gap: 4px; max-height: 480px; overflow: auto; }
+.qb-library-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--qb-text-secondary); text-align: left; cursor: pointer; }
+.qb-library-item:hover { background: var(--qb-bg-surface); }
+.qb-library-item[data-active="true"] { background: var(--qb-accent-primary-soft); border-color: var(--qb-border-focus); color: var(--qb-text-primary); }
+.qb-library-item > svg { flex-shrink: 0; }
+.qb-library-item > span { min-width: 0; display: grid; gap: 3px; }
+.qb-library-item strong, .qb-library-item small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.qb-library-item small { color: var(--qb-text-muted); }
+.qb-library-editor { display: grid; gap: 10px; padding-left: 16px; border-left: 1px solid var(--qb-border-subtle); min-width: 0; }
+.qb-library-editor .qb-tool-textarea { min-height: 140px; }
+.qb-library .qb-tool-actions { margin: 0; }
+.qb-library-confirm { border: 1px solid var(--qb-border-subtle); border-radius: 8px; padding: 10px; overflow-wrap: anywhere; }
+@media (max-width: 600px) { .qb-library-layout { grid-template-columns: 1fr; } .qb-library-list { max-height: 180px; } .qb-library-editor { border-left: 0; padding-left: 0; } }
+.qb-library { gap: 12px; }
+.qb-library .qb-tool-input { min-height: 34px; padding: 7px 9px; font-size: 12px; }
+.qb-library .qb-tool-field { gap: 5px; font-size: 12px; }
+.qb-library .qb-tool-button { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 5px 10px; font-size: 12px; }
+.qb-library-heading h2 { font-size: 16px; line-height: 22px; }

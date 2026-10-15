@@ -93,6 +93,7 @@ const CATEGORY_BY_ID = new Map(TOOL_CATEGORIES.map((category) => [category.id, c
 /** 内置命令 → 分类与图标，key 为去掉 `official.` 前缀的命令 id */
 const BUILTIN_TOOL_META: Record<string, [ToolCategoryId, LucideIcon]> = {
   'snippet-tool.open': ['dev', FileCode],
+  'library-tool.open': ['dev', Terminal],
   'json-tool.open': ['text', Braces],
   'timestamp-tool.open': ['time', Clock],
   'base64-tool.open': ['codec', Binary],

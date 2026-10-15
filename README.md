@@ -11,9 +11,22 @@ QuickBox 是一个键盘优先的桌面工具启动器，灵感来自 Raycast / 
 - **全局快捷键**：默认 `Alt+Space` 呼出/隐藏启动器，可在设置中切换
 - **系统托盘**：支持最小化到托盘，后台常驻
 - **本地优先**：配置、插件状态与命令使用记录持久化到 SQLite，无账号、无云同步
+- **命令与文件**：在启动器搜索“命令与文件”，记录、编辑、检索和复制命令，保存文件独立副本并导出（单个文件最大 20 MB）
+- **安装目录存储**：数据默认保存在程序安装目录的 `data` 文件夹，位置配置 `storage-location.json` 也保存在安装目录；Windows 禁止将应用数据保存到 C 盘。设置中使用原生文件夹选择器迁移数据库、附件和备份，旧目录保留副本
+- **统一备份管理**：任意格式文件直接复制到数据目录下的 `backups` 文件夹，不解析内容，无 JSON 格式或 20 MB 限制，支持多选、同名独立副本、导出和删除
 - **跨平台骨架**：Windows 优先交付，Rust 层已预留 macOS / Linux 平台差异目录
 
 ## 内置工具
+
+### Linux 命令大全
+
+启动器搜索“Linux”“命令大全”或命令名称，即可打开内置命令插件。完整接入 [jaywcjlove/linux-command](https://github.com/jaywcjlove/linux-command) 的 **621 份 Markdown 手册**（包含上游索引尚未列出的 4 份文档），支持离线阅读、按命令名 / 中文用途 / 参数与示例全文检索、分类筛选、复制代码块和完整原文；原有 tldr 快速示例保留在独立页签。
+
+文档固定于提交 `cd17682d612e6fdfaff29261c11ffbc3f951f41d`（上游版本 `1.22.0`）。完整 MIT 许可与作者署名保存在 `src/builtin-plugins/command-cheatsheet-tool/data/LICENSE.linux-command.txt`，也可在插件的“版本与许可证”中查看。数据随应用打包，使用时无需访问外网；正文与 Markdown 解析组件按需加载。
+
+维护时执行 `pnpm sync:linux-commands` 同步上游当前全部文档，或执行 `pnpm sync:linux-commands <提交号>` 同步固定版本。同步脚本仅读取文档、索引、分类和许可证，不执行上游代码；同步后请检查来源清单并更新固定快照测试，再运行 `pnpm test` 与 `pnpm build`。
+
+“命令与文件”的资料独立于代码片段。设置中的“统一备份管理”用于保存用户文件的原样副本；完整应用数据备份请退出应用后复制当前数据目录（包含 `quickbox.sqlite3`、`saved-files`、`backups`）。桌面窗口的 WebView 缓存保存在 `data/webview`；改变数据目录后重启可切换缓存位置。升级时会只读检查旧 AppData 数据并复制到新位置，旧数据保留。浏览器预览中的资料保存在 IndexedDB；磁盘备份管理和目录选择使用桌面应用中的系统对话框。
 
 | 分类 | 工具 |
 | --- | --- |
@@ -107,7 +120,7 @@ pnpm tauri:dev
 
 ## 发布
 
-GitHub Actions 会在推送 `v*` 标签时自动构建 Release 安装包。
+GitHub Actions 会在推送代码到 `main` 或 `master` 后自动构建并发布预览版 Release；推送与应用版本一致的 `vX.Y.Z` 标签时发布正式版。全部平台验证和打包成功后才统一公开安装包与 SHA256 校验文件，无需手动发布草稿。
 
 ```bash
 # 发布前请同步以下三处版本号

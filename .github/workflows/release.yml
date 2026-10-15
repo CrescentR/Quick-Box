@@ -3,36 +3,99 @@ name: Release
 on:
   workflow_dispatch:
   push:
-    tags:
-      - 'v*'
+    branches: [main, master]
+    tags: ['v*']
 
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  publish:
+  prepare:
+    name: Validate release version
+    runs-on: ubuntu-22.04
+    outputs:
+      version: ${{ steps.metadata.outputs.version }}
+      tag: ${{ steps.metadata.outputs.tag }}
+      name: ${{ steps.metadata.outputs.name }}
+      prerelease: ${{ steps.metadata.outputs.prerelease }}
+      commit: ${{ steps.metadata.outputs.commit }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Determine release metadata
+        id: metadata
+        shell: bash
+        env:
+          RELEASE_REF_TYPE: ${{ github.ref_type }}
+          RELEASE_REF_NAME: ${{ github.ref_name }}
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import { execFileSync } from 'node:child_process';
+
+          const version = JSON.parse(fs.readFileSync('package.json', 'utf8')).version;
+          const tauriVersion = JSON.parse(fs.readFileSync('src-tauri/tauri.conf.json', 'utf8')).version;
+          const cargo = fs.readFileSync('src-tauri/Cargo.toml', 'utf8');
+          const packageSection = cargo.match(/^\[package\]\s*\r?\n([\s\S]*?)(?=^\[|$(?![\s\S]))/m)?.[1];
+          const cargoVersion = packageSection?.match(/^version\s*=\s*"([^"]+)"\s*$/m)?.[1];
+          if (!/^\d+\.\d+\.\d+$/.test(version) || version !== tauriVersion || version !== cargoVersion) {
+            throw new Error(`Use the same X.Y.Z version in package.json, Cargo.toml and tauri.conf.json: ${version}, ${cargoVersion}, ${tauriVersion}`);
+          }
+
+          const commit = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+          const official = process.env.RELEASE_REF_TYPE === 'tag';
+          const expectedTag = `v${version}`;
+          if (official && process.env.RELEASE_REF_NAME !== expectedTag) {
+            throw new Error(`Release tag must match the application version: ${expectedTag}`);
+          }
+          const build = `${process.env.GITHUB_RUN_NUMBER}.${process.env.GITHUB_RUN_ATTEMPT}.${commit.slice(0, 7)}`;
+          const tag = official ? expectedTag : `${expectedTag}-build.${build}`;
+          const name = official ? `QuickBox ${expectedTag}` : `QuickBox ${expectedTag} (build ${build})`;
+          const outputs = { version, tag, name, prerelease: String(!official), commit };
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, Object.entries(outputs).map(([key, value]) => `${key}=${value}\n`).join(''));
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `Release: ${tag}\n\nCommit: ${commit}\n`);
+          NODE
+
+  build:
     name: Build ${{ matrix.name }}
+    needs: prepare
     runs-on: ${{ matrix.platform }}
     strategy:
       fail-fast: false
       matrix:
         include:
           - name: Windows x64
+            id: windows-x64
             platform: windows-latest
             args: --bundles nsis,msi
           - name: Linux x64
+            id: linux-x64
             platform: ubuntu-22.04
             args: --bundles appimage,deb
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Install Linux dependencies
         if: matrix.platform == 'ubuntu-22.04'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -43,7 +106,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          node-version: 24
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
@@ -61,21 +124,124 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
-      - name: Build and upload release assets
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Frontend tests
+        run: pnpm test
+
+      - name: Rust tests
+        run: cargo test --locked --manifest-path src-tauri/Cargo.toml --lib
+
+      # Build only here; a single publish job releases all platforms together.
+      - name: Build installers
+        uses: tauri-apps/tauri-action@v1
         with:
           tauriScript: pnpm tauri
-          tagName: ${{ github.ref_type == 'tag' && github.ref_name || 'v__VERSION__' }}
-          releaseName: QuickBox v__VERSION__
-          releaseBody: |
-            Download the installer for your operating system below.
-
-            Windows: use the .exe installer unless you specifically need MSI.
-            Linux: use AppImage for portable use, or .deb for Debian/Ubuntu.
-          releaseDraft: true
-          prerelease: false
-          includeUpdaterJson: false
-          assetNamePattern: QuickBox_[version]_[platform]_[arch][_setup][ext]
+          uploadUpdaterJson: false
           args: ${{ matrix.args }}
+
+      - name: Collect installers
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
+          BUILD_PLATFORM: ${{ matrix.id }}
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+
+          const bundles = {
+            'windows-x64': [['nsis', '.exe', '_windows_x64_setup.exe'], ['msi', '.msi', '_windows_x64.msi']],
+            'linux-x64': [['appimage', '.AppImage', '_linux_x64.AppImage'], ['deb', '.deb', '_linux_x64.deb']],
+          }[process.env.BUILD_PLATFORM];
+          if (!bundles) throw new Error('Unsupported build platform');
+          fs.mkdirSync('release-assets', { recursive: true });
+          for (const [bundle, extension, suffix] of bundles) {
+            const directory = path.join('src-tauri', 'target', 'release', 'bundle', bundle);
+            const files = fs.readdirSync(directory).filter(file => file.endsWith(extension));
+            if (files.length !== 1) throw new Error(`Expected one ${extension} installer, found ${files.length}`);
+            const source = path.join(directory, files[0]);
+            if (!fs.statSync(source).isFile() || fs.statSync(source).size === 0) throw new Error(`Empty or invalid installer: ${source}`);
+            fs.copyFileSync(source, path.join('release-assets', `QuickBox_${process.env.RELEASE_VERSION}${suffix}`));
+          }
+          NODE
+
+      - name: Upload installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: installers-${{ matrix.id }}
+          path: release-assets/*
+          if-no-files-found: error
+          overwrite: true
+          compression-level: 0
+          retention-days: 7
+
+  publish:
+    name: Publish complete release
+    needs: [prepare, build]
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+      RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
+      RELEASE_TAG: ${{ needs.prepare.outputs.tag }}
+      RELEASE_NAME: ${{ needs.prepare.outputs.name }}
+      RELEASE_PRERELEASE: ${{ needs.prepare.outputs.prerelease }}
+      RELEASE_COMMIT: ${{ needs.prepare.outputs.commit }}
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Download installers
+        uses: actions/download-artifact@v4
+        with:
+          pattern: installers-*
+          path: installers
+          merge-multiple: true
+
+      - name: Verify complete asset set and write release notes
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          import { createHash } from 'node:crypto';
+
+          const prefix = `QuickBox_${process.env.RELEASE_VERSION}`;
+          const expected = ['_windows_x64_setup.exe', '_windows_x64.msi', '_linux_x64.AppImage', '_linux_x64.deb'].map(suffix => prefix + suffix).sort();
+          const actual = fs.readdirSync('installers').sort();
+          if (JSON.stringify(actual) !== JSON.stringify(expected)) throw new Error(`Incomplete installer set: ${actual.join(', ')}`);
+          const checksums = expected.map(file => {
+            const data = fs.readFileSync(path.join('installers', file));
+            if (data.length === 0) throw new Error(`Empty installer: ${file}`);
+            return `${createHash('sha256').update(data).digest('hex')}  ${file}`;
+          });
+          fs.writeFileSync('installers/SHA256SUMS.txt', checksums.join('\n') + '\n');
+          const kind = process.env.RELEASE_PRERELEASE === 'true' ? 'Automated preview build.' : 'Official release.';
+          fs.writeFileSync('release-notes.md', [
+            `QuickBox ${process.env.RELEASE_TAG}`, '', kind, '',
+            '- Windows x64: use the setup.exe installer, or MSI for managed installation.',
+            '- Linux x64: use AppImage, or .deb for Debian/Ubuntu.',
+            '- SHA256SUMS.txt contains the installer checksums.', '',
+            `Source commit: ${process.env.RELEASE_COMMIT}`, '',
+            `Build: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`, '',
+          ].join('\n'));
+          NODE
+
+      - name: Upload all assets and publish
+        shell: bash
+        run: |
+          assets=(installers/*)
+          flags=(--draft --target "$RELEASE_COMMIT" --title "$RELEASE_NAME" --notes-file release-notes.md)
+          if [ "$RELEASE_PRERELEASE" = 'true' ]; then
+            flags+=(--prerelease --latest=false)
+          else
+            flags+=(--verify-tag)
+          fi
+          # Keep the release private until every asset has been uploaded successfully.
+          gh release create "$RELEASE_TAG" "${assets[@]}" "${flags[@]}"
+          gh release edit "$RELEASE_TAG" --draft=false
+          release_url=$(gh release view "$RELEASE_TAG" --json url --jq .url)
+          printf 'Published: %s\n' "$release_url" >> "$GITHUB_STEP_SUMMARY"

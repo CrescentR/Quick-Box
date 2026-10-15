@@ -1,12 +1,14 @@
 import type { ToolPlugin } from '../../core/plugin/plugin-types'
 import { lazy } from 'react'
+import source from './data/source.json'
+import commandNames from './data/command-names.json'
 const CommandCheatsheetToolView = lazy(() => import('./CommandCheatsheetToolView'))
 
 const plugin: ToolPlugin = {
   id: 'official.command-cheatsheet-tool',
-  name: 'Linux 命令速查',
-  version: '0.1.0',
-  description: '基于 tldr 的常用命令示例速查',
+  name: 'Linux 命令大全',
+  version: '1.0.0',
+  description: `${source.count} 份离线 Linux 命令手册，支持中文全文搜索与 tldr 快速示例`,
   author: 'QuickBox',
   source: 'builtin',
   permissions: ['clipboard.write'],
@@ -14,8 +16,8 @@ const plugin: ToolPlugin = {
     {
       id: 'official.command-cheatsheet-tool.open',
       pluginId: 'official.command-cheatsheet-tool',
-      title: 'Linux 命令速查',
-      description: '查看 tar、find、grep 等命令的常用示例',
+      title: 'Linux 命令大全',
+      description: `离线搜索 ${source.count} 个命令的详细说明、选项和使用示例`,
       keywords: [
         'tldr',
         'linux',
@@ -32,6 +34,15 @@ const plugin: ToolPlugin = {
         '速查',
         '手册',
         '示例',
+        'linux-command',
+        '大全',
+        'systemctl',
+        'iptables',
+        'journalctl',
+        'apt',
+        'yum',
+        'ssh',
+        ...commandNames,
       ],
       source: 'builtin',
       executeMode: 'view',
@@ -43,7 +54,7 @@ const plugin: ToolPlugin = {
   views: [
     {
       id: 'official.command-cheatsheet-tool.view',
-      title: 'Linux 命令速查',
+      title: 'Linux 命令大全',
       component: CommandCheatsheetToolView,
     },
   ],

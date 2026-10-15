@@ -1,0 +1,33 @@
+.qb-command-reference { gap: 12px; min-width: 0; container-type: inline-size; }
+.qb-command-reference__heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.qb-command-reference__heading h2 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px; }
+.qb-command-reference__heading p { margin: 4px 0 0; font-size: 12px; color: var(--qb-text-muted); }
+.qb-command-reference__tabs { display: flex; padding: 3px; border: 1px solid var(--qb-border-subtle); border-radius: 8px; }
+.qb-command-reference__tabs button { padding: 5px 10px; border: 0; border-radius: 5px; color: var(--qb-text-secondary); font-size: 12px; cursor: pointer; }
+.qb-command-reference__tabs button[aria-selected="true"] { background: var(--qb-accent-primary-soft); color: var(--qb-text-primary); }
+.qb-command-reference__panel { display: grid; gap: 10px; min-width: 0; }
+.qb-command-reference__toolbar { display: grid; grid-template-columns: minmax(0, 1fr) 130px; gap: 8px; }
+.qb-command-reference .qb-tool-input { min-height: 34px; min-width: 0; padding: 7px 9px; font-size: 12px; }
+.qb-command-reference .qb-tool-button { min-height: 28px; padding: 4px 8px; font-size: 12px; }
+.qb-command-reference__search { display: flex; align-items: center; gap: 7px; color: var(--qb-text-muted); min-width: 0; }
+.qb-command-reference__search input { flex: 1; }
+.qb-command-reference__layout { display: grid; grid-template-columns: minmax(145px, 0.65fr) minmax(0, 1.6fr); height: clamp(320px, calc(100vh - 270px), 780px); min-width: 0; border: 1px solid var(--qb-border-subtle); border-radius: 10px; overflow: hidden; }
+.qb-command-reference__sidebar { display: grid; grid-template-rows: auto minmax(0, 1fr); min-width: 0; min-height: 0; border-right: 1px solid var(--qb-border-subtle); }
+.qb-command-reference__count { font-size: 11px; color: var(--qb-text-muted); padding: 8px 10px; border-bottom: 1px solid var(--qb-border-subtle); }
+.qb-command-reference__list { overflow: auto; padding: 5px; min-width: 0; }
+.qb-command-reference__list > button { display: grid; gap: 3px; width: 100%; min-width: 0; padding: 8px; border: 1px solid transparent; border-radius: 6px; text-align: left; cursor: pointer; color: var(--qb-text-secondary); }
+.qb-command-reference__list > button:hover { background: var(--qb-bg-surface); }
+.qb-command-reference__list > button[data-active="true"] { border-color: var(--qb-border-focus); background: var(--qb-accent-primary-soft); color: var(--qb-text-primary); }
+.qb-command-reference__list strong { font-family: var(--qb-font-mono); font-size: 13px; overflow-wrap: anywhere; }
+.qb-command-reference__list span { color: var(--qb-text-muted); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.qb-command-reference__list .qb-command-reference__more { margin-top: 8px; text-align: center; font-size: 11px; border-color: var(--qb-border-subtle); }
+.qb-command-reference__article { min-width: 0; min-height: 0; overflow: auto; padding: 14px; user-select: text; }
+.qb-command-reference__article-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; color: var(--qb-text-muted); font-size: 11px; }
+.qb-command-reference__empty { color: var(--qb-text-muted); padding: 16px 8px; font-size: 12px; line-height: 1.6; }
+.qb-command-reference__source { display: flex; gap: 8px 14px; flex-wrap: wrap; color: var(--qb-text-muted); font-size: 11px; }
+.qb-command-reference__source a { color: var(--qb-text-secondary); }
+.qb-command-reference__source details { min-width: 0; }
+.qb-command-reference__source summary { cursor: pointer; }
+.qb-command-reference__source pre { max-height: 180px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; user-select: text; }
+@container (max-width: 480px) { .qb-command-reference__layout { grid-template-columns: minmax(115px, 0.5fr) minmax(0, 1fr); } .qb-command-reference__article { padding: 10px; } }
+@container (max-width: 350px) { .qb-command-reference__layout { grid-template-columns: 1fr; height: auto; } .qb-command-reference__sidebar { max-height: 180px; border-right: 0; border-bottom: 1px solid var(--qb-border-subtle); } .qb-command-reference__article { max-height: 420px; } }

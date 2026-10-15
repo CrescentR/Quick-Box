@@ -40,6 +40,23 @@ async function invokePreviewCommand<TResponse>(
   args?: Record<string, unknown>,
 ): Promise<TResponse> {
   switch (command) {
+    case 'load_library':
+    case 'save_library_item':
+    case 'read_library_file':
+    case 'delete_library_item':
+      return (await (await import('./library-preview')).libraryPreview(command, args)) as TResponse
+    case 'get_storage_location':
+      return { path: '', defaultPath: '' } as TResponse
+    case 'load_backups':
+      return [] as TResponse
+    case 'pick_storage_directory':
+    case 'add_backup_files':
+    case 'export_backup_file':
+    case 'delete_backup_file':
+    case 'open_backup_directory':
+      throw new Error('请选择 QuickBox 桌面应用中的此功能，浏览器预览无法打开系统文件夹或管理磁盘备份。')
+    case 'set_storage_location':
+      throw new Error('设置磁盘存储位置需要 QuickBox 桌面应用。')
     case 'load_workspace':
       return readLocalStorageJson('quickbox.preview.workspace', null) as TResponse
     case 'save_workspace':

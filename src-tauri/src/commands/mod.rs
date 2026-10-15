@@ -13,3 +13,5 @@ pub mod workspace;
 pub mod file_search;
 
 pub mod release;
+pub mod library;
+pub mod backups;

@@ -14,6 +14,7 @@
     "windows": [
       {
         "label": "main",
+        "create": false,
         "title": "QuickBox",
         "width": 1180,
         "height": 740,
@@ -56,6 +57,13 @@
           "x": 480,
           "y": 170
         }
+      }
+    },
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "languages": ["SimpChinese", "English"],
+        "installerHooks": "./windows/hooks.nsh"
       }
     }
   }
