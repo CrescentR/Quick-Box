@@ -24,9 +24,9 @@ it('添加任意类型大文件使用原生选择，不解析JSON，并支持搜
   expect(invoke).toHaveBeenCalledWith('add_backup_files')
   fireEvent.change(screen.getByLabelText('搜索备份文件'), { target: { value: 'sql.gz' } })
   expect(screen.queryByText(image.name)).toBeNull()
-  invoke.mockResolvedValueOnce('E:\\备份\\数据库备份.sql.gz')
+  invoke.mockResolvedValueOnce('C:\\备份\\数据库备份.sql.gz')
   fireEvent.click(screen.getByText('导出'))
-  await screen.findByText(/已导出至 E:/)
+  await screen.findByText(/已导出至 C:/)
   expect(invoke).toHaveBeenCalledWith('export_backup_file', { id: binary.id })
 })
 

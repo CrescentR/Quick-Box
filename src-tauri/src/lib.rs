@@ -80,7 +80,7 @@ pub fn run() {
                 .map_err(|error| std::io::Error::other(error.message))?;
             storage::migrations::run_migrations(app.handle())?;
 
-            // 窗口创建前设置 WebView 存储位置，避免缓存和 localStorage 写入 AppData/C 盘。
+            // 窗口创建前设置 WebView 存储位置，使缓存和 localStorage 跟随用户的数据目录。
             storage::location::validate_storage_path(&directory.join("webview"))
                 .map_err(|error| std::io::Error::other(error.message))?;
             let window_config = app
@@ -121,9 +121,7 @@ pub fn run() {
         .unwrap_or_else(|error| {
             rfd::MessageDialog::new()
                 .set_title("QuickBox 启动失败")
-                .set_description(format!(
-                    "{error}\n请确认程序安装在非 C 盘目录，且安装目录和数据目录可写。"
-                ))
+                .set_description(format!("{error}\n请确认安装目录和数据目录可写。"))
                 .set_level(rfd::MessageLevel::Error)
                 .show();
         });

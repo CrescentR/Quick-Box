@@ -67,7 +67,7 @@ QuickBox 面向经常处理 JSON、排查端口、查找命令、整理代码与
 | **macOS** | 暂无自动发布包 | 仓库保留本地构建脚本，当前不提供 macOS Release 安装包。 |
 
 > [!IMPORTANT]
-> **Windows 请安装到非 C 盘、当前用户可写的目录**，例如 `D:\Apps\QuickBox`。应用数据默认保存在安装目录下的 `data` 文件夹，数据目录选择和迁移也会拒绝 C 盘路径。
+> **可安装到 C 盘或其他磁盘，由用户选择。** 默认数据保存在所选安装目录下的 `data` 文件夹，不另行默认写入 AppData。请选择当前用户可写的安装目录和数据目录，例如 `C:\Apps\QuickBox` 或 `D:\Apps\QuickBox`。
 
 Windows 界面依赖系统 WebView2。安装器会处理 WebView2 运行时检测；首次安装可能需要联网下载缺失的运行时。Release 中的 `SHA256SUMS.txt` 可用于核对安装包。
 
@@ -137,7 +137,7 @@ D:\Apps\QuickBox\
     └── webview\              # 界面缓存与浏览器本地状态
 ```
 
-在“设置 → 数据存储位置”点击 **选择文件夹**，选取非 C 盘的空目录，再点击 **迁移并使用**。数据库、收藏文件和备份会一起复制，原目录保留副本；重启后 WebView 缓存也会使用新位置。
+在“设置 → 数据存储位置”点击 **选择文件夹**，选取自己需要的可写空目录，再点击 **迁移并使用**。数据库、收藏文件和备份会一起复制，原目录保留副本；重启后 WebView 缓存也会使用新位置。
 
 统一备份管理用于保管用户文件的副本。需要备份整个 QuickBox 时，退出应用后复制当前完整数据目录，并保留安装目录中的位置配置。迁移恢复、剪贴板行为和常见问题见 [数据管理说明](docs/usage.md#data-management)。
 
@@ -149,7 +149,7 @@ D:\Apps\QuickBox\
 
 ### 启动项目
 
-准备 **Node.js 24、pnpm 9.15.4、Rust stable** 和平台依赖，详见 [开发环境配置](docs/development.md)。Windows 需要 MSVC C++ 构建工具与 WebView2，代码仓库也应放在非 C 盘、可写目录。
+准备 **Node.js 24、pnpm 9.15.4、Rust stable** 和平台依赖，详见 [开发环境配置](docs/development.md)。Windows 需要 MSVC C++ 构建工具与 WebView2，代码仓库应放在当前用户可写的目录，磁盘由你选择。
 
 ```bash
 git clone https://github.com/CrescentR/Quick-Box.git

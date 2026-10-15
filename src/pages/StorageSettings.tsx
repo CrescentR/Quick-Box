@@ -27,7 +27,7 @@ export default function StorageSettings() {
         setBusy(true); setMessage('正在迁移，请保持应用开启…')
         void invokeCommand<StorageLocation>('set_storage_location', { path }).then((value) => { setLocation(value); setPath(value.path); setMessage('迁移完成，已使用新目录，原数据副本已保留。重启后缓存目录也会切换。'); window.dispatchEvent(new Event('quickbox:storage-changed')) }).catch((cause) => setMessage(libraryError(cause))).finally(() => setBusy(false))
       }}>{busy ? '迁移中…' : '迁移并使用'}</button></div></div>
-      <p>默认保存在安装目录的 data 文件夹。请选择非 C 盘的空文件夹，迁移会包含命令、文件及统一备份。</p>
+      <p>默认保存在所选安装目录的 data 文件夹。迁移请选择可写的空文件夹，命令、文件及统一备份会一并复制。</p>
     </> : location ? <p>浏览器预览使用浏览器本地存储；请在桌面应用中设置磁盘目录。</p> : <button className="qb-tool-button" disabled={busy} onClick={() => void load()}>{busy ? '读取中…' : '重试读取存储位置'}</button>}
     {message && <p role="status">{message}</p>}
   </section>

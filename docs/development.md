@@ -20,7 +20,7 @@
 npm install --global pnpm@9.15.4
 ```
 
-**Windows 请把仓库克隆到非 C 盘且当前用户可写的位置**，例如 `D:\Projects\Quick-Box`。开发版的数据默认位于 `src-tauri/target/debug/data`；应用会拒绝 C 盘路径及实际指向 C 盘的目录联接。直接在 C 盘运行桌面开发版也会触发此限制。
+**请把仓库克隆到当前用户可写的位置**，例如 `C:\Projects\Quick-Box` 或 `D:\Projects\Quick-Box`，磁盘由开发者选择。开发版的数据默认位于 `src-tauri/target/debug/data`，跟随调试可执行文件所在目录，不另行默认写入 AppData。
 
 ```bash
 git clone https://github.com/CrescentR/Quick-Box.git
@@ -147,7 +147,6 @@ Quick-Box/
 │  ├─ src/storage/         SQLite、迁移、数据目录与持久化逻辑
 │  ├─ src/platform/        平台相关能力
 │  ├─ src/lib.rs           桌面初始化与 command 注册
-│  ├─ windows/             Windows 安装器钩子
 │  └─ tauri.conf.json      应用、窗口与打包配置
 ├─ tests/                  Vitest 测试
 ├─ scripts/                启动环境、资料同步等辅助脚本
@@ -196,7 +195,7 @@ Quick-Box/
 
 ## 5. 数据位置与开发注意事项
 
-默认数据根目录为**当前可执行文件所在目录的 `data/`**。Linux AppImage 优先以 AppImage 文件所在目录计算。Windows 默认调试构建对应 `src-tauri/target/debug/data/`，Release 可执行文件对应其运行目录。
+默认数据根目录为**当前可执行文件所在目录的 `data/`**，不另行默认写入 AppData。Linux AppImage 优先以 AppImage 文件所在目录计算。Windows 默认调试构建对应 `src-tauri/target/debug/data/`，Release 可执行文件对应其运行目录；安装、存储与导出都允许选择 C 盘或其他磁盘，目录需具有相应写权限。
 
 | 位置 | 内容 |
 | --- | --- |
@@ -206,7 +205,7 @@ Quick-Box/
 | `<数据目录>/backups/` | 统一备份管理保存的任意格式文件副本 |
 | `<数据目录>/webview/` | WebView 的缓存与本地状态 |
 
-通过「设置 → 数据存储位置」选择非 C 盘的空目录后迁移。新旧目录不能相互包含；迁移会复制数据库、附件与备份，原目录保留副本。WebView 数据目录在窗口创建时确定，迁移后重启应用会使用新位置。
+通过「设置 → 数据存储位置」选择用户需要的可写空目录后迁移。新旧目录不能相互包含；迁移会复制数据库、附件与备份，原目录保留副本。WebView 数据目录在窗口创建时确定，迁移后重启应用会使用新位置。
 
 **清理 `src-tauri/target/` 前先备份开发数据**，因为默认开发数据也位于该目录下。数据目录迁移不改变安装目录本身仍需可写的要求：位置指针保存在安装目录。
 
@@ -240,7 +239,6 @@ pnpm tauri:build:win
 | `tauri:dev:attach` 提示找不到 Vite | 先执行 `pnpm dev:web`，确认可访问 `http://127.0.0.1:1420`，再启动桌面端。 |
 | 全局热键无效 | 确认运行的是桌面版，且没有重复实例或其他软件占用组合键；在设置中换一个组合键并保存。启动时程序会尝试备用热键，调试日志可查看注册失败信息。 |
 | Rust 或原生依赖找不到 | 确认 Rust stable、Windows C++ Build Tools / SDK 或 Linux 依赖已经安装。安装工具链后重开终端，再执行对应命令。 |
-| 提示不能保存到 C 盘 | 将程序或开发仓库放到可写的非 C 盘目录，并检查目录联接是否实际指向 C 盘。数据目录也必须符合限制。 |
 | 安装目录不可写或启动失败 | 使用当前用户可写的安装目录；仅迁移数据不能解决安装目录中位置指针不可写的问题。Linux 系统安装目录若不可写，也需要调整部署位置或权限。 |
 | 已配置的数据位置不可用 | 连接原磁盘或恢复原数据目录，确认 `quickbox.sqlite3` 存在；程序会拒绝静默创建空库，以免把旧数据误判为已丢失。 |
 | `storage-location.json` 损坏 | 先保留当前文件和数据目录，再恢复正确的位置指针；不要直接删除配置或原数据来绕过错误。 |

@@ -52,6 +52,8 @@ git push origin v1.0.0
 
 目前自动构建 Windows x64 和 Linux x64。macOS 构建配置保留在项目中，GitHub 工作流暂未启用 macOS；后续可以在具备签名和公证配置后加入。
 
+Windows 安装位置由用户选择，允许 C 盘或其他磁盘。应用默认把数据保存在所选安装目录下的 `data/`，不另行默认写入 AppData；验证安装包时应确认安装目录和数据目录可写，并检查自选目录迁移、旧数据保留及重启后的 WebView 缓存位置。Linux 的安装路径与写权限说明见 [使用指南](usage.md#linux-notes)。
+
 ## 配置参考
 
 - [GitHub Actions 工作流语法](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax)

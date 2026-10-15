@@ -35,34 +35,13 @@ pub fn display_path(path: &Path) -> String {
     }
 }
 
-fn is_c_drive(path: &Path) -> bool {
-    let value = display_path(path).replace('/', "\\");
-    value
-        .get(..2)
-        .is_some_and(|drive| drive.eq_ignore_ascii_case("c:"))
-}
-
-/// 所有写入目录必须是绝对路径；同时检查已存在祖先，防止 D 盘联接实际指向 C 盘。
+/// 所有写入目录必须是绝对路径，磁盘由用户选择，不限制盘符。
 pub fn validate_storage_path(path: &Path) -> Result<(), CommandError> {
-    if is_c_drive(path) {
-        return Err(CommandError::new(
-            "C_DRIVE_FORBIDDEN",
-            "不允许将数据保存到 C 盘，请选择其他磁盘的目录",
-        ));
-    }
     if !path.is_absolute() {
         return Err(CommandError::new(
             "INVALID_PATH",
             "请选择完整的绝对目录路径",
         ));
-    }
-    if let Some(existing) = path.ancestors().find(|ancestor| ancestor.exists()) {
-        if is_c_drive(&fs::canonicalize(existing)?) {
-            return Err(CommandError::new(
-                "C_DRIVE_FORBIDDEN",
-                "该目录实际指向 C 盘，请选择其他磁盘的目录",
-            ));
-        }
     }
     Ok(())
 }
@@ -118,7 +97,7 @@ fn copy_directory(source: &Path, target: &Path) -> Result<(), CommandError> {
 }
 
 fn copy_data(source: &Path, target: &Path) -> Result<(), CommandError> {
-    // 旧目录只读打开；VACUUM INTO 将一致性快照直接写入新盘，不写旧 C 盘数据库。
+    // 旧目录只读打开；VACUUM INTO 将一致性快照直接写入新目录，不改动旧数据库。
     let connection =
         Connection::open_with_flags(source.join(DATABASE), OpenFlags::SQLITE_OPEN_READ_ONLY)?;
     connection.execute_batch("PRAGMA temp_store = MEMORY")?;
@@ -221,7 +200,7 @@ pub fn get_storage_location(app: tauri::AppHandle) -> Result<StorageLocation, Co
 pub async fn pick_storage_directory(app: tauri::AppHandle) -> Result<Option<String>, CommandError> {
     tauri::async_runtime::spawn_blocking(move || {
         let mut dialog = rfd::FileDialog::new()
-            .set_title("选择数据目录（非 C 盘的空文件夹）")
+            .set_title("选择数据目录（空文件夹）")
             .set_directory(installation_directory()?);
         if let Some(window) = app.get_webview_window("main") {
             dialog = dialog.set_parent(&window);
@@ -292,10 +271,14 @@ pub async fn set_storage_location(
 mod tests {
     use super::*;
     #[test]
-    fn rejects_c_drive_and_formats_windows_paths() {
-        for path in [r"C:\QuickBox", r"c:\data", r"\\?\C:\data", "C:/data"] {
+    fn rejects_relative_storage_paths() {
+        for path in ["", "relative", "../data"] {
             assert!(validate_storage_path(Path::new(path)).is_err());
         }
+    }
+
+    #[test]
+    fn formats_windows_paths() {
         assert_eq!(
             display_path(Path::new(r"\\?\D:\QuickBox\data")),
             r"D:\QuickBox\data"
@@ -304,8 +287,37 @@ mod tests {
             display_path(Path::new(r"\\?\UNC\server\share")),
             r"\\server\share"
         );
-        assert!(validate_storage_path(Path::new("relative")).is_err());
     }
+
+    #[cfg(target_os = "windows")]
+    #[test]
+    fn accepts_user_selected_c_drive_paths() {
+        for path in [r"C:\QuickBox", r"c:\data", r"\\?\C:\data", "C:/data"] {
+            assert!(validate_storage_path(Path::new(path)).is_ok());
+        }
+        for path in [r"C:data", r"\data"] {
+            assert!(validate_storage_path(Path::new(path)).is_err());
+        }
+    }
+
+    #[cfg(target_os = "windows")]
+    #[test]
+    fn defaults_to_data_under_user_selected_c_drive_installation() {
+        // 仅解析路径，不在 C 盘创建文件或目录。
+        let name = format!(
+            "QuickBox-location-test-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        );
+        for base in [r"C:\", r"\\?\C:\"] {
+            let install = Path::new(base).join(&name);
+            assert_eq!(resolve_directory(&install).unwrap(), install.join("data"));
+        }
+    }
+
     #[test]
     fn defaults_to_install_directory_and_migrates_database_files_and_backups() {
         let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))

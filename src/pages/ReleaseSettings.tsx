@@ -32,6 +32,6 @@ export default function ReleaseSettings() {
       <button className="qb-tool-button" onClick={() => void invokeCommand('open_release_page').catch(() => setMessage('无法打开浏览器，请访问 github.com/CrescentR/Quick-Box/releases。'))}>打开官方发行页面</button>
     </div>
     {notes && <details><summary>更新说明</summary><pre className="qb-release-notes">{notes}</pre></details>}
-    <p>更新前可复制整个数据目录留档。Windows 安装时请选择非 C 盘目录。</p>
+    <p>更新前可复制整个数据目录留档。安装位置由您选择，请确保安装目录和数据目录可写。</p>
   </section>
 }
