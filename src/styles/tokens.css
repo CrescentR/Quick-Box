@@ -28,6 +28,11 @@
   --qb-bg-focus: rgba(255, 255, 255, 0.07);
   --qb-bg-overlay: rgba(0, 0, 0, 0.45);
   --qb-bg-input: rgba(255, 255, 255, 0.04);
+  /* 下拉框必须用不透明底色：原生下拉列表由浏览器单独渲染，弹出页的底写死为白色
+     （Blink picker_common.css），而列表会原样复制 <select> 自身的 background-color。
+     半透明背景在白底上会退化成浅色，浅色文字叠上去就不可读了。 */
+  --qb-bg-input-solid: #2f3033;
+  --qb-bg-input-focus-solid: #3a3b3e;
   --qb-bg-code: rgba(0, 0, 0, 0.22);
   --qb-bg-code-glint: rgba(255, 255, 255, 0.02);
   --qb-bg-selection: rgba(240, 180, 60, 0.3);
@@ -136,6 +141,8 @@
   --qb-bg-focus: rgba(20, 22, 26, 0.06);
   --qb-bg-overlay: rgba(20, 22, 26, 0.18);
   --qb-bg-input: #ffffff;
+  --qb-bg-input-solid: #ededef;
+  --qb-bg-input-focus-solid: #e7e8e9;
   --qb-bg-code: #ffffff;
   --qb-bg-code-glint: transparent;
   --qb-bg-selection: rgba(232, 165, 35, 0.3);

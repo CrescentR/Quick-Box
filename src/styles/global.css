@@ -59,6 +59,18 @@ body {
   color: var(--qb-text-muted);
 }
 
+/* 打开的原生下拉列表由浏览器在独立页面中渲染：该页面的底写死为白色
+   （Blink picker_common.css），列表元素则原样复制 <select> 自身的 background-color
+   与 color（list_picker.js）。控件背景是半透明时，列表会退化成浅色底 + 浅色文字，
+   暗色主题下几乎不可读，因此下拉框改用不透明底色。 */
+select:not([multiple]) {
+  background-color: var(--qb-bg-input-solid);
+}
+
+select:not([multiple]):focus-visible {
+  background-color: var(--qb-bg-input-focus-solid);
+}
+
 :where(:focus) {
   outline: none;
 }

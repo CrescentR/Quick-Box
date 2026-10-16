@@ -7,6 +7,7 @@ src-tauri/gen/
 .DS_Store
 *.log
 _tmp_*
+.tmp-build/
 .env
 .env.*
 market-server/
