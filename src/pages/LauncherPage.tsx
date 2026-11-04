@@ -1,7 +1,6 @@
 import { useWorkspaceStore } from '../stores/workspace-store'
 import { ClipboardSuggestion } from './launcher/components/ClipboardSuggestion'
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import type { PointerEvent as ReactPointerEvent } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   AppWindow,
   Command,
@@ -13,15 +12,11 @@ import {
   Settings2,
 } from 'lucide-react'
 import type { AppPage } from './page-types'
-import { loadCommandUsage, recordCommandUsage } from '../api/command-usage-api'
 import { hideLauncherWindow } from '../api/window-api'
-import { commandRegistry } from '../core/command/command-registry'
 import { runCommand } from '../core/command/command-runner'
-import { searchCommands } from '../core/command/command-search'
-import type { Command as QuickBoxCommand, CommandSearchResult, CommandUsageInfo } from '../core/command/command-types'
+import type { Command as QuickBoxCommand } from '../core/command/command-types'
 import { pluginRegistry } from '../core/plugin/plugin-registry'
 import { useLauncherStore } from '../stores/launcher-store'
-import { usePluginStore } from '../stores/plugin-store'
 import {
   ActionPanel,
   type ActionPanelItem,
@@ -37,61 +32,20 @@ import { QuickTiles } from './launcher/components/QuickTiles'
 import { ToolIcon } from './launcher/components/ToolIcon'
 import { ToolRow } from './launcher/components/ToolRow'
 import { ToolViewPane } from './launcher/components/ToolViewPane'
-import {
-  TOOL_CATEGORIES,
-  getToolMeta,
-  type ToolCategoryFilter,
-  type ToolCategoryId,
-} from './launcher/launcher-catalog'
-import {
-  MAX_QUICK_COMMANDS,
-} from './launcher/launcher-preferences'
+import { TOOL_CATEGORIES, type ToolCategoryFilter } from './launcher/launcher-catalog'
+import { MAX_QUICK_COMMANDS } from './launcher/launcher-preferences'
+import { useCommandUsage } from './launcher/use-command-usage'
+import { useLauncherResults } from './launcher/use-launcher-results'
+import { useQuickCommandDrag } from './launcher/use-quick-command-drag'
 import './Workbench.css'
 import './LauncherPage.css'
 import type { PageNavigationProps } from './page-types'
 import PageHeader from './PageHeader'
 
-/** 指针移动超过该距离才视为拖拽 */
-const COMMAND_DRAG_THRESHOLD = 6
-
 interface LauncherToastState {
   tone: 'default' | 'success' | 'warning' | 'danger'
   title: string
   description: string
-}
-
-interface PendingCommandDrag {
-  commandId: string
-  startX: number
-  startY: number
-  isDragging: boolean
-}
-
-/**
- * 按分类筛出当前列表
- * @param results 已按相关度排序的搜索结果
- * @param category 当前分类
- * @param quickCommandIds 常用工具 id
- */
-function filterResults(
-  results: CommandSearchResult[],
-  category: ToolCategoryFilter,
-  quickCommandIds: string[],
-) {
-  if (category === 'all') return results
-  if (category === 'quick') {
-    const order = new Map(quickCommandIds.map((id, index) => [id, index]))
-    return results
-      .filter((result) => order.has(result.command.id))
-      .sort((left, right) => (order.get(left.command.id) ?? 0) - (order.get(right.command.id) ?? 0))
-  }
-  return results.filter((result) => getToolMeta(result.command).category.id === category)
-}
-
-function isPointInsideElement(element: HTMLElement | null, x: number, y: number) {
-  if (!element) return false
-  const rect = element.getBoundingClientRect()
-  return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
 }
 
 function focusWorkspace() {
@@ -120,59 +74,17 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
   const workspaceError = useWorkspaceStore((state) => state.error)
   const setQuickCommandIds = (ids: string[]) => { void useWorkspaceStore.getState().update((data) => ({ ...data, quickCommandIds: ids })).catch(() => {}) }
   const [activeCommandId, setActiveCommandId] = useState<string>()
-  const [draggedCommandId, setDraggedCommandId] = useState<string | null>(null)
-  const [isQuickDropActive, setIsQuickDropActive] = useState(false)
-  const [usageByCommandId, setUsageByCommandId] = useState<Record<string, CommandUsageInfo>>({})
   const commandListRef = useRef<HTMLDivElement>(null)
-  const quickDropRef = useRef<HTMLElement>(null)
-  const dragGhostRef = useRef<HTMLDivElement | null>(null)
-  const dragPointerRef = useRef({ x: 0, y: 0 })
   const selectedCommandIdRef = useRef<string>()
-  const pendingCommandDragRef = useRef<PendingCommandDrag | null>(null)
-  const suppressCommandClickRef = useRef(false)
-  const { enabledPluginIds, status: pluginStatus } = usePluginStore()
-
-  const allCommands = useMemo(() => {
-    const commands = commandRegistry.list()
-    if (pluginStatus === 'idle' || pluginStatus === 'loading') return commands
-    const enabledPlugins = new Set(enabledPluginIds)
-    return commands.filter((command) => enabledPlugins.has(command.pluginId))
-  }, [enabledPluginIds, pluginStatus])
-  const commandById = useMemo(
-    () => new Map(allCommands.map((command) => [command.id, command])),
-    [allCommands],
-  )
-  const quickCommands = useMemo(
-    () =>
-      quickCommandIds
-        .map((commandId) => commandById.get(commandId))
-        .filter((command): command is QuickBoxCommand => Boolean(command))
-        .slice(0, MAX_QUICK_COMMANDS),
-    [commandById, quickCommandIds],
-  )
-  const searchResults = useMemo(
-    () => searchCommands(allCommands, query, usageByCommandId),
-    [allCommands, query, usageByCommandId],
-  )
-  const categoryCounts = useMemo(() => {
-    const counts: Partial<Record<ToolCategoryId, number>> = {}
-    for (const result of searchResults) {
-      const id = getToolMeta(result.command).category.id
-      counts[id] = (counts[id] ?? 0) + 1
-    }
-    return counts
-  }, [searchResults])
+  const { usageByCommandId, recordUsage } = useCommandUsage()
+  const { commandById, quickCommands, searchResults, categoryCounts, results, enabledPluginIds, pluginStatus } =
+    useLauncherResults({ query, category, quickCommandIds, usageByCommandId })
   const hasQuery = query.trim().length > 0
-  const results = useMemo(
-    () => filterResults(searchResults, category, quickCommandIds),
-    [category, quickCommandIds, searchResults],
-  )
 
   const selectedResult = results[selectedIndex]
   const selectedIsQuick = selectedResult ? quickCommandIds.includes(selectedResult.command.id) : false
   const openCommandId = typeof activeViewParams?.commandId === 'string' ? activeViewParams.commandId : activeCommandId
   const openCommand = openCommandId ? commandById.get(openCommandId) : undefined
-  const draggedCommand = draggedCommandId ? commandById.get(draggedCommandId) : undefined
 
   const launchCommand = useCallback(
     async (command: QuickBoxCommand) => {
@@ -187,17 +99,9 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
         setToast({ tone: 'danger', title: '工具打开失败', description: error instanceof Error ? error.message : '请重试或选择其他工具。' })
         return
       }
-      try {
-        const usage = await recordCommandUsage(command.id)
-        setUsageByCommandId((current) => ({
-          ...current,
-          [usage.commandId]: { runCount: usage.runCount, lastRunAt: usage.lastRunAt },
-        }))
-      } catch {
-        // 使用记录不应阻断命令本身执行。
-      }
+      await recordUsage(command.id)
     },
-    [closeView, openView],
+    [closeView, openView, recordUsage],
   )
 
   const toggleQuickCommand = useCallback(
@@ -224,72 +128,15 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
     [quickCommandIds, toggleQuickCommand],
   )
 
-  const startCommandPointerDrag = useCallback((event: ReactPointerEvent<HTMLElement>, command: QuickBoxCommand) => {
-    if (event.button !== 0) return
-    pendingCommandDragRef.current = {
-      commandId: command.id,
-      startX: event.clientX,
-      startY: event.clientY,
-      isDragging: false,
-    }
-  }, [])
-
-  useEffect(() => {
-    const cleanupPointerDrag = () => {
-      pendingCommandDragRef.current = null
-      setDraggedCommandId(null)
-      setIsQuickDropActive(false)
-    }
-
-    const onPointerMove = (event: PointerEvent) => {
-      const drag = pendingCommandDragRef.current
-      if (!drag) return
-      const distance = Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY)
-      if (!drag.isDragging && distance < COMMAND_DRAG_THRESHOLD) return
-      if (!drag.isDragging) {
-        drag.isDragging = true
-        setDraggedCommandId(drag.commandId)
-      }
-      event.preventDefault()
-      dragPointerRef.current = { x: event.clientX, y: event.clientY }
-      const ghost = dragGhostRef.current
-      if (ghost) {
-        ghost.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0) translate(-50%, -50%)`
-      }
-      setIsQuickDropActive(isPointInsideElement(quickDropRef.current, event.clientX, event.clientY))
-    }
-
-    const onPointerUp = (event: PointerEvent) => {
-      const drag = pendingCommandDragRef.current
-      if (!drag) return
-      const shouldDrop = drag.isDragging && isPointInsideElement(quickDropRef.current, event.clientX, event.clientY)
-      const command = shouldDrop ? commandById.get(drag.commandId) : undefined
-      if (drag.isDragging) {
-        suppressCommandClickRef.current = true
-        window.setTimeout(() => {
-          suppressCommandClickRef.current = false
-        }, 0)
-      }
-      cleanupPointerDrag()
-      if (command) addQuickCommand(command)
-    }
-
-    window.addEventListener('pointermove', onPointerMove)
-    window.addEventListener('pointerup', onPointerUp)
-    window.addEventListener('pointercancel', cleanupPointerDrag)
-    return () => {
-      window.removeEventListener('pointermove', onPointerMove)
-      window.removeEventListener('pointerup', onPointerUp)
-      window.removeEventListener('pointercancel', cleanupPointerDrag)
-    }
-  }, [addQuickCommand, commandById])
-
-  useLayoutEffect(() => {
-    const ghost = dragGhostRef.current
-    if (!ghost) return
-    const { x, y } = dragPointerRef.current
-    ghost.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`
-  }, [draggedCommandId])
+  const {
+    draggedCommand,
+    draggedCommandId,
+    isQuickDropActive,
+    quickDropRef,
+    dragGhostRef,
+    suppressCommandClickRef,
+    startCommandPointerDrag,
+  } = useQuickCommandDrag(commandById, addQuickCommand)
 
   const selectResult = useCallback(
     (index: number) => {
@@ -351,27 +198,6 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
     if (!selectedResult) return
     await launchCommand(selectedResult.command)
   }, [launchCommand, selectedResult])
-
-  useEffect(() => {
-    let cancelled = false
-    async function hydrateUsage() {
-      try {
-        const usage = await loadCommandUsage()
-        if (cancelled) return
-        setUsageByCommandId(
-          Object.fromEntries(
-            usage.map((item) => [item.commandId, { runCount: item.runCount, lastRunAt: item.lastRunAt }]),
-          ),
-        )
-      } catch {
-        if (!cancelled) setUsageByCommandId({})
-      }
-    }
-    void hydrateUsage()
-    return () => {
-      cancelled = true
-    }
-  }, [])
 
   useEffect(() => {
     const selectedCommandId = selectedCommandIdRef.current

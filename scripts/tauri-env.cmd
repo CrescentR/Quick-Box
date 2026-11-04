@@ -10,6 +10,8 @@ set "VSWHERE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
 set "VCVARS64="
 
 if exist "%VSWHERE%" (
+  rem vcvars64.bat 内部按名字调用 vswhere.exe，不把安装器目录放进 PATH 就会报“不是内部或外部命令”
+  for %%D in ("%VSWHERE%") do set "PATH=%%~dpD;%PATH%"
   for /f "usebackq delims=" %%I in (`"%VSWHERE%" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find VC\Auxiliary\Build\vcvars64.bat`) do (
     set "VCVARS64=%%I"
   )

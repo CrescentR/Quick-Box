@@ -11,3 +11,5 @@ _tmp_*
 .env
 .env.*
 market-server/
+.idea/
+.codex-logs/

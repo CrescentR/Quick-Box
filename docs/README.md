@@ -33,6 +33,7 @@
 | [功能需求笔记](New_Function.md) | 功能构想与需求记录 |
 | [产品界面重建计划](quickbox_product_ui_rebuild_plan.md) | 页面结构与界面改造规划 |
 | [V0.1 界面设计系统](quickbox_ui_design_system.md) | 历史视觉方向与未来 UI Schema 设想；当前实现参阅核心组件规范 |
+| [启动器重设计稿](../design/launcher-redesign.html) | 已采纳其结构（常用磁贴、列表 + 详情、Ctrl+K 动作菜单、底栏）；靛蓝主色、按分类上色、横向分类条有意未采用，配色以 `src/styles/tokens.css` 为准 |
 | [Zustand Store 示例](Zustand%20Store%20示例.md) | 状态管理示例，实际 Store 以 `src/stores/` 为准 |
 | [阶段任务清单](../CODEX_TASKS.md) / [分步任务](../分步任务.md) | 历史开发任务拆解，不能作为当前功能清单 |
 

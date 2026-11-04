@@ -18,6 +18,13 @@ debug = 1
 [profile.dev.package."*"]
 debug = 0
 
+# 发布包按体积优化；未用 panic = "abort"，命令里的 panic 不应直接带崩整个应用
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true
+
 [dependencies]
 chrono = { version = "0.4", features = ["clock"] }
 uuid = { version = "1", features = ["v4"] }
