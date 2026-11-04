@@ -7,13 +7,13 @@
   min-height: var(--qb-search-height);
   border-bottom: 1px solid var(--qb-border-subtle);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent),
+    linear-gradient(180deg, var(--qb-sheen), transparent),
     var(--qb-bg-input);
 }
 
 .qb-command-input:focus-within {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent),
+    linear-gradient(180deg, var(--qb-sheen-strong), transparent),
     var(--qb-bg-focus);
 }
 

@@ -5,8 +5,8 @@
   border: 1px solid color-mix(in srgb, var(--qb-status-danger) 28%, var(--qb-border-subtle));
   border-radius: var(--qb-radius-panel);
   background:
-    linear-gradient(180deg, rgba(248, 113, 113, 0.08), transparent),
-    rgba(255, 255, 255, 0.02);
+    linear-gradient(180deg, color-mix(in srgb, var(--qb-status-danger) 8%, transparent), transparent),
+    var(--qb-bg-panel);
 }
 
 .qb-error-state__title {

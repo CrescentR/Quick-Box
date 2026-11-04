@@ -4,6 +4,8 @@ const requiredModules = [
   'jsqr',
   'qrcode.react',
   'react-diff-viewer-continued',
+  'react-markdown',
+  'remark-gfm',
 ]
 
 const missing = requiredModules.filter((name) => {

@@ -11,7 +11,7 @@
   content: '';
   width: 100%;
   height: 100%;
-  border: 2px solid rgba(255, 255, 255, 0.14);
+  border: 2px solid var(--qb-border-strong);
   border-top-color: currentColor;
   border-radius: var(--qb-radius-pill);
   animation: qb-spinner-rotate var(--qb-motion-normal) linear infinite;

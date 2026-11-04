@@ -8,7 +8,7 @@
   border: 1px solid var(--qb-border-subtle);
   border-radius: 14px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015)),
+    linear-gradient(180deg, var(--qb-sheen-strong), var(--qb-sheen-fade)),
     var(--qb-bg-window);
   box-shadow: var(--qb-shadow-panel);
 }

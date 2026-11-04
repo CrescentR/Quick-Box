@@ -11,7 +11,7 @@
   padding: var(--qb-space-3);
   border: 1px solid var(--qb-border-subtle);
   border-radius: var(--qb-radius-item);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--qb-bg-panel);
 }
 
 .qb-loading-state__line {

@@ -73,7 +73,7 @@
   border: 1px solid var(--qb-border-subtle);
   border-radius: var(--qb-radius-control);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent),
+    linear-gradient(180deg, var(--qb-sheen), transparent),
     var(--qb-bg-surface);
   color: var(--qb-text-primary);
   padding: var(--qb-space-3);
@@ -111,7 +111,7 @@
   padding: var(--qb-space-3);
   border: 1px solid var(--qb-border-subtle);
   border-radius: var(--qb-radius-control);
-  background: rgba(255, 255, 255, 0.018);
+  background: var(--qb-bg-panel);
 }
 
 .qb-tool-checkbox {
@@ -172,10 +172,10 @@
   border: 1px solid var(--qb-border-subtle);
   border-radius: var(--qb-radius-control);
   background:
-    linear-gradient(45deg, rgba(255, 255, 255, 0.08) 25%, transparent 25%),
-    linear-gradient(-45deg, rgba(255, 255, 255, 0.08) 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, rgba(255, 255, 255, 0.08) 75%),
-    linear-gradient(-45deg, transparent 75%, rgba(255, 255, 255, 0.08) 75%);
+    linear-gradient(45deg, var(--qb-checker) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--qb-checker) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--qb-checker) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--qb-checker) 75%);
   background-position:
     0 0,
     0 8px,
@@ -189,7 +189,7 @@
   padding: var(--qb-space-3);
   border: 1px solid var(--qb-border-subtle);
   border-radius: var(--qb-radius-control);
-  background: rgba(255, 255, 255, 0.018);
+  background: var(--qb-bg-panel);
   overflow: auto;
 }
 
@@ -213,7 +213,7 @@
   padding: var(--qb-space-3);
   border: 1px solid var(--qb-border-subtle);
   border-radius: var(--qb-radius-control);
-  background: rgba(255, 255, 255, 0.018);
+  background: var(--qb-bg-panel);
 }
 
 .qb-tool-template__head {
@@ -282,7 +282,7 @@
   padding: var(--qb-space-2);
   border: 1px solid var(--qb-border-subtle);
   border-radius: var(--qb-radius-control);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--qb-bg-panel);
 }
 
 .qb-tool-chips {
@@ -292,7 +292,7 @@
   padding: var(--qb-space-3);
   border: 1px solid var(--qb-border-subtle);
   border-radius: var(--qb-radius-control);
-  background: rgba(255, 255, 255, 0.018);
+  background: var(--qb-bg-panel);
 }
 
 .qb-tool-chip {

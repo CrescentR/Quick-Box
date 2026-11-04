@@ -38,6 +38,14 @@
   --qb-bg-selection: rgba(240, 180, 60, 0.3);
   --qb-bg-scrollbar: rgba(255, 255, 255, 0.12);
   --qb-bg-scrollbar-hover: rgba(255, 255, 255, 0.2);
+  /* 面板、卡片、分段控件轨道的底色，以及顶部高光；组件里不要再写死白色叠加，
+     否则浅色主题下白叠白会失去层次 */
+  --qb-bg-panel: rgba(255, 255, 255, 0.02);
+  --qb-bg-track: rgba(255, 255, 255, 0.025);
+  --qb-sheen: rgba(255, 255, 255, 0.025);
+  --qb-sheen-strong: rgba(255, 255, 255, 0.04);
+  --qb-sheen-fade: rgba(255, 255, 255, 0.012);
+  --qb-checker: rgba(255, 255, 255, 0.08);
 
   --qb-border-subtle: rgba(255, 255, 255, 0.075);
   --qb-border-strong: rgba(255, 255, 255, 0.13);
@@ -148,6 +156,12 @@
   --qb-bg-selection: rgba(232, 165, 35, 0.3);
   --qb-bg-scrollbar: rgba(20, 22, 26, 0.16);
   --qb-bg-scrollbar-hover: rgba(20, 22, 26, 0.26);
+  --qb-bg-panel: rgba(255, 255, 255, 0.72);
+  --qb-bg-track: rgba(20, 22, 26, 0.045);
+  --qb-sheen: rgba(255, 255, 255, 0.5);
+  --qb-sheen-strong: rgba(255, 255, 255, 0.7);
+  --qb-sheen-fade: rgba(255, 255, 255, 0.2);
+  --qb-checker: rgba(20, 22, 26, 0.07);
 
   --qb-border-subtle: rgba(20, 22, 26, 0.09);
   --qb-border-strong: rgba(20, 22, 26, 0.16);
@@ -164,9 +178,13 @@
   --qb-text-secondary: #4f535a;
   --qb-text-muted: #73777e;
   --qb-text-on-accent: #2a1f06;
-  --qb-status-success-soft: rgba(52, 211, 153, 0.14);
-  --qb-status-warning-soft: rgba(251, 191, 36, 0.14);
-  --qb-status-danger-soft: rgba(248, 113, 113, 0.14);
+  /* 暗色主题的状态色在浅底上对比度不足 2:1，这里换成达到 WCAG AA 的深色版本 */
+  --qb-status-success: #0f7a55;
+  --qb-status-success-soft: rgba(15, 122, 85, 0.12);
+  --qb-status-warning: #8f5f00;
+  --qb-status-warning-soft: rgba(176, 112, 0, 0.13);
+  --qb-status-danger: #c0392f;
+  --qb-status-danger-soft: rgba(192, 57, 47, 0.11);
 
   --qb-shadow-window: 0 18px 50px rgba(20, 22, 26, 0.16);
   --qb-shadow-panel: 0 10px 28px rgba(20, 22, 26, 0.12);

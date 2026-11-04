@@ -27,8 +27,11 @@ describe('Linux 命令大全搜索', () => {
 })
 
 it('查阅完整手册、复制原文、空结果恢复和 tldr 示例切换', async () => {
+  vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify(commands))))
   render(<CommandCheatsheetToolView />)
-  const input = screen.getByLabelText('搜索 Linux 命令')
+  expect(screen.getByText('正在加载命令手册…')).toBeTruthy()
+  const input = await screen.findByLabelText('搜索 Linux 命令')
+  vi.unstubAllGlobals()
   fireEvent.change(input, { target: { value: 'systemctl' } })
   const article = screen.getByRole('article', { name: 'systemctl 命令手册' })
   expect(within(article).getByRole('heading', { name: 'systemctl', exact: true })).toBeTruthy()

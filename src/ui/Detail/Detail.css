@@ -5,8 +5,8 @@
   border: 1px solid var(--qb-border-subtle);
   border-radius: var(--qb-radius-panel);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.015)),
-    rgba(255, 255, 255, 0.02);
+    linear-gradient(180deg, var(--qb-sheen-strong), var(--qb-sheen-fade)),
+    var(--qb-bg-panel);
 }
 
 .qb-detail__header {

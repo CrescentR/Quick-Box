@@ -49,7 +49,7 @@
 .qb-backup-empty { margin: 0; padding: 8px 0; color: var(--qb-text-muted); font-size: 12px; }
 .qb-backup-confirm { border: 1px solid var(--qb-border-subtle); padding: 10px; border-radius: 8px; }
 .qb-backup-confirm p { margin: 0 0 8px; font-size: 12px; overflow-wrap: anywhere; }
-.qb-inline-error { margin: 0; color: var(--qb-accent-danger, #ef6464); font-size: 12px; }
+.qb-inline-error { margin: 0; color: var(--qb-status-danger); font-size: 12px; }
 .qb-plugin-toolbar { display: grid; grid-template-columns: minmax(0, 1fr) 120px; gap: 8px; }
 .qb-plugin-search { display: flex; align-items: center; gap: 8px; color: var(--qb-text-muted); }
 .qb-plugin-search input { width: 100%; }
@@ -157,7 +157,7 @@
   padding: 4px;
   border: 1px solid var(--qb-border-subtle);
   border-radius: var(--qb-radius-pill);
-  background: rgba(255, 255, 255, 0.025);
+  background: var(--qb-bg-track);
 }
 
 .qb-page-nav__button {
@@ -218,8 +218,8 @@
   border: 1px solid var(--qb-border-subtle);
   border-radius: var(--qb-radius-panel);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.012)),
-    rgba(255, 255, 255, 0.02);
+    linear-gradient(180deg, var(--qb-sheen-strong), var(--qb-sheen-fade)),
+    var(--qb-bg-panel);
 }
 
 .qb-page-card__top {
@@ -255,7 +255,7 @@
   padding: var(--qb-space-4);
   border: 1px solid var(--qb-border-subtle);
   border-radius: var(--qb-radius-item);
-  background: rgba(255, 255, 255, 0.018);
+  background: var(--qb-bg-panel);
 }
 
 .qb-page-stat__label {
@@ -294,7 +294,7 @@
   border: 1px solid var(--qb-border-subtle);
   border-radius: var(--qb-radius-control);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent),
+    linear-gradient(180deg, var(--qb-sheen), transparent),
     var(--qb-bg-surface);
   color: var(--qb-text-primary);
   padding: 0 var(--qb-space-3);
@@ -324,7 +324,7 @@
   padding: var(--qb-space-3);
   border: 1px solid var(--qb-border-subtle);
   border-radius: var(--qb-radius-item);
-  background: rgba(255, 255, 255, 0.018);
+  background: var(--qb-bg-panel);
   color: var(--qb-text-secondary);
   text-align: left;
   cursor: pointer;
@@ -383,7 +383,7 @@
   padding: var(--qb-space-1);
   border: 1px solid var(--qb-border-subtle);
   border-radius: var(--qb-radius-control);
-  background: rgba(255, 255, 255, 0.025);
+  background: var(--qb-bg-track);
 }
 
 .qb-page-segmented__item {
@@ -442,7 +442,7 @@
   padding: var(--qb-space-4);
   border: 1px solid var(--qb-border-subtle);
   border-radius: var(--qb-radius-item);
-  background: rgba(255, 255, 255, 0.018);
+  background: var(--qb-bg-panel);
 }
 
 .qb-page-toggle__copy {

@@ -1,15 +1,13 @@
-import { lazy, Suspense, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { BookOpen, Search } from 'lucide-react'
 import { useClipboardToast } from '../../hooks/useClipboardToast'
 import CommandMarkdown from './CommandMarkdown'
-import { indexLinuxCommands, searchLinuxCommands } from './search-linux-commands'
-import commands from './data/linux-commands.json'
+import { searchLinuxCommands, type IndexedLinuxCommand } from './search-linux-commands'
+import { loadLinuxCommands } from './linux-command-data'
 import source from './data/source.json'
 import license from './data/LICENSE.linux-command.txt?raw'
 import './command-cheatsheet.css'
 
-const indexed = indexLinuxCommands(commands)
-const categories = [...new Set(commands.map((command) => command.category))].sort((a, b) => a.localeCompare(b, 'zh-CN'))
 const TldrReference = lazy(() => import('./TldrReference'))
 const pageSize = 60
 
@@ -23,13 +21,23 @@ export default function CommandCheatsheetToolView() {
   const articleRef = useRef<HTMLElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
   const { copyText, clipboardToast } = useClipboardToast()
-  const results = useMemo(() => searchLinuxCommands(indexed, query, category), [query, category])
+  const [indexed, setIndexed] = useState<IndexedLinuxCommand[] | null>(null)
+  const [loadError, setLoadError] = useState('')
+  const [loadAttempt, setLoadAttempt] = useState(0)
+  useEffect(() => {
+    let active = true
+    setLoadError('')
+    loadLinuxCommands().then((data) => { if (active) setIndexed(data) }).catch((error: unknown) => { if (active) setLoadError(error instanceof Error ? error.message : String(error)) })
+    return () => { active = false }
+  }, [loadAttempt])
+  const categories = useMemo(() => [...new Set((indexed ?? []).map((command) => command.category))].sort((a, b) => a.localeCompare(b, 'zh-CN')), [indexed])
+  const results = useMemo(() => searchLinuxCommands(indexed ?? [], query, category), [indexed, query, category])
   const selected = results.find((command) => command.name === selectedName) ?? results[0]
   const visible = results.slice(0, visibleCount)
   const select = (name: string) => { setSelectedName(name); if (articleRef.current) articleRef.current.scrollTop = 0; setMessage('') }
   const changeSearch = (value: string) => { setQuery(value); setSelectedName(''); setVisibleCount(pageSize); setMessage(''); if (listRef.current) listRef.current.scrollTop = 0; if (articleRef.current) articleRef.current.scrollTop = 0 }
   const openCommand = (name: string) => {
-    const match = indexed.find((command) => command.searchName === name.toLowerCase())
+    const match = indexed?.find((command) => command.searchName === name.toLowerCase())
     if (!match) { setMessage(`内置库中没有「${name}」的文档。`); return }
     setCategory('all'); changeSearch(match.name); select(match.name)
   }
@@ -41,7 +49,11 @@ export default function CommandCheatsheetToolView() {
         <button type="button" role="tab" id="command-tldr-tab" aria-selected={mode === 'tldr'} aria-controls="command-tldr-panel" onClick={() => setMode('tldr')}>tldr 示例</button>
       </div>
     </header>
-    {mode === 'manual' ? <div id="command-manual-panel" role="tabpanel" aria-labelledby="command-manual-tab" className="qb-command-reference__panel">
+    {mode === 'manual' && !indexed ? <div id="command-manual-panel" role="tabpanel" aria-labelledby="command-manual-tab" className="qb-command-reference__panel">
+      {loadError
+        ? <div className="qb-command-reference__empty" role="alert">命令手册加载失败：{loadError} <button type="button" className="qb-tool-button" onClick={() => setLoadAttempt((count) => count + 1)}>重试</button></div>
+        : <p className="qb-command-reference__empty" role="status">正在加载命令手册…</p>}
+    </div> : mode === 'manual' ? <div id="command-manual-panel" role="tabpanel" aria-labelledby="command-manual-tab" className="qb-command-reference__panel">
       <div className="qb-command-reference__toolbar">
         <label className="qb-command-reference__search"><Search size={15} /><input className="qb-tool-input" type="search" aria-label="搜索 Linux 命令" placeholder="命令名、中文用途、选项或示例…" value={query} onChange={(event) => changeSearch(event.target.value)} onKeyDown={(event) => {
           if (!['ArrowDown', 'ArrowUp', 'Enter'].includes(event.key) || event.nativeEvent.isComposing || !results.length) return

@@ -20,7 +20,7 @@
   min-height: var(--qb-search-height);
   padding: var(--qb-space-2) var(--qb-space-5);
   border-bottom: 1px solid var(--qb-border-subtle);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent);
+  background: linear-gradient(180deg, var(--qb-sheen-strong), transparent);
 }
 
 .qb-window-shell__title {
@@ -45,5 +45,5 @@
   color: var(--qb-text-secondary);
   font-size: var(--qb-font-size-caption);
   line-height: var(--qb-line-height-caption);
-  background: linear-gradient(0deg, rgba(255, 255, 255, 0.03), transparent);
+  background: linear-gradient(0deg, var(--qb-sheen), transparent);
 }
