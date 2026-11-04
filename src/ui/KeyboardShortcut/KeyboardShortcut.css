@@ -17,7 +17,7 @@
   padding: 0 var(--qb-space-2);
   border: 1px solid var(--qb-border-subtle);
   border-bottom-color: var(--qb-border-strong);
-  border-radius: 8px;
+  border-radius: var(--qb-radius-item);
   background: var(--qb-bg-surface);
   color: var(--qb-text-primary);
   box-shadow: inset 0 -1px 0 var(--qb-sheen);

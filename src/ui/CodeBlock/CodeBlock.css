@@ -55,7 +55,7 @@
   overflow: auto;
   color: var(--qb-text-primary);
   font-family: var(--qb-font-mono);
-  font-size: 13px;
+  font-size: var(--qb-font-size-small);
   line-height: 1.65;
   white-space: pre;
 }

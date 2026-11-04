@@ -23,17 +23,17 @@
 }
 
 .qb-command-markdown h1 {
-  font-size: 22px;
+  font-size: var(--qb-font-size-display);
 }
 
 .qb-command-markdown h2 {
   padding-bottom: 6px;
   border-bottom: 1px solid var(--qb-border-subtle);
-  font-size: 18px;
+  font-size: var(--qb-font-size-title);
 }
 
 .qb-command-markdown :where(h3, h4, h5, h6) {
-  font-size: 15px;
+  font-size: var(--qb-font-size-subtitle);
 }
 
 .qb-command-markdown :where(p, ul, ol, blockquote) {
@@ -88,7 +88,7 @@
 .qb-command-markdown code {
   padding: 1px 4px;
   border: 1px solid var(--qb-border-subtle);
-  border-radius: 4px;
+  border-radius: var(--qb-radius-xs);
   background: var(--qb-bg-surface);
   color: var(--qb-text-primary);
   font-family: var(--qb-font-mono);
@@ -109,7 +109,7 @@
 .qb-command-markdown .qb-code-block__body {
   min-width: 0;
   max-width: 100%;
-  font-size: 12px;
+  font-size: var(--qb-font-size-caption);
   overflow-wrap: normal;
 }
 
@@ -124,7 +124,7 @@
 .qb-command-markdown table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: var(--qb-font-size-caption);
 }
 
 .qb-command-markdown :where(th, td) {

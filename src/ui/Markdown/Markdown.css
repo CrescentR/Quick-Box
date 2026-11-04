@@ -18,17 +18,17 @@
 }
 
 .qb-markdown h1 {
-  font-size: 24px;
+  font-size: var(--qb-font-size-display);
   line-height: 30px;
 }
 
 .qb-markdown h2 {
-  font-size: 18px;
+  font-size: var(--qb-font-size-title);
   line-height: 24px;
 }
 
 .qb-markdown h3 {
-  font-size: 15px;
+  font-size: var(--qb-font-size-subtitle);
   line-height: 20px;
 }
 
@@ -47,7 +47,7 @@
   display: inline-block;
   padding: 0 var(--qb-space-1);
   border: 1px solid var(--qb-border-subtle);
-  border-radius: 6px;
+  border-radius: var(--qb-radius-control);
   background: var(--qb-bg-surface);
   color: var(--qb-text-primary);
   font-size: 0.95em;

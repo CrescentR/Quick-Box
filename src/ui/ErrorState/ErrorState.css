@@ -11,7 +11,7 @@
 
 .qb-error-state__title {
   color: var(--qb-text-primary);
-  font-size: 18px;
+  font-size: var(--qb-font-size-title);
   line-height: 24px;
   font-weight: var(--qb-font-weight-semibold);
 }

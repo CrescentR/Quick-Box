@@ -4,8 +4,8 @@
     {
       "name": "web",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["dev:web"],
-      "port": 1420
+      "runtimeArgs": ["exec", "vite", "--port", "1431"],
+      "port": 1431
     }
   ]
 }

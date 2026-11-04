@@ -38,20 +38,20 @@
 }
 
 .qb-page-title__mark {
-  font-size: 13px;
+  font-size: var(--qb-font-size-small);
   font-weight: 600;
   letter-spacing: 0.01em;
 }
 
 .qb-page-title--compact .qb-page-nav {
   padding: 2px;
-  border-radius: 8px;
+  border-radius: var(--qb-radius-item);
 }
 
 .qb-page-title--compact .qb-page-nav__button {
   min-height: 24px;
   padding: 0 10px;
-  border-radius: 6px;
+  border-radius: var(--qb-radius-control);
 }
 
 .qb-page-title--compact .qb-page-nav__button.is-active {
@@ -86,7 +86,7 @@
   min-height: 34px;
   border: 1px solid var(--qb-border-subtle);
   border-bottom: 1px solid var(--qb-border-subtle);
-  border-radius: 8px;
+  border-radius: var(--qb-radius-item);
   background: var(--qb-bg-input);
 }
 
@@ -98,7 +98,7 @@
 .qb-launcher-search__input .qb-command-input__field {
   height: 32px;
   padding: 0 56px 0 34px;
-  font-size: 13px;
+  font-size: var(--qb-font-size-small);
 }
 
 .qb-launcher-search__input .qb-command-input__field:focus-visible {
@@ -114,7 +114,7 @@
   gap: 6px;
   transform: translateY(-50%);
   color: var(--qb-text-muted);
-  font-size: 11px;
+  font-size: var(--qb-font-size-micro);
   font-variant-numeric: tabular-nums;
   pointer-events: none;
 }
@@ -140,7 +140,7 @@
 .qb-launcher-nav__label {
   padding: 10px 8px 6px;
   color: var(--qb-text-muted);
-  font-size: 10px;
+  font-size: var(--qb-font-size-micro);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -154,7 +154,7 @@
   height: 32px;
   padding: 0 8px;
   border: 0;
-  border-radius: 6px;
+  border-radius: var(--qb-radius-control);
   background: transparent;
   color: var(--qb-text-secondary);
   text-align: left;
@@ -175,12 +175,12 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 12.5px;
+  font-size: var(--qb-font-size-small);
 }
 
 .qb-launcher-nav__count {
   color: var(--qb-text-muted);
-  font-size: 11px;
+  font-size: var(--qb-font-size-micro);
   font-variant-numeric: tabular-nums;
 }
 
@@ -211,7 +211,7 @@
   justify-content: space-between;
   gap: 8px;
   color: var(--qb-text-muted);
-  font-size: 11px;
+  font-size: var(--qb-font-size-micro);
   font-weight: 500;
 }
 
@@ -250,7 +250,7 @@
   height: 52px;
   padding: 0 8px;
   border: 1px solid var(--qb-border-subtle);
-  border-radius: 8px;
+  border-radius: var(--qb-radius-item);
   background: var(--qb-bg-surface);
   color: var(--qb-text-primary);
   text-align: left;
@@ -281,13 +281,13 @@
 }
 
 .qb-launcher-tile__name {
-  font-size: 12.5px;
+  font-size: var(--qb-font-size-small);
   font-weight: 500;
 }
 
 .qb-launcher-tile__meta {
   color: var(--qb-text-muted);
-  font-size: 11px;
+  font-size: var(--qb-font-size-micro);
 }
 
 .qb-launcher-tile__key {
@@ -300,7 +300,7 @@
   gap: 6px;
   padding: 8px;
   color: var(--qb-text-muted);
-  font-size: 12px;
+  font-size: var(--qb-font-size-caption);
 }
 
 /* ---- 图标 ---- */
@@ -312,7 +312,7 @@
   justify-content: center;
   width: 26px;
   height: 26px;
-  border-radius: 6px;
+  border-radius: var(--qb-radius-control);
   background: var(--qb-bg-surface-strong);
   color: var(--qb-text-secondary);
 }
@@ -344,7 +344,10 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 28px;
   align-items: stretch;
-  border-radius: 7px;
+  border-radius: var(--qb-radius-item);
+  transition:
+    background-color var(--qb-motion-fast) var(--qb-ease-out),
+    opacity var(--qb-motion-fast) var(--qb-ease-out);
 }
 
 .qb-tool-row:hover {
@@ -387,7 +390,7 @@
   align-items: baseline;
   gap: 6px;
   min-width: 0;
-  font-size: 13px;
+  font-size: var(--qb-font-size-small);
   font-weight: 500;
 }
 
@@ -404,7 +407,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   color: var(--qb-text-muted);
-  font-size: 11px;
+  font-size: var(--qb-font-size-micro);
   font-weight: 400;
 }
 
@@ -471,13 +474,13 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 13px;
+  font-size: var(--qb-font-size-small);
   font-weight: 600;
 }
 
 .qb-launcher-view__sub {
   color: var(--qb-text-muted);
-  font-size: 11px;
+  font-size: var(--qb-font-size-micro);
 }
 
 .qb-launcher-icon-btn {
@@ -488,7 +491,7 @@
   height: 28px;
   padding: 0 6px;
   border: 1px solid transparent;
-  border-radius: 6px;
+  border-radius: var(--qb-radius-control);
   background: transparent;
   color: var(--qb-text-secondary);
   cursor: pointer;
@@ -513,7 +516,7 @@
   gap: 8px;
   color: var(--qb-text-muted);
   text-align: center;
-  font-size: 13px;
+  font-size: var(--qb-font-size-small);
 }
 
 .qb-launcher-idle p {
@@ -541,7 +544,7 @@
   align-items: center;
   gap: 5px;
   color: var(--qb-text-muted);
-  font-size: 11px;
+  font-size: var(--qb-font-size-micro);
   white-space: nowrap;
 }
 
@@ -550,8 +553,8 @@
   min-width: 18px;
   min-height: 18px;
   padding: 0 4px;
-  border-radius: 4px;
-  font-size: 10px;
+  border-radius: var(--qb-radius-xs);
+  font-size: var(--qb-font-size-micro);
 }
 
 /* ---- 浮层 ---- */
@@ -584,7 +587,7 @@
   max-width: 240px;
   padding: 6px 10px 6px 6px;
   border: 1px solid var(--qb-border-strong);
-  border-radius: 8px;
+  border-radius: var(--qb-radius-item);
   background: var(--qb-bg-window-solid);
   box-shadow: var(--qb-shadow-panel);
 }
@@ -593,7 +596,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 13px;
+  font-size: var(--qb-font-size-small);
   font-weight: 500;
 }
 

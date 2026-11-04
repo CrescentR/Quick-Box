@@ -3,11 +3,18 @@
   color-scheme: dark;
 
   --qb-font-sans: "IBM Plex Sans", "Microsoft YaHei UI", "PingFang SC", "Noto Sans SC", sans-serif;
-  --qb-font-mono: "JetBrains Mono", "Cascadia Code", "SF Mono", Consolas, monospace;
+  /* 未打包等宽字体：优先 Win11 自带的 Cascadia Mono，再退到各平台系统字体 */
+  --qb-font-mono: "Cascadia Mono", "Cascadia Code", "JetBrains Mono", "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace;
 
-  --qb-font-size-search: 16px;
-  --qb-font-size-body: 14px;
+  /* 字号阶梯：11 / 12 / 13 / 14 / 16 / 18 / 22，组件里不要再写零散的 px 字号 */
+  --qb-font-size-micro: 11px;
   --qb-font-size-caption: 12px;
+  --qb-font-size-small: 13px;
+  --qb-font-size-body: 14px;
+  --qb-font-size-search: 16px;
+  --qb-font-size-subtitle: 16px;
+  --qb-font-size-title: 18px;
+  --qb-font-size-display: 22px;
   --qb-line-height-search: 24px;
   --qb-line-height-body: 20px;
   --qb-line-height-caption: 16px;
@@ -72,6 +79,7 @@
   --qb-status-danger-soft: rgba(248, 113, 113, 0.16);
 
   --qb-radius-window: 12px;
+  --qb-radius-xs: 4px;
   --qb-radius-panel: 10px;
   --qb-radius-item: 8px;
   --qb-radius-control: 6px;

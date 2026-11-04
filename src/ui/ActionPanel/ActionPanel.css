@@ -40,7 +40,7 @@
 
 .qb-action-panel__title {
   color: var(--qb-text-primary);
-  font-size: 16px;
+  font-size: var(--qb-font-size-subtitle);
   line-height: 22px;
   font-weight: var(--qb-font-weight-semibold);
 }

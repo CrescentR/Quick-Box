@@ -75,9 +75,25 @@ select:not([multiple]):focus-visible {
   outline: none;
 }
 
+/* 按钮、链接、标签页等用 outline 画焦点环：组件自身常带 box-shadow（键帽、卡片），
+   零优先级的 box-shadow 焦点环会被它们覆盖，键盘焦点就看不见了 */
 :where(:focus-visible) {
+  outline: 2px solid var(--qb-border-focus);
+  outline-offset: 1px;
+}
+
+:where(input, textarea, select, [contenteditable]):focus-visible {
   outline: none;
   box-shadow: var(--qb-shadow-focus);
+}
+
+:where(button, a, summary, input, textarea, select, [role="tab"], [role="option"]) {
+  transition:
+    background-color var(--qb-motion-fast) var(--qb-ease-out),
+    border-color var(--qb-motion-fast) var(--qb-ease-out),
+    color var(--qb-motion-fast) var(--qb-ease-out),
+    box-shadow var(--qb-motion-fast) var(--qb-ease-out),
+    opacity var(--qb-motion-fast) var(--qb-ease-out);
 }
 
 :where([data-tauri-drag-region]) {
