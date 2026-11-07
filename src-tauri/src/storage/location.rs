@@ -256,6 +256,8 @@ pub async fn set_storage_location(
         let _guard = super::STORAGE_LOCK
             .write()
             .map_err(|_| CommandError::new("STORAGE_LOCK", "存储暂不可用，请重启应用"))?;
+        // 写锁保证没有正在使用的连接；再关掉空闲连接，迁移后重新打开新目录。
+        super::close_idle_connections();
         let install = installation_directory()?;
         let target = migrate(&install, Path::new(path.trim()))?;
         Ok(StorageLocation {
