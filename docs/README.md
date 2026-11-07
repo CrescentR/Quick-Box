@@ -26,7 +26,7 @@
 
 | 文档 | 内容与阅读提示 |
 | --- | --- |
-| [早期架构设计](Architecture.md) | 架构原则与扩展设想；当前实现参阅根目录的架构概览 |
+| [早期架构设计](history/early-architecture.md) | 架构原则与扩展设想；当前实现参阅根目录的架构概览 |
 | [项目发展规划](项目发展规划.md) | 产品方向、实施建议与阶段目标 |
 | [插件市场需求与技术方案](插件市场需求与技术方案.md) | 在线市场、第三方插件与重型能力的规划；当前页面管理内置插件 |
 | [V0.5 阶段设计](V0.5.md) | 阶段性产品和能力取舍 |
@@ -35,7 +35,7 @@
 | [V0.1 界面设计系统](quickbox_ui_design_system.md) | 历史视觉方向与未来 UI Schema 设想；当前实现参阅核心组件规范 |
 | [启动器重设计稿](../design/launcher-redesign.html) | 已采纳其结构（常用磁贴、列表 + 详情、Ctrl+K 动作菜单、底栏）；靛蓝主色、按分类上色、横向分类条有意未采用，配色以 `src/styles/tokens.css` 为准 |
 | [Zustand Store 示例](Zustand%20Store%20示例.md) | 状态管理示例，实际 Store 以 `src/stores/` 为准 |
-| [阶段任务清单](../CODEX_TASKS.md) / [分步任务](../分步任务.md) | 历史开发任务拆解，不能作为当前功能清单 |
+| [阶段任务清单](history/CODEX_TASKS.md) / [分步任务](history/分步任务.md) | 历史开发任务拆解，不能作为当前功能清单 |
 
 内置 Linux 手册的固定版本、来源和许可保存在 [`command-cheatsheet-tool/data/`](../src/builtin-plugins/command-cheatsheet-tool/data)，也可以直接在应用中打开“版本与许可证”查看。
 
