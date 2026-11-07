@@ -2,7 +2,7 @@
 
 [返回首页](../README.md) · [开发内置工具](插件示范.md) · [构建与发布](release.md)
 
-本指南按仓库当前实现编写，涵盖本地启动、代码分层、数据约定和提交前检查。插件市场等后续设计可见 [架构设计稿](Architecture.md) 与 [插件市场方案](插件市场需求与技术方案.md)，其中的规划不代表当前功能已经上线。
+本指南按仓库当前实现编写，涵盖本地启动、代码分层、数据约定和提交前检查。插件市场等后续设计可见 [架构设计稿](history/early-architecture.md) 与 [插件市场方案](插件市场需求与技术方案.md)，其中的规划不代表当前功能已经上线。
 
 ## 1. 准备开发环境
 
@@ -96,10 +96,12 @@ pnpm dev
 | `pnpm tauri:dev` | 启动前端服务与桌面开发窗口 |
 | `pnpm tauri:dev:attach` | 连接已运行的前端服务并启动桌面开发窗口 |
 | `pnpm typecheck` | 执行 `tsc --noEmit`，检查前端类型 |
+| `pnpm lint` | 运行 ESLint，不允许任何警告 |
 | `pnpm prebuild` | 检查部分必要前端依赖，可在构建前单独运行 |
 | `pnpm build` | 检查 TypeScript 并生成 `dist/` 前端产物 |
 | `pnpm check:rust` | 在 `src-tauri/` 执行 `cargo check` |
-| `pnpm verify` | 依次执行类型检查、前端测试、前端构建与 Rust 编译检查 |
+| `pnpm check:rust:lint` | 在 `src-tauri/` 执行 `cargo fmt --check` 与 `cargo clippy -- -D warnings` |
+| `pnpm verify` | 依次执行类型检查、ESLint、前端测试、前端构建、Rust 编译检查与 Rust lint |
 | `pnpm test` | 运行一次 Vitest 前端测试 |
 | `pnpm test:watch` | 启动 Vitest 交互式监听模式 |
 | `pnpm preview` | 在本地预览已有 `dist/`；先执行 `pnpm build` |

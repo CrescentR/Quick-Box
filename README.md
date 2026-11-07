@@ -174,12 +174,12 @@ pnpm tauri:dev
 | 启动桌面开发 | `pnpm tauri:dev` |
 | 浏览器预览 | `pnpm dev` |
 | 复用已运行的 Vite，启动桌面壳 | `pnpm tauri:dev:attach` |
-| 前端类型、测试、构建与 Rust 检查 | `pnpm verify` |
+| 前端类型、lint、测试、构建与 Rust 检查 | `pnpm verify` |
 | Rust 单元测试 | `cargo test --locked --manifest-path src-tauri/Cargo.toml --lib` |
 | 打包 Windows / Linux | `pnpm tauri:build:win` / `pnpm tauri:build:linux` |
 | 同步完整 Linux 命令文档 | `pnpm sync:linux-commands` |
 
-`pnpm verify` 包含 Rust `cargo check`；提交前另外运行上面的 Rust 单测命令。双终端开发、脚本全表、存储约定与故障排查见 [开发指南](docs/development.md)。
+`pnpm verify` 包含 ESLint、Rust `cargo check`、`cargo fmt --check` 与 `cargo clippy`；提交前另外运行上面的 Rust 单测命令。双终端开发、脚本全表、存储约定与故障排查见 [开发指南](docs/development.md)。
 
 ### 自动构建与发布
 
@@ -227,7 +227,7 @@ Quick-Box/
 └── .github/workflows/      # 验证与 Release 自动化
 ```
 
-历史设计与规划可参考 [架构设计](docs/Architecture.md)、[UI 设计稿](docs/quickbox_ui_design_system.md)、[项目发展规划](docs/项目发展规划.md) 和 [插件市场方案](docs/插件市场需求与技术方案.md)。规划文档不代表当前版本已交付的功能；当前加载器只注册仓库内置插件。
+历史设计与规划可参考 [架构设计](docs/history/early-architecture.md)、[UI 设计稿](docs/quickbox_ui_design_system.md)、[项目发展规划](docs/项目发展规划.md) 和 [插件市场方案](docs/插件市场需求与技术方案.md)。规划文档不代表当前版本已交付的功能；当前加载器只注册仓库内置插件。
 
 </details>
 

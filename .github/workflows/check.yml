@@ -18,13 +18,18 @@ jobs:
           node-version: 24
           cache: pnpm
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
       - uses: swatinem/rust-cache@v2
         with:
           workspaces: src-tauri -> target
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
+      - run: pnpm lint
       - run: pnpm test
       - run: pnpm build
+      - run: cargo fmt --manifest-path src-tauri/Cargo.toml --check
+      - run: cargo clippy --manifest-path src-tauri/Cargo.toml --lib --all-targets -- -D warnings
       - run: cargo test --manifest-path src-tauri/Cargo.toml --lib
   rust-linux:
     # Release 也发 Linux 包，这里在 Linux 上编译并跑 Rust 测试，提前发现平台相关代码的问题
@@ -48,4 +53,6 @@ jobs:
       - run: pnpm install --frozen-lockfile
       # generate_context! 编译时要求 frontendDist 存在
       - run: pnpm build
+      # Unix 平台代码只在这里编译；本地（Windows）无法验证，先只报告警告不阻断，清零后再改为 -D warnings
+      - run: cargo clippy --manifest-path src-tauri/Cargo.toml --lib --all-targets
       - run: cargo test --manifest-path src-tauri/Cargo.toml --lib

@@ -1,4 +1,3 @@
-import { uniqueLines } from './shared'
 
 export type GitignoreTemplateKey = 'node' | 'rust' | 'tauri' | 'python' | 'os' | 'editor'
 

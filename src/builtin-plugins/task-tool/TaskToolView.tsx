@@ -66,8 +66,10 @@ export default function TaskToolView({ params }: PluginViewProps) {
     const timer = window.setTimeout(() => {
       void refresh().catch(cause => { if (active) setError(errorText(cause)) }).finally(() => { if (active) setLoading(false) })
     }, query.trim() ? 180 : 0)
+    // requestId 是请求序号而不是 DOM 引用，清理时递增用于作废过期请求。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     return () => { active = false; requestId.current++; window.clearTimeout(timer) }
-  }, [refresh])
+  }, [refresh, query])
   useEffect(() => { void loadRecentTemplates().then(setTemplates).catch(() => {}) }, [])
   useEffect(() => {
     const taskId = typeof params?.taskId === 'string' ? params.taskId : ''

@@ -15,6 +15,8 @@ function commandFromHref(href: string): string | undefined {
   if (!match) return undefined
   try {
     const command = decodeURIComponent(match[1])
+    // 刻意匹配控制字符：命令名里出现控制字符一律视为非法链接。
+    // eslint-disable-next-line no-control-regex
     return command && !/[\\/\s\x00-\x1f]/.test(command) && command !== '.' && command !== '..'
       ? command
       : undefined

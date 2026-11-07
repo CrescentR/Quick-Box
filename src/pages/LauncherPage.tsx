@@ -155,7 +155,7 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
       selectResult(index)
       await launchCommand(result.command)
     },
-    [launchCommand, results, selectResult],
+    [launchCommand, results, selectResult, suppressCommandClickRef],
   )
 
   const launchQuickCommand = useCallback(

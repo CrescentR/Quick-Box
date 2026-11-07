@@ -21,7 +21,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
     hydration = (async () => {
       try {
         const raw = await invokeCommand<WorkspaceData | null>('load_workspace')
-        let data = raw ? validateWorkspace(raw) : emptyWorkspace()
+        const data = raw ? validateWorkspace(raw) : emptyWorkspace()
         if (!raw) {
           const legacy = window.localStorage.getItem(legacyKey)
           if (legacy) {

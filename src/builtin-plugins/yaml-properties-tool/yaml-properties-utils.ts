@@ -247,7 +247,7 @@ export function parseProperties(input: string): { [key: string]: ConfigValue } {
   let pending = ''
 
   input.split(/\r?\n/).forEach((rawLine, lineIndex) => {
-    let line = pending ? pending + rawLine.trimStart() : rawLine
+    const line = pending ? pending + rawLine.trimStart() : rawLine
     pending = ''
     if (line.endsWith('\\')) {
       pending = line.slice(0, -1)

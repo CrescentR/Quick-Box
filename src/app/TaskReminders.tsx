@@ -47,6 +47,8 @@ function useReminders(active: boolean, popup: boolean) {
       }).catch((cause) => { if (!disposed) setError(messageOf(cause)) })
     }
     return () => {
+      // request 是请求序号而不是 DOM 引用，卸载时递增它正是为了让进行中的请求结果作废。
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       disposed = true; alive.current = false; request.current++
       stop?.(); window.clearInterval(timer)
       window.removeEventListener('quickbox:tasks-changed', update)

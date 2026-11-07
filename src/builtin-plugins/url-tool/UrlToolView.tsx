@@ -1,5 +1,5 @@
 import { useToolInput } from '../../core/tool/tool-context'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { writeClipboardText } from '../../api/clipboard-api'
 import { CodeBlock, Detail } from '../../ui'
 import { ToolShell } from '../../core/tool/ToolShell'

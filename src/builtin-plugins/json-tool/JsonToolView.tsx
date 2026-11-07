@@ -1,6 +1,6 @@
 import { useToolOption } from '../../core/tool/use-tool-option'
 import { useToolInput } from '../../core/tool/tool-context'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useClipboardToast } from '../../hooks/useClipboardToast'
 import { CodeBlock, Detail } from '../../ui'
 import { ToolShell } from '../../core/tool/ToolShell'
