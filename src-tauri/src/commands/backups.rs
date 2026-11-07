@@ -403,7 +403,7 @@ mod tests {
             *byte = (index % 256) as u8;
         }
         fs::write(&source, &bytes).unwrap();
-        let items = add_files(&directory, &[source.clone()]).unwrap();
+        let items = add_files(&directory, std::slice::from_ref(&source)).unwrap();
         assert_eq!(items.len(), 1);
         assert_eq!(items[0].size, bytes.len() as u64);
         assert_eq!(items[0].name, "任意备份.private-format");
@@ -468,7 +468,7 @@ mod tests {
         let directory = test.data();
         let source = test.0.join("original.bin");
         fs::write(&source, [0, 255, 17]).unwrap();
-        let previous = add_files(&directory, &[source.clone()]).unwrap();
+        let previous = add_files(&directory, std::slice::from_ref(&source)).unwrap();
         assert!(add_files(&directory, &[source.clone(), test.0.join("missing")]).is_err());
         let files = read_backups(&directory).unwrap();
         assert_eq!(files.len(), 1);

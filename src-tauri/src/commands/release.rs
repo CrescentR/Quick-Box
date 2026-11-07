@@ -14,6 +14,8 @@ pub fn open_release_page() -> Result<(), CommandError> {
     #[cfg(not(any(target_os = "windows", target_os = "macos")))]
     let mut command = std::process::Command::new("xdg-open");
     let mut child = command.arg(url).spawn()?;
-    std::thread::spawn(move || { let _ = child.wait(); });
+    std::thread::spawn(move || {
+        let _ = child.wait();
+    });
     Ok(())
 }

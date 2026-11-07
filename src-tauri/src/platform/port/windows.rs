@@ -1,12 +1,12 @@
 use super::PortOccupant;
 use crate::errors::CommandError;
 use std::collections::HashMap;
+use std::ffi::c_void;
 use std::mem;
 use std::net::Ipv6Addr;
 use std::path::Path;
 use windows::core::PWSTR;
 use windows::Win32::Foundation::{CloseHandle, ERROR_INSUFFICIENT_BUFFER, NO_ERROR};
-use std::ffi::c_void;
 use windows::Win32::NetworkManagement::IpHelper::{
     GetExtendedTcpTable, GetExtendedUdpTable, MIB_TCP6TABLE_OWNER_PID, MIB_TCPTABLE_OWNER_PID,
     MIB_UDPTABLE_OWNER_PID, TCP_TABLE_OWNER_PID_ALL, UDP_TABLE_OWNER_PID,
@@ -346,8 +346,12 @@ unsafe fn query_process_name(pid: u32) -> Option<String> {
     let mut buffer = [0u16; 512];
     let mut size = buffer.len() as u32;
 
-    let query_result =
-        QueryFullProcessImageNameW(handle, PROCESS_NAME_WIN32, PWSTR(buffer.as_mut_ptr()), &mut size);
+    let query_result = QueryFullProcessImageNameW(
+        handle,
+        PROCESS_NAME_WIN32,
+        PWSTR(buffer.as_mut_ptr()),
+        &mut size,
+    );
     let _ = CloseHandle(handle);
 
     query_result.ok()?;

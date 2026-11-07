@@ -33,23 +33,31 @@ pub struct Database {
 impl Deref for Database {
     type Target = Connection;
     fn deref(&self) -> &Connection {
-        self.connection.as_ref().expect("connection is present until drop")
+        self.connection
+            .as_ref()
+            .expect("connection is present until drop")
     }
 }
 impl DerefMut for Database {
     fn deref_mut(&mut self) -> &mut Connection {
-        self.connection.as_mut().expect("connection is present until drop")
+        self.connection
+            .as_mut()
+            .expect("connection is present until drop")
     }
 }
 impl Drop for Database {
     fn drop(&mut self) {
         // 此时读锁仍被持有（字段在 drop 之后才释放），迁移无法在这之间开始。
-        let Some(connection) = self.connection.take() else { return };
+        let Some(connection) = self.connection.take() else {
+            return;
+        };
         // 还处在事务中的连接状态不确定，直接关闭，不放回连接池。
         if !self.pooled || !connection.is_autocommit() {
             return;
         }
-        let mut idle = IDLE_CONNECTIONS.lock().unwrap_or_else(|poison| poison.into_inner());
+        let mut idle = IDLE_CONNECTIONS
+            .lock()
+            .unwrap_or_else(|poison| poison.into_inner());
         if idle.len() < MAX_IDLE_CONNECTIONS {
             idle.push((std::mem::take(&mut self.directory), connection));
         }

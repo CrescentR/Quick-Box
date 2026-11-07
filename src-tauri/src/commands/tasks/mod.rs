@@ -339,7 +339,7 @@ mod tests {
         data.reminder_minutes = Some(5);
         let task = create_inner(&conn, &data).unwrap();
         assert_eq!(due_reminders_inner(&conn).unwrap().len(), 1);
-        acknowledge_inner(&conn, &[task.id.clone()]).unwrap();
+        acknowledge_inner(&conn, std::slice::from_ref(&task.id)).unwrap();
         assert!(due_reminders_inner(&conn).unwrap().is_empty());
         data.due_time = Some("10:00".into());
         update_inner(&conn, &task.id, &data).unwrap();
@@ -419,7 +419,7 @@ mod tests {
             [],
         )
         .unwrap();
-        acknowledge_inner(&conn, &[task.id.clone()]).unwrap();
+        acknowledge_inner(&conn, std::slice::from_ref(&task.id)).unwrap();
         conn.execute(
             "UPDATE plugins SET enabled=1 WHERE id='official.task-tool'",
             [],

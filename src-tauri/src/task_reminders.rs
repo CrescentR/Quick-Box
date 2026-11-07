@@ -27,7 +27,8 @@ fn ensure_window(app: &tauri::AppHandle) -> Result<WebviewWindow, CommandError> 
         return Ok(window);
     }
     // 提醒窗口复用用户的数据目录，不能另外落到系统 AppData。
-    let directory = storage::location::resolve_directory(&storage::location::installation_directory()?)?;
+    let directory =
+        storage::location::resolve_directory(&storage::location::installation_directory()?)?;
     let window = tauri::WebviewWindowBuilder::new(app, LABEL, WebviewUrl::App("index.html".into()))
         .title("QuickBox · 任务提醒")
         .inner_size(390.0, 220.0)
@@ -90,8 +91,14 @@ pub fn task_open_from_reminder(app: tauri::AppHandle, id: String) -> Result<(), 
     if id.is_empty() || id.len() > 100 {
         return Err(CommandError::new("INVALID_TASK", "任务编号无效"));
     }
-    if !tasks::task_due_reminders(app.clone())?.iter().any(|notice| notice.id == id) {
-        return Err(CommandError::new("STALE_REMINDER", "提醒已更新或任务插件已停用，请刷新后重试"));
+    if !tasks::task_due_reminders(app.clone())?
+        .iter()
+        .any(|notice| notice.id == id)
+    {
+        return Err(CommandError::new(
+            "STALE_REMINDER",
+            "提醒已更新或任务插件已停用，请刷新后重试",
+        ));
     }
     let window = app.get_webview_window("main").ok_or_else(|| {
         CommandError::new("WINDOW_UNAVAILABLE", "主窗口尚未就绪，请重新打开 QuickBox")

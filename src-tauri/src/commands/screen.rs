@@ -20,19 +20,30 @@ fn pick_screen_color_impl() -> Result<ScreenColor, CommandError> {
 
     unsafe {
         let mut point = POINT { x: 0, y: 0 };
-        GetCursorPos(&mut point)
-            .map_err(|error| CommandError::with_details("GET_CURSOR_POS_FAILED", "无法读取鼠标位置", error.to_string()))?;
+        GetCursorPos(&mut point).map_err(|error| {
+            CommandError::with_details(
+                "GET_CURSOR_POS_FAILED",
+                "无法读取鼠标位置",
+                error.to_string(),
+            )
+        })?;
 
         let device_context = GetDC(None);
         if device_context.is_invalid() {
-            return Err(CommandError::new("GET_SCREEN_DC_FAILED", "无法读取屏幕设备上下文"));
+            return Err(CommandError::new(
+                "GET_SCREEN_DC_FAILED",
+                "无法读取屏幕设备上下文",
+            ));
         }
 
         let pixel = GetPixel(device_context, point.x, point.y);
         let _ = ReleaseDC(None, device_context);
 
         if pixel.0 == 0xFFFF_FFFF {
-            return Err(CommandError::new("GET_PIXEL_FAILED", "无法读取屏幕像素颜色"));
+            return Err(CommandError::new(
+                "GET_PIXEL_FAILED",
+                "无法读取屏幕像素颜色",
+            ));
         }
 
         let raw = pixel.0;

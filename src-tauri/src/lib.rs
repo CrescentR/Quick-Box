@@ -103,7 +103,9 @@ pub fn run() {
         ])
         .on_window_event(|window, event| {
             // 主窗口关闭仍表示退出；隐藏的提醒窗口不能让进程残留且无法再次打开。
-            if window.label() == "main" && matches!(event, tauri::WindowEvent::CloseRequested { .. }) {
+            if window.label() == "main"
+                && matches!(event, tauri::WindowEvent::CloseRequested { .. })
+            {
                 window.app_handle().exit(0);
             }
         })

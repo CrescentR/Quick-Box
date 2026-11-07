@@ -37,7 +37,7 @@ pub fn scan_port(port: u16) -> Result<Vec<PortOccupant>, CommandError> {
 
     #[cfg(target_os = "windows")]
     {
-        return windows::scan_port(port);
+        windows::scan_port(port)
     }
 
     #[cfg(not(target_os = "windows"))]
@@ -46,17 +46,15 @@ pub fn scan_port(port: u16) -> Result<Vec<PortOccupant>, CommandError> {
     }
 }
 
-pub fn kill_port_occupants(port: u16, pids: Option<Vec<u32>>) -> Result<PortKillResult, CommandError> {
+pub fn kill_port_occupants(
+    port: u16,
+    pids: Option<Vec<u32>>,
+) -> Result<PortKillResult, CommandError> {
     validate_port(port)?;
 
     let target_pids = match pids {
         Some(values) if !values.is_empty() => dedupe_pids(values),
-        _ => dedupe_pids(
-            scan_port(port)?
-                .iter()
-                .map(|item| item.pid)
-                .collect(),
-        ),
+        _ => dedupe_pids(scan_port(port)?.iter().map(|item| item.pid).collect()),
     };
 
     let mut killed_pids = Vec::new();

@@ -12,7 +12,7 @@ pub mod workspace;
 
 pub mod file_search;
 
-pub mod release;
-pub mod library;
 pub mod backups;
+pub mod library;
+pub mod release;
 pub mod tasks;

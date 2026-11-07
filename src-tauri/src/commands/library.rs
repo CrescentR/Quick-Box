@@ -44,9 +44,11 @@ fn validate(item: &LibraryItem) -> Result<(), CommandError> {
         return Err(CommandError::new("EMPTY_COMMAND", "请输入需要保存的命令"));
     }
     if item.kind == "file"
-        && (item.file_name.as_ref().map_or(true, |name| {
-            name.is_empty() || name.len() > 1000 || name.contains(['/', '\\'])
-        }) || item.size.map_or(true, |size| size > MAX_FILE_SIZE))
+        && (item
+            .file_name
+            .as_ref()
+            .is_none_or(|name| name.is_empty() || name.len() > 1000 || name.contains(['/', '\\']))
+            || item.size.is_none_or(|size| size > MAX_FILE_SIZE))
     {
         return Err(CommandError::new(
             "INVALID_FILE",
@@ -207,7 +209,7 @@ fn delete_item(db: &Database, id: &str) -> Result<Vec<LibraryItem>, CommandError
         .find(|item| item.id == id)
         .cloned()
         .ok_or_else(|| CommandError::new("ITEM_NOT_FOUND", "资料不存在"))?;
-    let path = db.directory.join("saved-files").join(&id);
+    let path = db.directory.join("saved-files").join(id);
     let trash = path.with_extension("deleted");
     let moved = item.kind == "file" && path.exists();
     if moved {
