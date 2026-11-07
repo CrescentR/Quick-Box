@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { writeClipboardText } from '../../api/clipboard-api'
 import { CodeBlock, Detail, Tag } from '../../ui'
+import { ToolShell } from '../../core/tool/ToolShell'
 import {
   chmodPresets,
   createDefaultPermissions,
@@ -82,20 +83,7 @@ export default function ChmodCalculatorToolView() {
   }
 
   return (
-    <section className="qb-tool-view">
-      <header className="qb-tool-view__header">
-        <div className="qb-tool-view__header-copy">
-          <div className="qb-tool-view__eyebrow">官方工具</div>
-          <div className="qb-tool-view__title">Linux 权限计算器</div>
-          <div className="qb-tool-view__description">
-            通过勾选 Owner / Group / Public 的 Read、Write、Execute，实时生成八进制权限与 chmod 命令。
-          </div>
-        </div>
-        <div className="qb-tool-view__header-meta">
-          <Tag tone="primary">内置</Tag>
-          <Tag tone="default">{octalMode}</Tag>
-        </div>
-      </header>
+    <ToolShell title="Linux 权限计算器" description="通过勾选 Owner / Group / Public 的 Read、Write、Execute，实时生成八进制权限与 chmod 命令。" badge={octalMode}>
 
       <div className="qb-tool-grid">
         <div className="qb-tool-field qb-tool-field--full">
@@ -218,6 +206,6 @@ export default function ChmodCalculatorToolView() {
           { label: '示例', value: 'chmod 755 {{file}}' },
         ]}
       />
-    </section>
+    </ToolShell>
   )
 }

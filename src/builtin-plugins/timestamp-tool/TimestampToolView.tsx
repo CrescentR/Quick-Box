@@ -2,8 +2,9 @@ import { useToolOption } from '../../core/tool/use-tool-option'
 import { useToolInput } from '../../core/tool/tool-context'
 import { useMemo, useState } from 'react'
 import { useClipboardToast } from '../../hooks/useClipboardToast'
-import { Detail, Tag } from '../../ui'
+import { Detail } from '../../ui'
 import { unixSeconds } from '../../utils/time'
+import { ToolShell } from '../../core/tool/ToolShell'
 
 export default function TimestampToolView() {
   const [timestamp, setTimestamp] = useToolInput(String(unixSeconds()))
@@ -22,20 +23,7 @@ export default function TimestampToolView() {
   }, [timestamp, unit])
 
   return (
-    <section className="qb-tool-view">
-      <header className="qb-tool-view__header">
-        <div className="qb-tool-view__header-copy">
-          <div className="qb-tool-view__eyebrow">官方工具</div>
-          <div className="qb-tool-view__title">时间戳转换</div>
-          <div className="qb-tool-view__description">
-            在 Unix 时间戳和 ISO 时间之间快速转换，适合调试接口、日志和事件时间。
-          </div>
-        </div>
-        <div className="qb-tool-view__header-meta">
-          <Tag tone="primary">内置</Tag>
-          <Tag tone="default">Unix / ISO</Tag>
-        </div>
-      </header>
+    <ToolShell title="时间戳转换" description="在 Unix 时间戳和 ISO 时间之间快速转换，适合调试接口、日志和事件时间。" badge="Unix / ISO">
 
       <label className="qb-tool-field">时间戳单位<select className="qb-tool-input" value={unit} onChange={(event) => setUnit(event.target.value)}><option value="auto">自动</option><option value="seconds">秒</option><option value="milliseconds">毫秒</option></select></label>
       <div className="qb-tool-grid">
@@ -88,6 +76,6 @@ export default function TimestampToolView() {
         ]}
       />
       {clipboardToast}
-    </section>
+    </ToolShell>
   )
 }

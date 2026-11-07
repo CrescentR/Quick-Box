@@ -1,27 +1,15 @@
 import { useState } from 'react'
 import { useClipboardToast } from '../../hooks/useClipboardToast'
-import { CodeBlock, Detail, Tag } from '../../ui'
+import { CodeBlock, Detail } from '../../ui'
 import { createUuid } from '../../utils/id'
+import { ToolShell } from '../../core/tool/ToolShell'
 
 export default function UuidToolView() {
   const [uuid, setUuid] = useState(createUuid())
   const { copyText, clipboardToast } = useClipboardToast()
 
   return (
-    <section className="qb-tool-view">
-      <header className="qb-tool-view__header">
-        <div className="qb-tool-view__header-copy">
-          <div className="qb-tool-view__eyebrow">官方工具</div>
-          <div className="qb-tool-view__title">UUID 生成器</div>
-          <div className="qb-tool-view__description">
-            即时生成 UUID v4，并在不离开启动器流程的情况下复制结果。
-          </div>
-        </div>
-        <div className="qb-tool-view__header-meta">
-          <Tag tone="primary">内置</Tag>
-          <Tag tone="default">UUID v4</Tag>
-        </div>
-      </header>
+    <ToolShell title="UUID 生成器" description="即时生成 UUID v4，并在不离开启动器流程的情况下复制结果。" badge="UUID v4">
 
       <CodeBlock code={uuid} language="uuid" copyable />
 
@@ -44,6 +32,6 @@ export default function UuidToolView() {
         ]}
       />
       {clipboardToast}
-    </section>
+    </ToolShell>
   )
 }

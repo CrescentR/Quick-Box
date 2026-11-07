@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import ReactDiffViewer, { DiffMethod } from 'react-diff-viewer-continued'
-import { ToolShell } from './ToolShell'
+import { ToolShell } from '../../core/tool/ToolShell'
 type DiffMode = 'lines' | 'words' | 'json'
 function getDiffMethod(mode: DiffMode) {
   if (mode === 'json') return DiffMethod.JSON

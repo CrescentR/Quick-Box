@@ -1,16 +1,16 @@
 import type { ToolPlugin } from '../../core/plugin/plugin-types'
 import { lazy } from 'react'
-const AstVisualizerToolView = lazy(() => import('./AdvancedToolsView').then((module) => ({ default: module.AstVisualizerToolView })))
-const BatchRenameToolView = lazy(() => import('./AdvancedToolsView').then((module) => ({ default: module.BatchRenameToolView })))
-const CronToolView = lazy(() => import('./AdvancedToolsView').then((module) => ({ default: module.CronToolView })))
-const CssClampToolView = lazy(() => import('./AdvancedToolsView').then((module) => ({ default: module.CssClampToolView })))
+const AstVisualizerToolView = lazy(() => import('./AstVisualizerToolView'))
+const BatchRenameToolView = lazy(() => import('./BatchRenameToolView'))
+const CronToolView = lazy(() => import('./CronToolView'))
+const CssClampToolView = lazy(() => import('./CssClampToolView'))
 const FileContentSearchToolView = lazy(() => import('./FileContentSearchToolView'))
-const HmacToolView = lazy(() => import('./AdvancedToolsView').then((module) => ({ default: module.HmacToolView })))
-const PasswordStrengthToolView = lazy(() => import('./AdvancedToolsView').then((module) => ({ default: module.PasswordStrengthToolView })))
-const SensitiveMaskToolView = lazy(() => import('./AdvancedToolsView').then((module) => ({ default: module.SensitiveMaskToolView })))
-const SqlFormatterToolView = lazy(() => import('./AdvancedToolsView').then((module) => ({ default: module.SqlFormatterToolView })))
-const XmlToolView = lazy(() => import('./AdvancedToolsView').then((module) => ({ default: module.XmlToolView })))
-const YamlToolView = lazy(() => import('./AdvancedToolsView').then((module) => ({ default: module.YamlToolView })))
+const HmacToolView = lazy(() => import('./HmacToolView'))
+const PasswordStrengthToolView = lazy(() => import('./PasswordStrengthToolView'))
+const SensitiveMaskToolView = lazy(() => import('./SensitiveMaskToolView'))
+const SqlFormatterToolView = lazy(() => import('./SqlFormatterToolView'))
+const XmlToolView = lazy(() => import('./XmlToolView'))
+const YamlToolView = lazy(() => import('./YamlToolView'))
 
 const tools = [
   {

@@ -1,8 +1,9 @@
 import { useToolInput } from '../../core/tool/tool-context'
 import { useMemo, useState } from 'react'
 import { useClipboardToast } from '../../hooks/useClipboardToast'
-import { CodeBlock, Detail, Tag } from '../../ui'
+import { CodeBlock, Detail } from '../../ui'
 import { analyzeCidr, isIpInCidr } from './cidr-utils'
+import { ToolShell } from '../../core/tool/ToolShell'
 
 export default function CidrToolView() {
   const [input, setInput] = useToolInput('192.168.1.42/24')
@@ -35,20 +36,7 @@ export default function CidrToolView() {
   }, [checkIp, input])
 
   return (
-    <section className="qb-tool-view">
-      <header className="qb-tool-view__header">
-        <div className="qb-tool-view__header-copy">
-          <div className="qb-tool-view__eyebrow">官方工具</div>
-          <div className="qb-tool-view__title">CIDR 子网计算器</div>
-          <div className="qb-tool-view__description">
-            输入 IPv4 CIDR 或「IP + 掩码」，立刻得到网段、广播地址、可用主机数，并检查某个 IP 是否落在该网段。
-          </div>
-        </div>
-        <div className="qb-tool-view__header-meta">
-          <Tag tone="primary">内置</Tag>
-          <Tag tone="default">IPv4</Tag>
-        </div>
-      </header>
+    <ToolShell title="CIDR 子网计算器" description="输入 IPv4 CIDR 或「IP + 掩码」，立刻得到网段、广播地址、可用主机数，并检查某个 IP 是否落在该网段。" badge="IPv4">
 
       <div className="qb-tool-grid">
         <label className="qb-tool-field">
@@ -104,6 +92,6 @@ export default function CidrToolView() {
         ]}
       />
       {clipboardToast}
-    </section>
+    </ToolShell>
   )
 }

@@ -11,6 +11,7 @@ import {
   type PortUsage,
 } from '../../api/process-api'
 import { Detail, Icon, List, ListItem, Tag, Toast } from '../../ui'
+import { ToolShell } from '../../core/tool/ToolShell'
 
 interface CommandErrorShape {
   message?: string
@@ -208,20 +209,7 @@ export default function PortKillerToolView() {
   }, [])
 
   return (
-    <section className="qb-tool-view">
-      <header className="qb-tool-view__header">
-        <div className="qb-tool-view__header-copy">
-          <div className="qb-tool-view__eyebrow">官方工具</div>
-          <div className="qb-tool-view__title">端口占用清理</div>
-          <div className="qb-tool-view__description">
-            输入端口号后扫描占用进程，并一键终止监听进程，快速解决本地开发中的 EADDRINUSE 问题。
-          </div>
-        </div>
-        <div className="qb-tool-view__header-meta">
-          <Tag tone="primary">内置</Tag>
-          <Tag tone="warning">系统能力</Tag>
-        </div>
-      </header>
+    <ToolShell title="端口占用清理" description="输入端口号后扫描占用进程，并一键终止监听进程，快速解决本地开发中的 EADDRINUSE 问题。" badge="系统能力" badgeTone="warning">
 
       <div className="qb-tool-grid">
         <label className="qb-tool-field">
@@ -399,6 +387,6 @@ export default function PortKillerToolView() {
           onDismiss={() => setToast(null)}
         />
       ) : null}
-    </section>
+    </ToolShell>
   )
 }

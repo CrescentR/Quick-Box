@@ -1,4 +1,4 @@
-import { ToolShell } from './ToolShell'
+import { ToolShell } from '../../core/tool/ToolShell'
 import { useToolContext } from '../../core/tool/tool-context'
 import { useMemo, useState } from 'react'
 import { CodeBlock } from '../../ui'

@@ -1,7 +1,8 @@
 import { useToolInput } from '../../core/tool/tool-context'
 import { useMemo, useState } from 'react'
 import { writeClipboardText } from '../../api/clipboard-api'
-import { CodeBlock, Detail, Tag } from '../../ui'
+import { CodeBlock, Detail } from '../../ui'
+import { ToolShell } from '../../core/tool/ToolShell'
 
 function safeDecode(value: string) {
   try {
@@ -44,20 +45,7 @@ export default function UrlToolView() {
   const parsed = useMemo(() => parseUrl(input), [input])
 
   return (
-    <section className="qb-tool-view">
-      <header className="qb-tool-view__header">
-        <div className="qb-tool-view__header-copy">
-          <div className="qb-tool-view__eyebrow">官方工具</div>
-          <div className="qb-tool-view__title">URL 工具</div>
-          <div className="qb-tool-view__description">
-            快速处理 URL 编码、解码和 query 参数解析，适合调试接口地址和跳转链接。
-          </div>
-        </div>
-        <div className="qb-tool-view__header-meta">
-          <Tag tone="primary">内置</Tag>
-          <Tag tone="default">URL / URI</Tag>
-        </div>
-      </header>
+    <ToolShell title="URL 工具" description="快速处理 URL 编码、解码和 query 参数解析，适合调试接口地址和跳转链接。" badge="URL / URI">
 
       <div className="qb-tool-grid">
         <label className="qb-tool-field qb-tool-field--full">
@@ -109,6 +97,6 @@ export default function UrlToolView() {
           { label: '剪贴板', value: '支持复制' },
         ]}
       />
-    </section>
+    </ToolShell>
   )
 }

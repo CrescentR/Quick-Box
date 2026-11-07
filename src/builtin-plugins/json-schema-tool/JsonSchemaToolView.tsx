@@ -1,8 +1,9 @@
 import { useToolInput } from '../../core/tool/tool-context'
 import { useMemo, useState } from 'react'
 import { useClipboardToast } from '../../hooks/useClipboardToast'
-import { CodeBlock, Detail, Tag } from '../../ui'
+import { CodeBlock, Detail } from '../../ui'
 import { jsonToSchema } from './json-schema-utils'
+import { ToolShell } from '../../core/tool/ToolShell'
 
 const sampleJson = `{
   "id": 1001,
@@ -30,20 +31,7 @@ export default function JsonSchemaToolView() {
   }, [includeMeta, includeRequired, input])
 
   return (
-    <section className="qb-tool-view">
-      <header className="qb-tool-view__header">
-        <div className="qb-tool-view__header-copy">
-          <div className="qb-tool-view__eyebrow">官方工具</div>
-          <div className="qb-tool-view__title">JSON Schema 生成器</div>
-          <div className="qb-tool-view__description">
-            从示例 JSON 推断类型、对象字段、数组 items 和 required，生成可复制的 JSON Schema。
-          </div>
-        </div>
-        <div className="qb-tool-view__header-meta">
-          <Tag tone="primary">内置</Tag>
-          <Tag tone="default">Draft 2020-12</Tag>
-        </div>
-      </header>
+    <ToolShell title="JSON Schema 生成器" description="从示例 JSON 推断类型、对象字段、数组 items 和 required，生成可复制的 JSON Schema。" badge="Draft 2020-12">
 
       <div className="qb-tool-grid">
         <label className="qb-tool-field">
@@ -95,6 +83,6 @@ export default function JsonSchemaToolView() {
         ]}
       />
       {clipboardToast}
-    </section>
+    </ToolShell>
   )
 }

@@ -5,7 +5,7 @@ import { useToolOption } from '../../core/tool/use-tool-option'
 
 export default function FileContentSearchToolView() {
   const [root, setRoot] = useState('')
-  const [query, setQuery] = useState('TODO')
+  const [query, setQuery] = useState('')
   const [patterns, setPatterns] = useState('*.ts\n*.rs\n*.java')
   const [excluded, setExcluded] = useToolOption<string>('fileSearch.excluded', 'node_modules\n.git\ntarget\ndist')
   const [maxResults, setMaxResults] = useState(100)
@@ -33,7 +33,7 @@ export default function FileContentSearchToolView() {
     <h2>文件内容搜索</h2>
     <div className="qb-tool-grid">
       <label className="qb-tool-field qb-tool-field--full">根目录<input className="qb-tool-input" disabled={busy} value={root} onChange={(e) => setRoot(e.target.value)} /></label>
-      <label className="qb-tool-field">搜索文本<input className="qb-tool-input" disabled={busy} value={query} onChange={(e) => setQuery(e.target.value)} /></label>
+      <label className="qb-tool-field">搜索文本<input className="qb-tool-input" disabled={busy} placeholder="例如 TODO" value={query} onChange={(e) => setQuery(e.target.value)} /></label>
       <label className="qb-tool-field">最多结果<input className="qb-tool-input" disabled={busy} type="number" min={1} max={1000} value={maxResults} onChange={(e) => setMaxResults(Number(e.target.value))} /></label>
       <label className="qb-tool-field">文件通配符，每行一个<textarea className="qb-tool-textarea" disabled={busy} value={patterns} onChange={(e) => setPatterns(e.target.value)} /></label>
       <label className="qb-tool-field">排除目录名（自动保存）<textarea className="qb-tool-textarea" disabled={busy} value={excluded} onChange={(e) => setExcluded(e.target.value)} /></label>

@@ -6,6 +6,7 @@ import { searchTldrPages } from './search-tldr-pages'
 import { tldrPages } from './tldr-data'
 import type { TldrPage, TldrPlatform } from './tldr-types'
 import { tldrPlatformLabels } from './tldr-types'
+import { ToolShell } from '../../core/tool/ToolShell'
 
 const platformFilters: Array<{ value: TldrPlatform | 'all'; label: string }> = [
   { value: 'all', label: '全部' },
@@ -47,20 +48,7 @@ export default function TldrReference() {
   const activeId = selectedPage?.id ?? ''
 
   return (
-    <section className="qb-tool-view">
-      <header className="qb-tool-view__header">
-        <div className="qb-tool-view__header-copy">
-          <div className="qb-tool-view__eyebrow">官方工具</div>
-          <div className="qb-tool-view__title">tldr 快速示例</div>
-          <div className="qb-tool-view__description">
-            基于 tldr 精简示例库，输入命令名即可查看最常用的几条用法，比 man 手册更适合日常开发速查。
-          </div>
-        </div>
-        <div className="qb-tool-view__header-meta">
-          <Tag tone="primary">内置</Tag>
-          <Tag tone="default">tldr</Tag>
-        </div>
-      </header>
+    <ToolShell title="tldr 快速示例" description="基于 tldr 精简示例库，输入命令名即可查看最常用的几条用法，比 man 手册更适合日常开发速查。" badge="tldr">
 
       <div className="qb-tool-grid">
         <label className="qb-tool-field">
@@ -180,6 +168,6 @@ export default function TldrReference() {
           复制当前页面
         </button>
       </div>
-    </section>
+    </ToolShell>
   )
 }

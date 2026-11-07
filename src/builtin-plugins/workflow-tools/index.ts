@@ -1,18 +1,18 @@
 import type { ToolPlugin } from '../../core/plugin/plugin-types'
 import { lazy } from 'react'
-const AesGcmToolView = lazy(() => import('./WorkflowToolsView').then((module) => ({ default: module.AesGcmToolView })))
-const CsvToJsonToolView = lazy(() => import('./WorkflowToolsView').then((module) => ({ default: module.CsvToJsonToolView })))
-const CurlFetchToolView = lazy(() => import('./WorkflowToolsView').then((module) => ({ default: module.CurlFetchToolView })))
-const EnvParserToolView = lazy(() => import('./WorkflowToolsView').then((module) => ({ default: module.EnvParserToolView })))
-const GitignoreGeneratorToolView = lazy(() => import('./WorkflowToolsView').then((module) => ({ default: module.GitignoreGeneratorToolView })))
-const JsonPathToolView = lazy(() => import('./WorkflowToolsView').then((module) => ({ default: module.JsonPathToolView })))
-const JsonStringToolView = lazy(() => import('./WorkflowToolsView').then((module) => ({ default: module.JsonStringToolView })))
-const JsonToCsvToolView = lazy(() => import('./WorkflowToolsView').then((module) => ({ default: module.JsonToCsvToolView })))
-const JsonToRustToolView = lazy(() => import('./WorkflowToolsView').then((module) => ({ default: module.JsonToRustToolView })))
-const RegexReplaceToolView = lazy(() => import('./WorkflowToolsView').then((module) => ({ default: module.RegexReplaceToolView })))
-const SemverHelperToolView = lazy(() => import('./WorkflowToolsView').then((module) => ({ default: module.SemverHelperToolView })))
-const TextCleanerToolView = lazy(() => import('./WorkflowToolsView').then((module) => ({ default: module.TextCleanerToolView })))
-const TextDeduplicateToolView = lazy(() => import('./WorkflowToolsView').then((module) => ({ default: module.TextDeduplicateToolView })))
+const AesGcmToolView = lazy(() => import('./AesGcmToolView'))
+const CsvToJsonToolView = lazy(() => import('./CsvToJsonToolView'))
+const CurlFetchToolView = lazy(() => import('./CurlFetchToolView'))
+const EnvParserToolView = lazy(() => import('./EnvParserToolView'))
+const GitignoreGeneratorToolView = lazy(() => import('./GitignoreGeneratorToolView'))
+const JsonPathToolView = lazy(() => import('./JsonPathToolView'))
+const JsonStringToolView = lazy(() => import('./JsonStringToolView'))
+const JsonToCsvToolView = lazy(() => import('./JsonToCsvToolView'))
+const JsonToRustToolView = lazy(() => import('./JsonToRustToolView'))
+const RegexReplaceToolView = lazy(() => import('./RegexReplaceToolView'))
+const SemverHelperToolView = lazy(() => import('./SemverHelperToolView'))
+const TextCleanerToolView = lazy(() => import('./TextCleanerToolView'))
+const TextDeduplicateToolView = lazy(() => import('./TextDeduplicateToolView'))
 
 const tools = [
   {

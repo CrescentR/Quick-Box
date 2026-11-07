@@ -1,4 +1,4 @@
-import { ToolShell } from './ToolShell'
+import { ToolShell } from '../../core/tool/ToolShell'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { clearClipboardHistory, deleteClipboardHistoryItem, loadClipboardHistory, readClipboardText, recordClipboardText, writeClipboardText } from '../../api/clipboard-api'
 import type { ClipboardHistoryItem } from '../../api/clipboard-api'

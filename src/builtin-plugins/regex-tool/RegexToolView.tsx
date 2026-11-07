@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
 import { writeClipboardText } from '../../api/clipboard-api'
 import type { PluginViewProps } from '../../core/plugin/plugin-types'
-import { CodeBlock, Detail, Tag } from '../../ui'
+import { CodeBlock, Detail } from '../../ui'
+import { ToolShell } from '../../core/tool/ToolShell'
 
 const supportedFlags = new Set(['g', 'i', 'm', 's', 'u', 'y'])
 
@@ -76,20 +77,7 @@ export default function RegexToolView({ params }: PluginViewProps) {
   const result = useMemo(() => collectMatches(pattern, flags, text), [flags, pattern, text])
 
   return (
-    <section className="qb-tool-view">
-      <header className="qb-tool-view__header">
-        <div className="qb-tool-view__header-copy">
-          <div className="qb-tool-view__eyebrow">官方工具</div>
-          <div className="qb-tool-view__title">正则测试</div>
-          <div className="qb-tool-view__description">
-            在启动器中快速验证正则表达式，查看匹配位置、捕获组和匹配数量。
-          </div>
-        </div>
-        <div className="qb-tool-view__header-meta">
-          <Tag tone="primary">内置</Tag>
-          <Tag tone="default">RegExp</Tag>
-        </div>
-      </header>
+    <ToolShell title="正则测试" description="在启动器中快速验证正则表达式，查看匹配位置、捕获组和匹配数量。" badge="RegExp">
 
       <div className="qb-tool-grid">
         <label className="qb-tool-field">
@@ -150,6 +138,6 @@ export default function RegexToolView({ params }: PluginViewProps) {
           { label: '剪贴板', value: '支持复制' },
         ]}
       />
-    </section>
+    </ToolShell>
   )
 }

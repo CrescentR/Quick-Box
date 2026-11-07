@@ -2,7 +2,8 @@ import { useToolOption } from '../../core/tool/use-tool-option'
 import { useToolInput } from '../../core/tool/tool-context'
 import { useMemo, useState } from 'react'
 import { useClipboardToast } from '../../hooks/useClipboardToast'
-import { CodeBlock, Detail, Tag } from '../../ui'
+import { CodeBlock, Detail } from '../../ui'
+import { ToolShell } from '../../core/tool/ToolShell'
 
 export default function JsonToolView() {
   const [input, setInput] = useToolInput('{\n  "name": "QuickBox",\n  "mode": "design-system"\n}')
@@ -26,20 +27,7 @@ export default function JsonToolView() {
   }, [input])
 
   return (
-    <section className="qb-tool-view">
-      <header className="qb-tool-view__header">
-        <div className="qb-tool-view__header-copy">
-          <div className="qb-tool-view__eyebrow">官方工具</div>
-          <div className="qb-tool-view__title">JSON 工具</div>
-          <div className="qb-tool-view__description">
-            在统一的 QuickBox 工具面板中格式化、校验和压缩 JSON，输入与结果保持清晰分区。
-          </div>
-        </div>
-        <div className="qb-tool-view__header-meta">
-          <Tag tone="primary">内置</Tag>
-          <Tag tone="default">格式化</Tag>
-        </div>
-      </header>
+    <ToolShell title="JSON 工具" description="在统一的 QuickBox 工具面板中格式化、校验和压缩 JSON，输入与结果保持清晰分区。" badge="格式化">
 
       <label className="qb-tool-field">缩进（自动保存预设）<select className="qb-tool-input" value={indent === 4 ? 4 : 2} onChange={(event) => setIndent(Number(event.target.value))}><option value={2}>2 空格</option><option value={4}>4 空格</option></select></label>
       <div className="qb-tool-grid">
@@ -88,6 +76,6 @@ export default function JsonToolView() {
         ]}
       />
       {clipboardToast}
-    </section>
+    </ToolShell>
   )
 }

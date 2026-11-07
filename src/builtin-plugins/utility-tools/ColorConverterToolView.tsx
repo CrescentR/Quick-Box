@@ -1,4 +1,4 @@
-import { ToolShell } from './ToolShell'
+import { ToolShell } from '../../core/tool/ToolShell'
 import { useMemo, useState } from 'react'
 import type { PluginViewProps } from '../../core/plugin/plugin-types'
 import { CodeBlock } from '../../ui'

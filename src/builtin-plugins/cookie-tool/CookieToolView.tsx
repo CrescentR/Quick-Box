@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useClipboardToast } from '../../hooks/useClipboardToast'
-import { CodeBlock, Detail, Tag } from '../../ui'
+import { CodeBlock, Detail } from '../../ui'
 import { buildCookieHeader, parseCookieInput } from './cookie-utils'
+import { ToolShell } from '../../core/tool/ToolShell'
 
 const sampleInput = `Set-Cookie: sessionId=qb_a1b2; Path=/; Domain=localhost; HttpOnly; Secure; SameSite=Lax; Max-Age=3600
 Set-Cookie: theme=dark; Path=/; SameSite=Lax`
@@ -44,20 +45,7 @@ export default function CookieToolView() {
     : ''
 
   return (
-    <section className="qb-tool-view">
-      <header className="qb-tool-view__header">
-        <div className="qb-tool-view__header-copy">
-          <div className="qb-tool-view__eyebrow">官方工具</div>
-          <div className="qb-tool-view__title">Cookie 解析器</div>
-          <div className="qb-tool-view__description">
-            粘贴 Cookie 或 Set-Cookie 头，拆出名称、值、Path、HttpOnly、SameSite 等属性，并重建请求 Cookie。
-          </div>
-        </div>
-        <div className="qb-tool-view__header-meta">
-          <Tag tone="primary">内置</Tag>
-          <Tag tone="default">{parsed.ok ? parsed.value.kind : '错误'}</Tag>
-        </div>
-      </header>
+    <ToolShell title="Cookie 解析器" description="粘贴 Cookie 或 Set-Cookie 头，拆出名称、值、Path、HttpOnly、SameSite 等属性，并重建请求 Cookie。" badge={parsed.ok ? parsed.value.kind : '错误'}>
 
       <div className="qb-tool-grid">
         <label className="qb-tool-field">
@@ -99,6 +87,6 @@ export default function CookieToolView() {
         ]}
       />
       {clipboardToast}
-    </section>
+    </ToolShell>
   )
 }

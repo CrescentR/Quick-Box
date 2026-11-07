@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useClipboardToast } from '../../hooks/useClipboardToast'
-import { CodeBlock, Detail, Tag } from '../../ui'
+import { CodeBlock, Detail } from '../../ui'
+import { ToolShell } from '../../core/tool/ToolShell'
 
 type HashAlgorithm = 'SHA-1' | 'SHA-256' | 'SHA-512'
 
@@ -50,20 +51,7 @@ export default function HashToolView() {
   }, [algorithm, input])
 
   return (
-    <section className="qb-tool-view">
-      <header className="qb-tool-view__header">
-        <div className="qb-tool-view__header-copy">
-          <div className="qb-tool-view__eyebrow">官方工具</div>
-          <div className="qb-tool-view__title">Hash 工具</div>
-          <div className="qb-tool-view__description">
-            为文本生成 SHA 系列摘要，适合校验 payload、签名调试和比对短文本指纹。
-          </div>
-        </div>
-        <div className="qb-tool-view__header-meta">
-          <Tag tone="primary">内置</Tag>
-          <Tag tone="default">{algorithm}</Tag>
-        </div>
-      </header>
+    <ToolShell title="Hash 工具" description="为文本生成 SHA 系列摘要，适合校验 payload、签名调试和比对短文本指纹。" badge={algorithm}>
 
       <div className="qb-tool-grid">
         <label className="qb-tool-field">
@@ -121,6 +109,6 @@ export default function HashToolView() {
         ]}
       />
       {clipboardToast}
-    </section>
+    </ToolShell>
   )
 }

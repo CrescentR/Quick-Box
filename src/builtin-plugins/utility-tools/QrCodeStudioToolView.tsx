@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import { QRCodeCanvas } from 'qrcode.react'
 import { CodeBlock } from '../../ui'
 import { writeClipboardText } from '../../api/clipboard-api'
-import { ToolShell } from './ToolShell'
+import { ToolShell } from '../../core/tool/ToolShell'
 // jsQR 约 130 KB，只有识别图片时才用到，按需加载，打开工具时只加载生成二维码的部分。
 async function decodeQrFromFile(file: File) {
   const { default: jsQR } = await import('jsqr')

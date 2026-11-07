@@ -1,4 +1,4 @@
-import { ToolShell } from './ToolShell'
+import { ToolShell } from '../../core/tool/ToolShell'
 import { useMemo, useState } from 'react'
 import { writeClipboardText } from '../../api/clipboard-api'
 import { useLauncherStore } from '../../stores/launcher-store'

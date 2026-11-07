@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useClipboardToast } from '../../hooks/useClipboardToast'
-import { CodeBlock, Detail, Tag } from '../../ui'
+import { CodeBlock, Detail } from '../../ui'
 import { propertiesToYaml, yamlToProperties } from './yaml-properties-utils'
+import { ToolShell } from '../../core/tool/ToolShell'
 
 type ConvertDirection = 'yaml-to-properties' | 'properties-to-yaml'
 
@@ -46,20 +47,7 @@ export default function YamlPropertiesToolView() {
   }
 
   return (
-    <section className="qb-tool-view">
-      <header className="qb-tool-view__header">
-        <div className="qb-tool-view__header-copy">
-          <div className="qb-tool-view__eyebrow">官方工具</div>
-          <div className="qb-tool-view__title">YAML / Properties 互转</div>
-          <div className="qb-tool-view__description">
-            把嵌套 YAML 转成 Spring 风格的点分 properties，也可以把 properties 还原成缩进 YAML。
-          </div>
-        </div>
-        <div className="qb-tool-view__header-meta">
-          <Tag tone="primary">内置</Tag>
-          <Tag tone="default">{direction === 'yaml-to-properties' ? 'YAML → Properties' : 'Properties → YAML'}</Tag>
-        </div>
-      </header>
+    <ToolShell title="YAML / Properties 互转" description="把嵌套 YAML 转成 Spring 风格的点分 properties，也可以把 properties 还原成缩进 YAML。" badge={direction === 'yaml-to-properties' ? 'YAML → Properties' : 'Properties → YAML'}>
 
       <div className="qb-tool-actions">
         <button
@@ -113,6 +101,6 @@ export default function YamlPropertiesToolView() {
         ]}
       />
       {clipboardToast}
-    </section>
+    </ToolShell>
   )
 }

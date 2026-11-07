@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useClipboardToast } from '../../hooks/useClipboardToast'
-import { CodeBlock, Detail, Tag } from '../../ui'
+import { CodeBlock, Detail } from '../../ui'
+import { ToolShell } from '../../core/tool/ToolShell'
 import {
   HMAC_BYTE_LENGTH,
   generateEcdsaKeyPair,
@@ -50,20 +51,7 @@ export default function JwtKeyToolView() {
   }
 
   return (
-    <section className="qb-tool-view">
-      <header className="qb-tool-view__header">
-        <div className="qb-tool-view__header-copy">
-          <div className="qb-tool-view__eyebrow">官方工具</div>
-          <div className="qb-tool-view__title">JWT 密钥生成器</div>
-          <div className="qb-tool-view__description">
-            在本地生成 JWT 签名密钥。HMAC 输出随机密钥，RSA / ECDSA 输出 PEM 与 JWK，适合联调鉴权配置。
-          </div>
-        </div>
-        <div className="qb-tool-view__header-meta">
-          <Tag tone="primary">内置</Tag>
-          <Tag tone="default">{algorithm}</Tag>
-        </div>
-      </header>
+    <ToolShell title="JWT 密钥生成器" description="在本地生成 JWT 签名密钥。HMAC 输出随机密钥，RSA / ECDSA 输出 PEM 与 JWK，适合联调鉴权配置。" badge={algorithm}>
 
       <div className="qb-tool-grid">
         <label className="qb-tool-field">
@@ -213,6 +201,6 @@ export default function JwtKeyToolView() {
         ]}
       />
       {clipboardToast}
-    </section>
+    </ToolShell>
   )
 }

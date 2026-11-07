@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useClipboardToast } from '../../hooks/useClipboardToast'
-import { CodeBlock, Detail, Tag } from '../../ui'
+import { CodeBlock, Detail } from '../../ui'
+import { ToolShell } from '../../core/tool/ToolShell'
 
 function bytesToBase64(bytes: Uint8Array) {
   let binary = ''
@@ -52,20 +53,7 @@ export default function Base64ToolView() {
   }, [input])
 
   return (
-    <section className="qb-tool-view">
-      <header className="qb-tool-view__header">
-        <div className="qb-tool-view__header-copy">
-          <div className="qb-tool-view__eyebrow">官方工具</div>
-          <div className="qb-tool-view__title">Base64 编解码</div>
-          <div className="qb-tool-view__description">
-            快速编码或解码 Base64 文本，在同一个面板中同时查看输入、编码结果和解码结果。
-          </div>
-        </div>
-        <div className="qb-tool-view__header-meta">
-          <Tag tone="primary">内置</Tag>
-          <Tag tone="default">编码 / 解码</Tag>
-        </div>
-      </header>
+    <ToolShell title="Base64 编解码" description="快速编码或解码 Base64 文本，在同一个面板中同时查看输入、编码结果和解码结果。" badge="编码 / 解码">
 
       <div className="qb-tool-grid">
         <label className="qb-tool-field">
@@ -113,6 +101,6 @@ export default function Base64ToolView() {
         ]}
       />
       {clipboardToast}
-    </section>
+    </ToolShell>
   )
 }
