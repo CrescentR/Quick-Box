@@ -1,12 +1,10 @@
 import { useWorkspaceStore } from './stores/workspace-store'
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { ensureAppBootstrapped } from './app/bootstrap'
 import { useAppShortcuts } from './app/useAppShortcuts'
 import { useAppTheme } from './app/useAppTheme'
 import MainLayout from './layouts/MainLayout'
 import LauncherPage from './pages/LauncherPage'
-import PluginManagerPage from './pages/PluginManagerPage'
-import SettingsPage from './pages/SettingsPage'
 import type { AppPage } from './pages/page-types'
 import { pluginRegistry } from './core/plugin/plugin-registry'
 import { useConfigStore } from './stores/config-store'
@@ -14,6 +12,11 @@ import { usePluginStore } from './stores/plugin-store'
 import { listen } from '@tauri-apps/api/event'
 import { TaskReminderCenter } from './app/TaskReminders'
 import { useLauncherStore } from './stores/launcher-store'
+import { LoadingState } from './ui'
+
+// 设置页和插件管理页不常用，按需加载以缩小启动时的主包。
+const PluginManagerPage = lazy(() => import('./pages/PluginManagerPage'))
+const SettingsPage = lazy(() => import('./pages/SettingsPage'))
 
 export default function App() {
   ensureAppBootstrapped()
@@ -62,7 +65,7 @@ export default function App() {
 
   return (
     <MainLayout>
-      {renderPage()}
+      <Suspense fallback={<LoadingState />}>{renderPage()}</Suspense>
       <TaskReminderCenter onOpen={openTask} />
     </MainLayout>
   )
