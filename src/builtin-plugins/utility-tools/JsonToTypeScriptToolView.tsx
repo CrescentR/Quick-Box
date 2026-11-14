@@ -1,6 +1,8 @@
 import { ToolShell } from '../../core/tool/ToolShell'
 import { useToolInput } from '../../core/tool/tool-context'
 import { useMemo, useState } from 'react'
+import { lt, useLocale, useT } from '../../i18n'
+import type { ResolvedLocale } from '../../i18n'
 import { CodeBlock } from '../../ui'
 import type { JsonValue } from './utility-shared'
 
@@ -27,7 +29,7 @@ function inferType(value: JsonValue, name: string, depth = 0): string {
   return `{\n${fields}\n${closeIndent}}`
 }
 
-function jsonToTypeScript(input: string, typeName: string) {
+function jsonToTypeScript(input: string, typeName: string, locale: ResolvedLocale) {
   try {
     const parsed = JSON.parse(input) as JsonValue
     const safeName = /^[A-Za-z_$][\w$]*$/.test(typeName) ? typeName : 'GeneratedType'
@@ -36,20 +38,26 @@ function jsonToTypeScript(input: string, typeName: string) {
       ? `export interface ${safeName} ${inferred}`
       : `export type ${safeName} = ${inferred}`
   } catch (error) {
-    return error instanceof Error ? error.message : 'JSON 无效'
+    return error instanceof Error ? error.message : lt('JSON 无效', 'Invalid JSON', locale)
   }
 }
 
 export default function JsonToTypeScriptToolView() {
+  const tr = useT()
+  const locale = useLocale()
   const [input, setInput] = useToolInput(sampleJson)
   const [typeName, setTypeName] = useState('QuickBoxItem')
-  const output = useMemo(() => jsonToTypeScript(input, typeName), [input, typeName])
+  const output = useMemo(() => jsonToTypeScript(input, typeName, locale), [input, locale, typeName])
 
   return (
-    <ToolShell title="JSON 转 TypeScript 类型" level="L2" description="根据示例 JSON 对象或数组推断 TypeScript 类型定义。">
+    <ToolShell
+      title={tr('JSON 转 TypeScript 类型', 'JSON to TypeScript')}
+      level="L2"
+      description={tr('根据示例 JSON 对象或数组推断 TypeScript 类型定义。', 'Infer TypeScript interfaces and types from sample JSON objects or arrays.')}
+    >
       <div className="qb-tool-grid">
         <label className="qb-tool-field">
-          <span className="qb-tool-label">类型名称</span>
+          <span className="qb-tool-label">{tr('类型名称', 'Type Name')}</span>
           <input className="qb-tool-input qb-mono" value={typeName} onChange={(event) => setTypeName(event.target.value)} />
         </label>
         <label className="qb-tool-field qb-tool-field--full">

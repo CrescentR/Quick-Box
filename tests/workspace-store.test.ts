@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { emptyWorkspace } from '../src/core/workspace/workspace-data'
+import { createBackup, emptyWorkspace, mergeWorkspace, readBackup } from '../src/core/workspace/workspace-data'
 const api = vi.hoisted(() => ({ invoke: vi.fn() }))
 vi.mock('../src/api/tauri-api', () => ({ invokeCommand: api.invoke }))
 beforeEach(() => { vi.resetModules(); api.invoke.mockReset(); localStorage.clear() })
@@ -27,5 +27,22 @@ describe('工作台持久化', () => {
     api.invoke.mockRejectedValue(new Error('write failed'))
     await expect(useWorkspaceStore.getState().update((data) => ({ ...data, quickCommandIds: [] }))).rejects.toThrow()
     expect(useWorkspaceStore.getState().data.quickCommandIds).toEqual(['json', 'port'])
+  })
+  it('工作台备份导出、SHA-256 校验解析与增量合并保留双方数据', async () => {
+    const local = {
+      ...emptyWorkspace(),
+      quickCommandIds: ['official.json-tool.open'],
+      snippets: [{ id: 's1', title: 'Local', content: 'echo 1', language: 'shell', tags: 'dev', updatedAt: '2026-01-01T00:00:00Z' }],
+    }
+    const incoming = {
+      ...emptyWorkspace(),
+      quickCommandIds: ['official.timestamp-tool.open'],
+      snippets: [{ id: 's2', title: 'Incoming', content: 'echo 2', language: 'shell', tags: 'ops', updatedAt: '2026-01-02T00:00:00Z' }],
+    }
+    const backup = await createBackup(incoming)
+    const parsed = await readBackup(backup)
+    const merged = mergeWorkspace(local, parsed)
+    expect(merged.quickCommandIds).toEqual(['official.timestamp-tool.open', 'official.json-tool.open'])
+    expect(merged.snippets.map((s) => s.id)).toEqual(['s1', 's2'])
   })
 })

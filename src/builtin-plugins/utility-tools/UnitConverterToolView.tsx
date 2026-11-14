@@ -1,12 +1,13 @@
 import { ToolShell } from '../../core/tool/ToolShell'
 import { useMemo, useState } from 'react'
+import { lt, useLocale, useT } from '../../i18n'
+import type { ResolvedLocale } from '../../i18n'
 import { CodeBlock } from '../../ui'
 
 type UnitCategory = 'length' | 'weight' | 'data' | 'temperature'
 
 const unitDefinitions = {
   length: {
-    label: '长度',
     base: 'm',
     units: {
       mm: 0.001,
@@ -20,7 +21,6 @@ const unitDefinitions = {
     },
   },
   weight: {
-    label: '重量',
     base: 'g',
     units: {
       mg: 0.001,
@@ -31,7 +31,6 @@ const unitDefinitions = {
     },
   },
   data: {
-    label: '数据容量',
     base: 'B',
     units: {
       B: 1,
@@ -73,13 +72,13 @@ function getUnitOptions(category: UnitCategory) {
   return Object.keys(unitDefinitions[category].units)
 }
 
-function convertUnits(category: UnitCategory, value: number, fromUnit: string) {
+function convertUnits(category: UnitCategory, value: number, fromUnit: string, locale: ResolvedLocale) {
   const values = category === 'temperature' ? convertTemperature(value, fromUnit) : convertLinearUnit(category, value, fromUnit)
   if (!values) {
     return JSON.stringify(
       {
         valid: false,
-        message: '数值或单位无效',
+        message: lt('数值或单位无效', 'Invalid number or unit', locale),
       },
       null,
       2,
@@ -102,11 +101,13 @@ function convertUnits(category: UnitCategory, value: number, fromUnit: string) {
 }
 
 export default function UnitConverterToolView() {
+  const tr = useT()
+  const locale = useLocale()
   const [category, setCategory] = useState<UnitCategory>('length')
   const [value, setValue] = useState(1000)
   const [fromUnit, setFromUnit] = useState('m')
   const unitOptions = useMemo(() => getUnitOptions(category), [category])
-  const output = useMemo(() => convertUnits(category, value, fromUnit), [category, fromUnit, value])
+  const output = useMemo(() => convertUnits(category, value, fromUnit, locale), [category, fromUnit, locale, value])
 
   const updateCategory = (nextCategory: UnitCategory) => {
     setCategory(nextCategory)
@@ -114,19 +115,23 @@ export default function UnitConverterToolView() {
   }
 
   return (
-    <ToolShell title="单位换算器" level="L1" description="换算常见长度、重量、数据容量和温度单位，输出结构化结果。">
+    <ToolShell
+      title={tr('单位换算器', 'Unit Converter')}
+      level="L1"
+      description={tr('换算常见长度、重量、数据容量和温度单位，输出结构化结果。', 'Convert common length, weight, data storage, and temperature units into structured output.')}
+    >
       <div className="qb-tool-grid">
         <label className="qb-tool-field">
-          <span className="qb-tool-label">类别</span>
+          <span className="qb-tool-label">{tr('类别', 'Category')}</span>
           <select className="qb-tool-input" value={category} onChange={(event) => updateCategory(event.target.value as UnitCategory)}>
-            <option value="length">长度</option>
-            <option value="weight">重量</option>
-            <option value="data">数据容量</option>
-            <option value="temperature">温度</option>
+            <option value="length">{tr('长度', 'Length')}</option>
+            <option value="weight">{tr('重量', 'Weight')}</option>
+            <option value="data">{tr('数据容量', 'Data Storage')}</option>
+            <option value="temperature">{tr('温度', 'Temperature')}</option>
           </select>
         </label>
         <label className="qb-tool-field">
-          <span className="qb-tool-label">输入单位</span>
+          <span className="qb-tool-label">{tr('输入单位', 'Input Unit')}</span>
           <select className="qb-tool-input" value={fromUnit} onChange={(event) => setFromUnit(event.target.value)}>
             {unitOptions.map((unit) => (
               <option value={unit} key={unit}>
@@ -136,11 +141,11 @@ export default function UnitConverterToolView() {
           </select>
         </label>
         <label className="qb-tool-field qb-tool-field--full">
-          <span className="qb-tool-label">数值</span>
+          <span className="qb-tool-label">{tr('数值', 'Value')}</span>
           <input className="qb-tool-input qb-mono" type="number" value={value} onChange={(event) => setValue(Number(event.target.value))} />
         </label>
         <div className="qb-tool-field qb-tool-field--full">
-          <span className="qb-tool-label">换算结果</span>
+          <span className="qb-tool-label">{tr('换算结果', 'Converted Values')}</span>
           <CodeBlock code={output} language="json" wrap copyable />
         </div>
       </div>

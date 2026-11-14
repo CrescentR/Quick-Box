@@ -1,3 +1,5 @@
+import { lt } from '../../i18n'
+
 export type CookieAttributeMap = {
   name: string
   value: string
@@ -48,10 +50,10 @@ function parseNameValue(part: string) {
 
 export function parseSetCookie(input: string): CookieAttributeMap {
   const parts = splitCookiePairs(input.replace(/^Set-Cookie:\s*/i, ''))
-  if (!parts.length) throw new Error('Set-Cookie 为空')
+  if (!parts.length) throw new Error(lt('Set-Cookie 为空', 'Set-Cookie is empty'))
 
   const first = parseNameValue(parts[0])
-  if (first.value === true || !first.name) throw new Error('缺少 cookie 名称或值')
+  if (first.value === true || !first.name) throw new Error(lt('缺少 cookie 名称或值', 'Missing cookie name or value'))
 
   const result: CookieAttributeMap = {
     name: first.name,

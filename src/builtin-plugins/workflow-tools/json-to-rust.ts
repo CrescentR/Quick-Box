@@ -1,3 +1,4 @@
+import { getCurrentLocale, lt, type ResolvedLocale } from '../../i18n'
 import { safeJsonParse } from './shared'
 import type { JsonValue, JsonObject } from './shared'
 
@@ -42,11 +43,13 @@ export function buildRustStruct(value: JsonObject, structName: string, structs: 
   return `#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]\npub struct ${structName} {\n${fields}\n}`
 }
 
-export function jsonToRust(input: string, rootName: string) {
-  const parsed = safeJsonParse(input)
+export function jsonToRust(input: string, rootName: string, locale: ResolvedLocale = getCurrentLocale()) {
+  const parsed = safeJsonParse(input, locale)
   if (!parsed.ok) return parsed.message
   const root = Array.isArray(parsed.value) ? parsed.value[0] : parsed.value
-  if (!root || typeof root !== 'object' || Array.isArray(root)) return 'JSON 根节点需要是对象或对象数组'
+  if (!root || typeof root !== 'object' || Array.isArray(root)) {
+    return lt('JSON 根节点需要是对象或对象数组', 'Root JSON value must be an object or array of objects', locale)
+  }
   const structs: string[] = []
   const rootStruct = buildRustStruct(root, toPascalCase(rootName), structs)
   return [rootStruct, ...structs].join('\n\n')

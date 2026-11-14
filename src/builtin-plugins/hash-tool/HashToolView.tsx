@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useClipboardToast } from '../../hooks/useClipboardToast'
+import { useT } from '../../i18n'
 import { CodeBlock, Detail } from '../../ui'
 import { ToolShell } from '../../core/tool/ToolShell'
 
@@ -20,6 +21,7 @@ async function createDigest(input: string, algorithm: HashAlgorithm) {
 }
 
 export default function HashToolView() {
+  const tr = useT()
   const [input, setInput] = useState('QuickBox')
   const [algorithm, setAlgorithm] = useState<HashAlgorithm>('SHA-256')
   const [digest, setDigest] = useState('')
@@ -39,7 +41,7 @@ export default function HashToolView() {
       } catch (nextError) {
         if (!cancelled) {
           setDigest('')
-          setError(nextError instanceof Error ? nextError.message : '无法生成摘要')
+          setError(nextError instanceof Error ? nextError.message : tr('无法生成摘要', 'Failed to compute digest'))
         }
       }
     }
@@ -48,14 +50,21 @@ export default function HashToolView() {
     return () => {
       cancelled = true
     }
-  }, [algorithm, input])
+  }, [algorithm, input, tr])
 
   return (
-    <ToolShell title="Hash 工具" description="为文本生成 SHA 系列摘要，适合校验 payload、签名调试和比对短文本指纹。" badge={algorithm}>
+    <ToolShell
+      title={tr('Hash 工具', 'Hash Digest')}
+      description={tr(
+        '为文本生成 SHA 系列摘要，适合校验 payload、签名调试和比对短文本指纹。',
+        'Generate SHA digests locally for payload verification and signature debugging.',
+      )}
+      badge={algorithm}
+    >
 
       <div className="qb-tool-grid">
         <label className="qb-tool-field">
-          <span className="qb-tool-label">输入文本</span>
+          <span className="qb-tool-label">{tr('输入文本', 'Input Text')}</span>
           <textarea
             id="hash-tool-input"
             name="hash-tool-input"
@@ -66,7 +75,7 @@ export default function HashToolView() {
         </label>
 
         <label className="qb-tool-field">
-          <span className="qb-tool-label">算法</span>
+          <span className="qb-tool-label">{tr('算法', 'Algorithm')}</span>
           <select
             id="hash-tool-algorithm"
             name="hash-tool-algorithm"
@@ -83,8 +92,8 @@ export default function HashToolView() {
         </label>
 
         <div className="qb-tool-field qb-tool-field--full">
-          <span className="qb-tool-label">摘要结果</span>
-          <CodeBlock code={error || digest || '// 等待输入'} language="txt" wrap copyable />
+          <span className="qb-tool-label">{tr('摘要结果', 'Digest Output')}</span>
+          <CodeBlock code={error || digest || tr('// 等待输入', '// Waiting for input')} language="txt" wrap copyable />
         </div>
       </div>
 
@@ -95,17 +104,20 @@ export default function HashToolView() {
           onClick={() => void copyText(digest, `${algorithm} digest`)}
           disabled={!digest}
         >
-          复制摘要
+          {tr('复制摘要', 'Copy Digest')}
         </button>
       </div>
 
       <Detail
-        title="使用说明"
-        markdown="- 使用浏览器 Web Crypto API 生成摘要。\n- 支持 SHA-1、SHA-256 和 SHA-512。\n- 摘要以十六进制小写字符串输出。"
+        title={tr('使用说明', 'Usage')}
+        markdown={tr(
+          '- 使用浏览器 Web Crypto API 生成摘要。\n- 支持 SHA-1、SHA-256 和 SHA-512。\n- 摘要以十六进制小写字符串输出。',
+          '- Uses the native Web Crypto API locally.\n- Supports SHA-1, SHA-256, and SHA-512.\n- Outputs lowercase hexadecimal digest strings.',
+        )}
         metadata={[
-          { label: '输入', value: 'UTF-8 文本' },
-          { label: '算法', value: algorithms.join(' / ') },
-          { label: '剪贴板', value: '支持复制' },
+          { label: tr('输入', 'Input'), value: tr('UTF-8 文本', 'UTF-8 Text') },
+          { label: tr('算法', 'Algorithms'), value: algorithms.join(' / ') },
+          { label: tr('剪贴板', 'Clipboard'), value: tr('支持复制', 'Copy ready') },
         ]}
       />
       {clipboardToast}

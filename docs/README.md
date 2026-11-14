@@ -2,7 +2,7 @@
 
 从使用方法到开发扩展，按当前任务选择入口。
 
-[项目首页](../README.md) · [下载安装包](https://github.com/CrescentR/Quick-Box/releases)
+[项目首页 (English)](../README.md) · [中文自述](../README.zh-CN.md) · [下载安装包](https://github.com/CrescentR/Quick-Box/releases)
 
 ## 当前使用与开发
 

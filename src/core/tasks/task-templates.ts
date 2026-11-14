@@ -2,6 +2,7 @@ import { taskApi } from '../../api/task-api'
 import type { Task, TaskInput, TaskTemplate } from './task-types'
 import { localDate } from './natural-date'
 import { validateImportTask } from './task-transfer'
+import { lt } from '../../i18n'
 
 const TEMPLATE_KEY = 'recent_task_templates'
 const MAX_TEMPLATES = 12
@@ -54,13 +55,13 @@ export async function loadRecentTemplates(): Promise<TaskTemplate[]> {
   const raw = await taskApi.setting(TEMPLATE_KEY)
   if (!raw) return []
   let items: unknown
-  try { items = JSON.parse(raw) } catch { throw new Error('最近任务模板数据已损坏，原数据已保留') }
+  try { items = JSON.parse(raw) } catch { throw new Error(lt('最近任务模板数据已损坏，原数据已保留', 'Recent task templates data is corrupted; original data preserved')) }
   if (!Array.isArray(items) || items.some(item => !item || typeof item !== 'object' ||
     typeof item.id !== 'string' || typeof item.title !== 'string' || typeof item.description !== 'string' ||
     !Number.isInteger(item.priority) || item.priority < 1 || item.priority > 4 ||
     !Array.isArray(item.tag_ids) || item.tag_ids.some((id: unknown) => typeof id !== 'string') ||
     !Array.isArray(item.subtasks) || item.subtasks.some((sub: { title?: unknown } | null) => !sub || typeof sub.title !== 'string'))) {
-    throw new Error('最近任务模板格式无效，原数据已保留')
+    throw new Error(lt('最近任务模板格式无效，原数据已保留', 'Recent task templates format is invalid; original data preserved'))
   }
   for (const item of items) {
     try {
@@ -70,7 +71,7 @@ export async function loadRecentTemplates(): Promise<TaskTemplate[]> {
         typeof item.used_at !== 'string' || !Number.isFinite(new Date(item.used_at).getTime()) ||
         (item.due_time && !item.due_date) || (item.reminder_minutes !== null && (!item.due_date || !item.due_time)) ||
         (item.recurrence && !item.due_date)) throw new Error('invalid template')
-    } catch { throw new Error('最近任务模板格式无效，原数据已保留') }
+    } catch { throw new Error(lt('最近任务模板格式无效，原数据已保留', 'Recent task templates format is invalid; original data preserved')) }
   }
   return items.slice(0, MAX_TEMPLATES) as TaskTemplate[]
 }

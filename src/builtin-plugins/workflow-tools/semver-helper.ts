@@ -1,3 +1,5 @@
+import { getCurrentLocale, lt, type ResolvedLocale } from '../../i18n'
+
 export const semverPattern = /^v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([0-9A-Za-z.-]+))?(?:\+([0-9A-Za-z.-]+))?$/
 
 export function parseSemver(input: string) {
@@ -21,11 +23,11 @@ export function formatSemver(version: { major: number; minor: number; patch: num
   return `${version.major}.${version.minor}.${version.patch}${prerelease}${build}`
 }
 
-export function analyzeSemver(input: string) {
+export function analyzeSemver(input: string, locale: ResolvedLocale = getCurrentLocale()) {
   const parsed = parseSemver(input)
   if (!parsed) {
     return {
-      summary: '版本格式无效，示例：1.2.3、v1.2.3-beta.1、1.2.3+build.7',
+      summary: lt('版本格式无效，示例：1.2.3、v1.2.3-beta.1、1.2.3+build.7', 'Invalid SemVer format. Examples: 1.2.3, v1.2.3-beta.1, 1.2.3+build.7', locale),
       output: JSON.stringify({ valid: false }, null, 2),
     }
   }
@@ -46,12 +48,12 @@ export function analyzeSemver(input: string) {
 
   return {
     summary: [
-      `当前版本：${output.current}`,
-      `下一个 major：${output.next.major}`,
-      `下一个 minor：${output.next.minor}`,
-      `下一个 patch：${output.next.patch}`,
-      `去除预发布/构建信息：${output.next.release}`,
-      `下一个 RC：${output.next.prereleaseRc}`,
+      lt(`当前版本：${output.current}`, `Current: ${output.current}`, locale),
+      lt(`下一个 major：${output.next.major}`, `Next major: ${output.next.major}`, locale),
+      lt(`下一个 minor：${output.next.minor}`, `Next minor: ${output.next.minor}`, locale),
+      lt(`下一个 patch：${output.next.patch}`, `Next patch: ${output.next.patch}`, locale),
+      lt(`去除预发布/构建信息：${output.next.release}`, `Strip pre/build: ${output.next.release}`, locale),
+      lt(`下一个 RC：${output.next.prereleaseRc}`, `Next RC: ${output.next.prereleaseRc}`, locale),
     ].join('\n'),
     output: JSON.stringify(output, null, 2),
   }

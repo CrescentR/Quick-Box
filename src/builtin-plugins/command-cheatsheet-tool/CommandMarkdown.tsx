@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import CodeBlock from '../../ui/CodeBlock/CodeBlock'
+import { useT } from '../../i18n'
 import './CommandMarkdown.css'
 
 export interface CommandMarkdownProps {
@@ -45,6 +46,7 @@ function codeText(children: ReactNode): string {
 
 /** Offline documentation reader: Markdown is rendered without executing HTML or loading images. */
 export function CommandMarkdown({ content, onCommandLink }: CommandMarkdownProps) {
+  const tr = useT()
   return (
     <div className="qb-command-markdown">
       <ReactMarkdown
@@ -66,7 +68,7 @@ export function CommandMarkdown({ content, onCommandLink }: CommandMarkdownProps
                 <button
                   type="button"
                   className="qb-command-markdown__command-link"
-                  title={title ?? `查看 ${command} 命令`}
+                  title={title ?? tr(`查看 ${command} 命令`, `View ${command} command`)}
                   onClick={() => onCommandLink(command)}
                 >
                   {children}
@@ -80,14 +82,14 @@ export function CommandMarkdown({ content, onCommandLink }: CommandMarkdownProps
           },
           img({ src, alt }) {
             const external = externalHref(src)
-            const label = alt ? `图片：${alt}` : '查看图片'
+            const label = alt ? tr(`图片：${alt}`, `Image: ${alt}`) : tr('查看图片', 'View image')
             return external
               ? <a href={external} target="_blank" rel="noopener noreferrer">{label} ↗</a>
               : <span className="qb-command-markdown__image-label">{label}</span>
           },
           table({ children }) {
             return (
-              <div className="qb-command-markdown__table qb-scrollbar" role="region" aria-label="命令文档表格" tabIndex={0}>
+              <div className="qb-command-markdown__table qb-scrollbar" role="region" aria-label={tr('命令文档表格', 'Command documentation table')} tabIndex={0}>
                 <table>{children}</table>
               </div>
             )

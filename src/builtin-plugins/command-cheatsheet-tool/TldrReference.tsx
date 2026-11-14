@@ -1,20 +1,15 @@
 import { useMemo, useState } from 'react'
 import { BookOpen, Terminal } from 'lucide-react'
 import { writeClipboardText } from '../../api/clipboard-api'
+import { useLocale, useT } from '../../i18n'
 import { CodeBlock, Detail, Icon, List, ListItem, Tag } from '../../ui'
 import { searchTldrPages } from './search-tldr-pages'
 import { tldrPages } from './tldr-data'
 import type { TldrPage, TldrPlatform } from './tldr-types'
-import { tldrPlatformLabels } from './tldr-types'
+import { getTldrPlatformLabel } from './tldr-types'
 import { ToolShell } from '../../core/tool/ToolShell'
 
-const platformFilters: Array<{ value: TldrPlatform | 'all'; label: string }> = [
-  { value: 'all', label: '全部' },
-  { value: 'common', label: tldrPlatformLabels.common },
-  { value: 'linux', label: tldrPlatformLabels.linux },
-  { value: 'osx', label: tldrPlatformLabels.osx },
-  { value: 'windows', label: tldrPlatformLabels.windows },
-]
+const platformValues: Array<TldrPlatform | 'all'> = ['all', 'common', 'linux', 'osx', 'windows']
 
 function getPlatformTone(platform: TldrPlatform): 'primary' | 'success' | 'warning' | 'default' {
   switch (platform) {
@@ -30,6 +25,8 @@ function getPlatformTone(platform: TldrPlatform): 'primary' | 'success' | 'warni
 }
 
 export default function TldrReference() {
+  const tr = useT()
+  const locale = useLocale()
   const [query, setQuery] = useState('tar')
   const [platform, setPlatform] = useState<TldrPlatform | 'all'>('all')
   const [selectedId, setSelectedId] = useState('tar@common')
@@ -48,42 +45,50 @@ export default function TldrReference() {
   const activeId = selectedPage?.id ?? ''
 
   return (
-    <ToolShell title="tldr 快速示例" description="基于 tldr 精简示例库，输入命令名即可查看最常用的几条用法，比 man 手册更适合日常开发速查。" badge="tldr">
-
+    <ToolShell
+      title={tr('tldr 快速示例', 'tldr Quick Examples')}
+      description={tr(
+        '基于 tldr 精简示例库，输入命令名即可查看最常用的几条用法，比 man 手册更适合日常开发速查。',
+        'Browse curated tldr examples by command name to quickly check common flags instead of reading full man pages.',
+      )}
+      badge="tldr"
+    >
       <div className="qb-tool-grid">
         <label className="qb-tool-field">
-          <span className="qb-tool-label">搜索命令</span>
+          <span className="qb-tool-label">{tr('搜索命令', 'Search command')}</span>
           <input
             id="command-cheatsheet-query"
             name="command-cheatsheet-query"
             className="qb-tool-input qb-mono"
-            placeholder="例如 tar、find、grep、docker"
+            placeholder={tr('例如 tar、find、grep、docker', 'e.g. tar, find, grep, docker')}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
           />
         </label>
 
         <div className="qb-tool-field">
-          <span className="qb-tool-label">平台筛选</span>
+          <span className="qb-tool-label">{tr('平台筛选', 'Platform filter')}</span>
           <div className="qb-tool-options">
-            {platformFilters.map((item) => (
+            {platformValues.map((value) => (
               <button
-                key={item.value}
-                className={platform === item.value ? 'qb-tool-button qb-tool-button--primary' : 'qb-tool-button'}
+                key={value}
+                className={platform === value ? 'qb-tool-button qb-tool-button--primary' : 'qb-tool-button'}
                 type="button"
-                onClick={() => setPlatform(item.value)}
+                onClick={() => setPlatform(value)}
               >
-                {item.label}
+                {value === 'all' ? tr('全部', 'All') : getTldrPlatformLabel(value, locale)}
               </button>
             ))}
           </div>
         </div>
 
         <div className="qb-tool-field">
-          <span className="qb-tool-label">匹配结果 ({results.length})</span>
+          <span className="qb-tool-label">{tr(`匹配结果 (${results.length})`, `Matches (${results.length})`)}</span>
           <List
             emptyState={
-              <div className="qb-tool-options">没有匹配的命令，试试 tar、find、chmod 或 git status。</div>
+              <div className="qb-tool-options">
+                {tr('没有匹配的命令，试试 tar、find、chmod 或 git status。', 'No matching commands. Try tar, find, chmod, or git status.')}
+              </div>
             }
           >
             {results.map((item) => (
@@ -94,7 +99,7 @@ export default function TldrReference() {
                 icon={<Icon icon={Terminal} size={16} tone="muted" />}
                 title={item.page.command}
                 subtitle={item.page.summary}
-                accessory={<Tag tone={getPlatformTone(item.page.platform)}>{tldrPlatformLabels[item.page.platform]}</Tag>}
+                accessory={<Tag tone={getPlatformTone(item.page.platform)}>{getTldrPlatformLabel(item.page.platform, locale)}</Tag>}
                 onClick={setSelectedId}
               />
             ))}
@@ -105,13 +110,13 @@ export default function TldrReference() {
           <div className="qb-tool-field qb-tool-field--full">
             <span className="qb-tool-label">
               {selectedPage.command}
-              <Tag tone={getPlatformTone(selectedPage.platform)}>{tldrPlatformLabels[selectedPage.platform]}</Tag>
+              <Tag tone={getPlatformTone(selectedPage.platform)}>{getTldrPlatformLabel(selectedPage.platform, locale)}</Tag>
             </span>
             <div className="qb-tool-options">
               <span>{selectedPage.summary}</span>
               {selectedPage.moreInfo ? (
                 <a href={selectedPage.moreInfo} target="_blank" rel="noreferrer">
-                  更多说明
+                  {tr('更多说明', 'More info')}
                 </a>
               ) : null}
             </div>
@@ -127,7 +132,7 @@ export default function TldrReference() {
                       type="button"
                       onClick={() => void writeClipboardText(example.command)}
                     >
-                      复制命令
+                      {tr('复制命令', 'Copy command')}
                     </button>
                   </div>
                 </div>
@@ -138,12 +143,15 @@ export default function TldrReference() {
       </div>
 
       <Detail
-        title="使用说明"
-        markdown={`- 数据整理自开源项目 [tldr-pages](https://github.com/tldr-pages/tldr)。\n- 占位符 \`{{name}}\` 表示需要替换的参数。\n- 平台筛选会始终保留 \`common\` 通用命令。\n- 适合快速回忆 tar 解压、find 排除目录等高频场景。`}
+        title={tr('使用说明', 'Guide')}
+        markdown={tr(
+          `- 数据整理自开源项目 [tldr-pages](https://github.com/tldr-pages/tldr)。\n- 占位符 \`{{name}}\` 表示需要替换的参数。\n- 平台筛选会始终保留 \`common\` 通用命令。\n- 适合快速回忆 tar 解压、find 排除目录等高频场景。`,
+          `- Curated from [tldr-pages](https://github.com/tldr-pages/tldr).\n- Placeholders like \`{{name}}\` represent arguments you should replace.\n- Platform filtering always includes \`common\` cross-platform commands.\n- Great for quickly recalling frequent recipes like \`tar\` extraction or \`find\` exclusions.`,
+        )}
         metadata={[
-          { label: '来源', value: 'tldr-pages (CC BY 4.0)' },
-          { label: '内置条目', value: String(tldrPages.length) },
-          { label: '搜索', value: '命令名、别名、示例描述' },
+          { label: tr('来源', 'Source'), value: 'tldr-pages (CC BY 4.0)' },
+          { label: tr('内置条目', 'Entries'), value: String(tldrPages.length) },
+          { label: tr('搜索', 'Search'), value: tr('命令名、别名、示例描述', 'Command, alias, or description') },
         ]}
       />
 
@@ -165,7 +173,7 @@ export default function TldrReference() {
           }}
         >
           <Icon icon={BookOpen} size={14} />
-          复制当前页面
+          {tr('复制当前页面', 'Copy page')}
         </button>
       </div>
     </ToolShell>

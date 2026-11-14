@@ -1,17 +1,18 @@
 import { useMemo, useState } from 'react'
 import { writeClipboardText } from '../../api/clipboard-api'
 import type { PluginViewProps } from '../../core/plugin/plugin-types'
+import { lt, useLocale, useT } from '../../i18n'
 import { CodeBlock, Detail } from '../../ui'
 import { ToolShell } from '../../core/tool/ToolShell'
 
 const supportedFlags = new Set(['g', 'i', 'm', 's', 'u', 'y'])
 
-function normalizeFlags(flags: string) {
+function normalizeFlags(flags: string, locale: 'zh-CN' | 'en-US') {
   const normalized: string[] = []
 
   for (const flag of flags.trim()) {
     if (!supportedFlags.has(flag)) {
-      throw new Error(`暂不支持标记 "${flag}"`)
+      throw new Error(lt(`暂不支持标记 "${flag}"`, `Unsupported flag "${flag}"`, locale))
     }
 
     if (!normalized.includes(flag)) {
@@ -22,9 +23,9 @@ function normalizeFlags(flags: string) {
   return normalized.join('')
 }
 
-function collectMatches(pattern: string, flags: string, text: string) {
+function collectMatches(pattern: string, flags: string, text: string, locale: 'zh-CN' | 'en-US') {
   try {
-    const normalizedFlags = normalizeFlags(flags)
+    const normalizedFlags = normalizeFlags(flags, locale)
     const globalFlags = normalizedFlags.includes('g') ? normalizedFlags : `${normalizedFlags}g`
     const regex = new RegExp(pattern, globalFlags)
     const matches: Array<{
@@ -59,7 +60,7 @@ function collectMatches(pattern: string, flags: string, text: string) {
       2,
     )
   } catch (error) {
-    return error instanceof Error ? error.message : '正则表达式无效'
+    return error instanceof Error ? error.message : lt('正则表达式无效', 'Invalid regular expression', locale)
   }
 }
 
@@ -69,19 +70,27 @@ function getStringParam(params: PluginViewProps['params'], key: string, fallback
 }
 
 export default function RegexToolView({ params }: PluginViewProps) {
+  const tr = useT()
+  const locale = useLocale()
   const [pattern, setPattern] = useState(() => getStringParam(params, 'pattern', '\\b\\w+box\\b'))
   const [flags, setFlags] = useState(() => getStringParam(params, 'flags', 'gi'))
   const [text, setText] = useState(() =>
     getStringParam(params, 'text', 'QuickBox is a focused desktop toolbox.\nquickbox keeps tools close.'),
   )
-  const result = useMemo(() => collectMatches(pattern, flags, text), [flags, pattern, text])
+  const result = useMemo(() => collectMatches(pattern, flags, text, locale), [flags, locale, pattern, text])
 
   return (
-    <ToolShell title="正则测试" description="在启动器中快速验证正则表达式，查看匹配位置、捕获组和匹配数量。" badge="RegExp">
-
+    <ToolShell
+      title={tr('正则测试', 'Regex Tester')}
+      description={tr(
+        '在启动器中快速验证正则表达式，查看匹配位置、捕获组和匹配数量。',
+        'Test regular expressions quickly and inspect match offsets, capture groups, and counts.',
+      )}
+      badge="RegExp"
+    >
       <div className="qb-tool-grid">
         <label className="qb-tool-field">
-          <span className="qb-tool-label">表达式</span>
+          <span className="qb-tool-label">{tr('表达式', 'Pattern')}</span>
           <input
             id="regex-tool-pattern"
             name="regex-tool-pattern"
@@ -92,7 +101,7 @@ export default function RegexToolView({ params }: PluginViewProps) {
         </label>
 
         <label className="qb-tool-field">
-          <span className="qb-tool-label">标记</span>
+          <span className="qb-tool-label">{tr('标记', 'Flags')}</span>
           <input
             id="regex-tool-flags"
             name="regex-tool-flags"
@@ -103,7 +112,7 @@ export default function RegexToolView({ params }: PluginViewProps) {
         </label>
 
         <label className="qb-tool-field qb-tool-field--full">
-          <span className="qb-tool-label">测试文本</span>
+          <span className="qb-tool-label">{tr('测试文本', 'Test text')}</span>
           <textarea
             id="regex-tool-text"
             name="regex-tool-text"
@@ -114,7 +123,7 @@ export default function RegexToolView({ params }: PluginViewProps) {
         </label>
 
         <div className="qb-tool-field qb-tool-field--full">
-          <span className="qb-tool-label">匹配结果</span>
+          <span className="qb-tool-label">{tr('匹配结果', 'Match result')}</span>
           <CodeBlock code={result} language="json" wrap copyable />
         </div>
       </div>
@@ -125,17 +134,20 @@ export default function RegexToolView({ params }: PluginViewProps) {
           type="button"
           onClick={() => void writeClipboardText(result)}
         >
-          复制匹配结果
+          {tr('复制匹配结果', 'Copy match result')}
         </button>
       </div>
 
       <Detail
-        title="使用说明"
-        markdown="- 支持 JavaScript RegExp 常用标记：`g`、`i`、`m`、`s`、`u`、`y`。\n- 输出最多展示 50 条匹配，避免超长文本卡住界面。\n- 未输入 `g` 时会自动追加全局匹配标记用于结果列表。"
+        title={tr('使用说明', 'Guide')}
+        markdown={tr(
+          '- 支持 JavaScript RegExp 常用标记：`g`、`i`、`m`、`s`、`u`、`y`。\n- 输出最多展示 50 条匹配，避免超长文本卡住界面。\n- 未输入 `g` 时会自动追加全局匹配标记用于结果列表。',
+          '- Supports common JavaScript RegExp flags: `g`, `i`, `m`, `s`, `u`, `y`.\n- Up to 50 matches are shown to keep the UI responsive.\n- If `g` is omitted, it is appended automatically to collect all matches.',
+        )}
         metadata={[
-          { label: '模式', value: '正则匹配测试' },
-          { label: '输出', value: '匹配数量、位置、捕获组' },
-          { label: '剪贴板', value: '支持复制' },
+          { label: tr('模式', 'Mode'), value: tr('正则匹配测试', 'Regex matching') },
+          { label: tr('输出', 'Output'), value: tr('匹配数量、位置、捕获组', 'Count, index, capture groups') },
+          { label: tr('剪贴板', 'Clipboard'), value: tr('支持复制', 'Copy supported') },
         ]}
       />
     </ToolShell>

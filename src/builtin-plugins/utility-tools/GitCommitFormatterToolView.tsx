@@ -1,6 +1,7 @@
 import { ToolShell } from '../../core/tool/ToolShell'
 import { useMemo, useState } from 'react'
 import { writeClipboardText } from '../../api/clipboard-api'
+import { useT } from '../../i18n'
 import { CodeBlock } from '../../ui'
 
 type CommitType = 'feat' | 'fix' | 'docs' | 'style' | 'refactor' | 'perf' | 'test' | 'build' | 'ci' | 'chore' | 'revert'
@@ -15,6 +16,7 @@ function buildCommitMessage(type: CommitType, scope: string, subject: string, br
 }
 
 export default function GitCommitFormatterToolView() {
+  const tr = useT()
   const [type, setType] = useState<CommitType>('feat')
   const [scope, setScope] = useState('tools')
   const [subject, setSubject] = useState('add text diff view')
@@ -24,10 +26,13 @@ export default function GitCommitFormatterToolView() {
 
   return (
     <ToolShell
-      title="Git 标准 Commit 生成器"
+      title={tr('Git 标准 Commit 生成器', 'Conventional Git Commit Builder')}
       level="L1"
-      description="按 Angular Conventional Commits 结构生成可复制的提交信息。"
-      notes="- Header 格式为 `type(scope): subject`。\n- 勾选 breaking change 后会生成 `type(scope)!: subject`。"
+      description={tr('按 Angular Conventional Commits 结构生成可复制的提交信息。', 'Generate copy-ready commit messages following Angular Conventional Commits.')}
+      notes={tr(
+        '- Header 格式为 `type(scope): subject`。\n- 勾选 breaking change 后会生成 `type(scope)!: subject`。',
+        '- Header format: `type(scope): subject`.\n- Enabling Breaking change outputs `type(scope)!: subject`.',
+      )}
     >
       <div className="qb-tool-grid">
         <label className="qb-tool-field">
@@ -49,7 +54,7 @@ export default function GitCommitFormatterToolView() {
           <input className="qb-tool-input" value={subject} onChange={(event) => setSubject(event.target.value)} />
         </label>
         <label className="qb-tool-field qb-tool-field--full">
-          <span className="qb-tool-label">Body，可留空</span>
+          <span className="qb-tool-label">{tr('Body，可留空', 'Body (optional)')}</span>
           <textarea className="qb-tool-textarea qb-mono" value={body} onChange={(event) => setBody(event.target.value)} />
         </label>
         <label className="qb-tool-checkbox">
@@ -63,7 +68,7 @@ export default function GitCommitFormatterToolView() {
       </div>
       <div className="qb-tool-actions">
         <button className="qb-tool-button qb-tool-button--primary" type="button" onClick={() => void writeClipboardText(message)}>
-          复制 Commit
+          {tr('复制 Commit', 'Copy Commit')}
         </button>
       </div>
     </ToolShell>

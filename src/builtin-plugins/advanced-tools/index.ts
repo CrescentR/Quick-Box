@@ -4,8 +4,10 @@ const AstVisualizerToolView = lazy(() => import('./AstVisualizerToolView'))
 const BatchRenameToolView = lazy(() => import('./BatchRenameToolView'))
 const CronToolView = lazy(() => import('./CronToolView'))
 const CssClampToolView = lazy(() => import('./CssClampToolView'))
+const CssVisualToolView = lazy(() => import('./CssVisualToolView'))
 const FileContentSearchToolView = lazy(() => import('./FileContentSearchToolView'))
 const HmacToolView = lazy(() => import('./HmacToolView'))
+const PasswordHashToolView = lazy(() => import('./PasswordHashToolView'))
 const PasswordStrengthToolView = lazy(() => import('./PasswordStrengthToolView'))
 const SensitiveMaskToolView = lazy(() => import('./SensitiveMaskToolView'))
 const SqlFormatterToolView = lazy(() => import('./SqlFormatterToolView'))
@@ -56,6 +58,13 @@ const tools = [
     component: PasswordStrengthToolView,
   },
   {
+    id: 'password-hash',
+    title: '密码哈希生成与校验',
+    description: '使用 PBKDF2 生成密码哈希并校验明文是否匹配',
+    keywords: ['password', 'pbkdf2', 'bcrypt', 'hash', '密码', '哈希', '校验'],
+    component: PasswordHashToolView,
+  },
+  {
     id: 'sensitive-mask',
     title: '敏感信息脱敏',
     description: '识别并脱敏邮箱、手机号、银行卡号和密钥字段',
@@ -68,6 +77,13 @@ const tools = [
     description: '生成响应式 CSS clamp 表达式',
     keywords: ['css', 'clamp', '响应式', '字号'],
     component: CssClampToolView,
+  },
+  {
+    id: 'css-visual',
+    title: 'CSS 阴影与渐变生成器',
+    description: '可视化调节 box-shadow 与 linear-gradient 并实时预览',
+    keywords: ['css', 'shadow', 'gradient', 'box-shadow', '阴影', '渐变'],
+    component: CssVisualToolView,
   },
   {
     id: 'ast-visualizer',

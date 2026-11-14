@@ -1,6 +1,7 @@
 import { forwardRef } from 'react'
 import type { HTMLAttributes, ReactNode } from 'react'
 import clsx from 'clsx'
+import { useT } from '../../i18n'
 import { EmptyState } from '../EmptyState/EmptyState'
 import { LoadingState } from '../LoadingState/LoadingState'
 import { ListSection, type ListSectionProps } from './ListSection'
@@ -21,6 +22,7 @@ const ListRoot = forwardRef<HTMLDivElement, ListProps>(function ListRoot({
   className,
   ...props
 }, ref) {
+  const tr = useT()
   const childCount = Array.isArray(children) ? children.length : children ? 1 : 0
   const hasContent = childCount > 0
 
@@ -32,7 +34,7 @@ const ListRoot = forwardRef<HTMLDivElement, ListProps>(function ListRoot({
           {!isLoading && hasContent ? children : null}
           {!isLoading && !hasContent
             ? (emptyState ?? (
-                <EmptyState title="暂无结果" description="当前没有可显示的内容。" />
+                <EmptyState title={tr('暂无结果', 'No results')} description={tr('当前没有可显示的内容。', 'Nothing to display right now.')} />
               ))
             : null}
         </div>

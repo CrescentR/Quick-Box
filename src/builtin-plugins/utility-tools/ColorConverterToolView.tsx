@@ -1,6 +1,7 @@
 import { ToolShell } from '../../core/tool/ToolShell'
 import { useMemo, useState } from 'react'
 import type { PluginViewProps } from '../../core/plugin/plugin-types'
+import { useT } from '../../i18n'
 import { CodeBlock } from '../../ui'
 
 function getStringParam(params: PluginViewProps['params'], key: string, fallback: string) {
@@ -34,10 +35,11 @@ function rgbToHsl(r: number, g: number, b: number) {
 }
 
 export default function ColorConverterToolView({ params }: PluginViewProps) {
+  const tr = useT()
   const [hex, setHex] = useState(() => getStringParam(params, 'hex', '#3b82f6'))
   const color = useMemo(() => parseHex(hex), [hex])
   const output = useMemo(() => {
-    if (!color) return 'HEX 颜色无效'
+    if (!color) return tr('HEX 颜色无效', 'Invalid HEX color')
     const hsl = rgbToHsl(color.r, color.g, color.b)
     return JSON.stringify(
       {
@@ -48,21 +50,25 @@ export default function ColorConverterToolView({ params }: PluginViewProps) {
       null,
       2,
     )
-  }, [color])
+  }, [color, tr])
 
   return (
-    <ToolShell title="HEX / RGB / HSL 颜色转换" level="L1" description="把 HEX 颜色转换为可直接用于 CSS 的 RGB 与 HSL 格式。">
+    <ToolShell
+      title={tr('HEX / RGB / HSL 颜色转换', 'HEX / RGB / HSL Color Converter')}
+      level="L1"
+      description={tr('把 HEX 颜色转换为可直接用于 CSS 的 RGB 与 HSL 格式。', 'Convert HEX colors into CSS-ready RGB and HSL formats.')}
+    >
       <div className="qb-tool-grid">
         <label className="qb-tool-field">
           <span className="qb-tool-label">HEX</span>
           <input className="qb-tool-input qb-mono" value={hex} onChange={(event) => setHex(event.target.value)} />
         </label>
         <div className="qb-tool-field">
-          <span className="qb-tool-label">预览</span>
+          <span className="qb-tool-label">{tr('预览', 'Preview')}</span>
           <div className="qb-tool-swatch" style={{ background: color ? `rgb(${color.r}, ${color.g}, ${color.b})` : 'transparent' }} />
         </div>
         <div className="qb-tool-field qb-tool-field--full">
-          <span className="qb-tool-label">格式</span>
+          <span className="qb-tool-label">{tr('格式', 'Formats')}</span>
           <CodeBlock code={output} language="json" wrap copyable />
         </div>
       </div>

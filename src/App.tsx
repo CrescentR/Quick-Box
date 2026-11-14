@@ -3,6 +3,7 @@ import { lazy, Suspense, useEffect, useState } from 'react'
 import { ensureAppBootstrapped } from './app/bootstrap'
 import { useAppShortcuts } from './app/useAppShortcuts'
 import { useAppTheme } from './app/useAppTheme'
+import { useLocale } from './i18n'
 import MainLayout from './layouts/MainLayout'
 import LauncherPage from './pages/LauncherPage'
 import type { AppPage } from './pages/page-types'
@@ -24,9 +25,14 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState<AppPage>('launcher')
   const { config, hydrateConfig } = useConfigStore()
   const { hydratePluginState } = usePluginStore()
+  const locale = useLocale()
 
   useAppTheme(config.theme)
   useAppShortcuts(setCurrentPage)
+
+  useEffect(() => {
+    document.documentElement.lang = locale
+  }, [locale])
 
   const openTask = (id: string) => {
     setCurrentPage('launcher')

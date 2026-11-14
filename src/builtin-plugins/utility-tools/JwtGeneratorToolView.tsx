@@ -1,6 +1,7 @@
 import { ToolShell } from '../../core/tool/ToolShell'
 import { useState } from 'react'
 import { writeClipboardText } from '../../api/clipboard-api'
+import { lt, useT } from '../../i18n'
 import { CodeBlock } from '../../ui'
 import type { JsonValue } from './utility-shared'
 
@@ -27,7 +28,7 @@ async function signHs256(message: string, secret: string) {
 }
 
 async function createJwt(payloadText: string, secret: string, algorithm: JwtAlgorithm) {
-  if (algorithm !== 'HS256') return '当前版本仅支持 HS256'
+  if (algorithm !== 'HS256') return lt('当前版本仅支持 HS256', 'Only HS256 is supported in this version')
 
   const payload = JSON.parse(payloadText) as JsonValue
   const header = { alg: algorithm, typ: 'JWT' }
@@ -39,6 +40,7 @@ async function createJwt(payloadText: string, secret: string, algorithm: JwtAlgo
 }
 
 export default function JwtGeneratorToolView() {
+  const tr = useT()
   const [payload, setPayload] = useState('{\n  "id": 1,\n  "name": "QuickBox",\n  "iat": 1781200000\n}')
   const [secret, setSecret] = useState('quickbox-secret')
   const [algorithm, setAlgorithm] = useState<JwtAlgorithm>('HS256')
@@ -48,16 +50,19 @@ export default function JwtGeneratorToolView() {
     try {
       setToken(await createJwt(payload, secret, algorithm))
     } catch (error) {
-      setToken(error instanceof Error ? error.message : 'JWT 生成失败')
+      setToken(error instanceof Error ? error.message : lt('JWT 生成失败', 'Failed to generate JWT'))
     }
   }
 
   return (
     <ToolShell
-      title="JWT 生成器"
+      title={tr('JWT 生成器', 'JWT Generator')}
       level="L1"
-      description="输入 payload 和密钥，在本地生成 HS256 JWT，适合接口鉴权联调。"
-      notes="- 生成过程只在本地完成，不会把密钥或 payload 发送到网络。\n- 当前版本按文档需求实现 HS256。"
+      description={tr('输入 payload 和密钥，在本地生成 HS256 JWT，适合接口鉴权联调。', 'Sign HS256 JWT tokens locally from JSON payload and secret for API testing.')}
+      notes={tr(
+        '- 生成过程只在本地完成，不会把密钥或 payload 发送到网络。\n- 当前版本按文档需求实现 HS256。',
+        '- Signing runs entirely locally; secrets and payloads are never sent over the network.\n- Currently implements HS256.',
+      )}
     >
       <div className="qb-tool-grid">
         <label className="qb-tool-field qb-tool-field--full">
@@ -65,26 +70,26 @@ export default function JwtGeneratorToolView() {
           <textarea className="qb-tool-textarea qb-mono" value={payload} onChange={(event) => setPayload(event.target.value)} />
         </label>
         <label className="qb-tool-field">
-          <span className="qb-tool-label">算法</span>
+          <span className="qb-tool-label">{tr('算法', 'Algorithm')}</span>
           <select className="qb-tool-input" value={algorithm} onChange={(event) => setAlgorithm(event.target.value as JwtAlgorithm)}>
             <option value="HS256">HS256</option>
           </select>
         </label>
         <label className="qb-tool-field">
-          <span className="qb-tool-label">密钥</span>
+          <span className="qb-tool-label">{tr('密钥', 'Secret')}</span>
           <input className="qb-tool-input qb-mono" value={secret} onChange={(event) => setSecret(event.target.value)} />
         </label>
         <div className="qb-tool-field qb-tool-field--full">
           <span className="qb-tool-label">JWT</span>
-          <CodeBlock code={token || '// 点击生成 JWT'} language="txt" wrap copyable />
+          <CodeBlock code={token || tr('// 点击生成 JWT', '// Click Generate JWT')} language="txt" wrap copyable />
         </div>
       </div>
       <div className="qb-tool-actions">
         <button className="qb-tool-button qb-tool-button--primary" type="button" onClick={() => void generateToken()}>
-          生成 JWT
+          {tr('生成 JWT', 'Generate JWT')}
         </button>
         <button className="qb-tool-button" type="button" onClick={() => void writeClipboardText(token)} disabled={!token}>
-          复制 JWT
+          {tr('复制 JWT', 'Copy JWT')}
         </button>
       </div>
     </ToolShell>

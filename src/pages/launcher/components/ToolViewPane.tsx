@@ -1,8 +1,9 @@
 import { AppWindow, Pin, PinOff } from 'lucide-react'
 import type { Command as QuickBoxCommand } from '../../../core/command/command-types'
 import { pluginRegistry } from '../../../core/plugin/plugin-registry'
+import { localizeCommand, localizeViewTitle, useLocale, useT } from '../../../i18n'
 import { EmptyState, Icon, KeyboardShortcut } from '../../../ui'
-import { getToolMeta } from '../launcher-catalog'
+import { getCategoryLabel, getToolMeta } from '../launcher-catalog'
 import { ToolIcon } from './ToolIcon'
 import { Suspense } from 'react'
 import { ToolErrorBoundary } from '../../../ui/ErrorState/ToolErrorBoundary'
@@ -26,15 +27,20 @@ export function ToolViewPane({
   onToggleQuick,
   onOpenActions,
 }: ToolViewPaneProps) {
+  const locale = useLocale()
+  const tr = useT()
   const view = pluginRegistry.getView(viewId)
-  const categoryName = command ? getToolMeta(command).category.name : undefined
+  const categoryName = command ? getCategoryLabel(getToolMeta(command).category, locale) : undefined
+  const title = command
+    ? localizeCommand(command, locale).title
+    : localizeViewTitle(viewId, view?.title ?? viewId, locale)
 
   return (
     <div className="qb-launcher-view">
       <header className="qb-launcher-view__bar">
         {command ? <ToolIcon command={command} /> : null}
         <div className="qb-launcher-view__copy">
-          <div className="qb-launcher-view__title">{command?.title ?? view?.title ?? viewId}</div>
+          <div className="qb-launcher-view__title">{title}</div>
           {categoryName ? <div className="qb-launcher-view__sub">{categoryName}</div> : null}
         </div>
         {command ? (
@@ -42,12 +48,12 @@ export function ToolViewPane({
             type="button"
             className={isQuick ? 'qb-launcher-icon-btn is-on' : 'qb-launcher-icon-btn'}
             onClick={onToggleQuick}
-            title={isQuick ? '取消置顶' : '置顶到常用'}
+            title={isQuick ? tr('取消置顶', 'Unpin') : tr('置顶到常用', 'Pin to Quick Access')}
           >
             <Icon icon={isQuick ? PinOff : Pin} size={14} />
           </button>
         ) : null}
-        <button type="button" className="qb-launcher-icon-btn" onClick={onOpenActions} title="更多动作">
+        <button type="button" className="qb-launcher-icon-btn" onClick={onOpenActions} title={tr('更多动作', 'More Actions')}>
           <KeyboardShortcut keys={['Ctrl', 'K']} />
         </button>
       </header>
@@ -55,7 +61,7 @@ export function ToolViewPane({
       <div className="qb-launcher-view__body qb-scrollbar">
         {view ? (
           <ToolErrorBoundary key={viewId === 'official.task-tool.view' ? viewId : `${viewId}:${params?.requestId ?? ''}`}>
-            <Suspense fallback={<p role="status">正在加载工具…</p>}>
+            <Suspense fallback={<p role="status">{tr('正在加载工具…', 'Loading tool…')}</p>}>
               <ToolProvider viewId={viewId} params={params}>
                 <view.component params={params} />
               </ToolProvider>
@@ -64,8 +70,8 @@ export function ToolViewPane({
         ) : (
           <EmptyState
             icon={<Icon icon={AppWindow} size={20} tone="muted" />}
-            title="视图不可用"
-            description={`找不到视图 "${viewId}"。`}
+            title={tr('视图不可用', 'View unavailable')}
+            description={tr(`找不到视图 "${viewId}"。`, `View "${viewId}" could not be found.`)}
           />
         )}
       </div>

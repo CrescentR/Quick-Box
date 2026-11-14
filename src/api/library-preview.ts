@@ -1,3 +1,4 @@
+import { lt } from '../i18n'
 import type { LibraryItem } from './library-api'
 
 // 浏览器预览使用 IndexedDB 保存文件，避免 localStorage 的容量限制。
@@ -6,7 +7,7 @@ export async function libraryPreview(command: string, args?: Record<string, unkn
     const request = indexedDB.open('quickbox-library', 1)
     request.onupgradeneeded = () => { request.result.createObjectStore('items', { keyPath: 'item.id' }) }
     request.onsuccess = () => resolve(request.result)
-    request.onerror = () => reject(new Error('无法打开浏览器资料存储'))
+    request.onerror = () => reject(new Error(lt('无法打开浏览器资料存储', 'Unable to open browser IndexedDB storage')))
   })
   try {
     const readAll = () => new Promise<Array<{ item: LibraryItem; bytes?: number[] }>>((resolve, reject) => {
@@ -17,15 +18,15 @@ export async function libraryPreview(command: string, args?: Record<string, unkn
     })
     if (command === 'read_library_file') {
       const entry = (await readAll()).find(({ item }) => item.id === args?.id)
-      if (!entry?.bytes) throw new Error('文件不存在')
+      if (!entry?.bytes) throw new Error(lt('文件不存在', 'File not found'))
       return entry.bytes
     }
     if (command !== 'load_library') {
       await new Promise<void>((resolve, reject) => {
         const tx = db.transaction('items', 'readwrite'), store = tx.objectStore('items')
         tx.oncomplete = () => resolve()
-        tx.onerror = () => reject(new Error('保存失败，请检查浏览器存储空间'))
-        tx.onabort = () => reject(new Error('保存失败，原数据已保留'))
+        tx.onerror = () => reject(new Error(lt('保存失败，请检查浏览器存储空间', 'Save failed. Check available browser storage space.')))
+        tx.onabort = () => reject(new Error(lt('保存失败，原数据已保留', 'Save aborted. Original data preserved.')))
         if (command === 'delete_library_item') store.delete(String(args?.id))
         else {
           const item = { ...(args?.item as LibraryItem), updatedAt: new Date().toISOString() }

@@ -5,12 +5,14 @@ const CsvToJsonToolView = lazy(() => import('./CsvToJsonToolView'))
 const CurlFetchToolView = lazy(() => import('./CurlFetchToolView'))
 const EnvParserToolView = lazy(() => import('./EnvParserToolView'))
 const GitignoreGeneratorToolView = lazy(() => import('./GitignoreGeneratorToolView'))
+const JavaBeanJsonToolView = lazy(() => import('./JavaBeanJsonToolView'))
 const JsonPathToolView = lazy(() => import('./JsonPathToolView'))
 const JsonStringToolView = lazy(() => import('./JsonStringToolView'))
 const JsonToCsvToolView = lazy(() => import('./JsonToCsvToolView'))
 const JsonToRustToolView = lazy(() => import('./JsonToRustToolView'))
 const RegexReplaceToolView = lazy(() => import('./RegexReplaceToolView'))
 const SemverHelperToolView = lazy(() => import('./SemverHelperToolView'))
+const SqlMockToolView = lazy(() => import('./SqlMockToolView'))
 const TextCleanerToolView = lazy(() => import('./TextCleanerToolView'))
 const TextDeduplicateToolView = lazy(() => import('./TextDeduplicateToolView'))
 
@@ -65,6 +67,20 @@ const tools = [
     component: JsonToRustToolView,
   },
   {
+    id: 'java-bean-json',
+    title: 'Java Bean 与 JSON 互转',
+    description: '在 Java DTO 类定义与 JSON 模板之间双向转换',
+    keywords: ['java', 'bean', 'dto', 'pojo', 'json', '实体类'],
+    component: JavaBeanJsonToolView,
+  },
+  {
+    id: 'sql-mock',
+    title: 'SQL Mock 数据生成器',
+    description: '按字段规则批量生成 INSERT INTO 测试 SQL',
+    keywords: ['sql', 'mock', 'insert', '测试数据', '数据库'],
+    component: SqlMockToolView,
+  },
+  {
     id: 'json-path',
     title: 'JSONPath 测试器',
     description: '用路径表达式从 JSON 中提取匹配结果',
@@ -112,7 +128,7 @@ const plugin: ToolPlugin = {
   id: 'official.workflow-tools',
   name: '开发工作流工具集',
   version: '0.1.0',
-  description: '继续 QuickBox 工具库清单的 13 个开发者高频工具',
+  description: '继续 QuickBox 工具库清单的高频开发工作流工具',
   author: 'QuickBox',
   source: 'builtin',
   permissions: ['clipboard.write'],

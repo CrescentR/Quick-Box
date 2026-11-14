@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest'
 import { analyzeCron } from '../src/builtin-plugins/advanced-tools/cron'
 import { maskSensitive } from '../src/builtin-plugins/advanced-tools/sensitive-mask'
 import { buildClamp } from '../src/builtin-plugins/advanced-tools/css-clamp'
+import { buildBoxShadowCss, buildLinearGradientCss, hexToRgba } from '../src/builtin-plugins/advanced-tools/css-visual'
 import { formatSql, minifySql } from '../src/builtin-plugins/advanced-tools/sql-formatter'
 import { scorePassword } from '../src/builtin-plugins/advanced-tools/password-strength'
+import { hashPasswordPbkdf2, verifyPasswordPbkdf2 } from '../src/builtin-plugins/advanced-tools/password-hash'
 import { previewRename } from '../src/builtin-plugins/advanced-tools/batch-rename'
 import { analyzeCidr, isIpInCidr, parseCidrInput } from '../src/builtin-plugins/cidr-tool/cidr-utils'
 import {
@@ -34,10 +36,29 @@ describe('敏感信息脱敏', () => {
   })
 })
 
-describe('CSS clamp', () => {
+describe('CSS clamp 与可视化生成', () => {
   it('按视口线性插值字号', () => {
     expect(buildClamp(16, 24, 320, 1280)).toBe('clamp(16px, 13.3333px + 0.8333vw, 24px)')
     expect(buildClamp(16, 24, 800, 800)).toBe('视口宽度不能相同')
+  })
+
+  it('生成 box-shadow 与 linear-gradient 表达式', () => {
+    expect(hexToRgba('#f0b43c', 50)).toBe('rgba(240, 180, 60, 0.5)')
+    expect(hexToRgba('#fff', 100)).toBe('rgba(255, 255, 255, 1)')
+    expect(
+      buildBoxShadowCss({
+        offsetX: 0,
+        offsetY: 12,
+        blur: 24,
+        spread: -4,
+        color: '#000000',
+        alpha: 35,
+        inset: true,
+      }),
+    ).toBe('inset 0px 12px 24px -4px rgba(0, 0, 0, 0.35)')
+    expect(buildLinearGradientCss({ angle: 495, startColor: '#f0b43c', endColor: '#3b82f6' })).toBe(
+      'linear-gradient(135deg, #f0b43c 0%, #3b82f6 100%)',
+    )
   })
 })
 
@@ -49,11 +70,19 @@ describe('SQL 格式化', () => {
   })
 })
 
-describe('密码强度', () => {
+describe('密码强度与 PBKDF2 哈希校验', () => {
   it('按检查项评分', () => {
     expect(JSON.parse(scorePassword('Abcdefgh1234!'))).toMatchObject({ 强度: '强', 分数: '6/6' })
     // 只有小写字母一项通过；连续重复的 aaa 不得分
     expect(JSON.parse(scorePassword('aaa'))).toMatchObject({ 强度: '弱', 分数: '1/6' })
+  })
+
+  it('生成并校验 PBKDF2 密码哈希，拒绝错误密码和篡改哈希', async () => {
+    const hash = await hashPasswordPbkdf2('QuickBox#2026', 1000, 'SHA-256')
+    expect(hash).toMatch(/^\$pbkdf2-sha256\$i=1000\$/)
+    await expect(verifyPasswordPbkdf2('QuickBox#2026', hash)).resolves.toMatchObject({ valid: true })
+    await expect(verifyPasswordPbkdf2('wrong-password', hash)).resolves.toMatchObject({ valid: false })
+    await expect(verifyPasswordPbkdf2('QuickBox#2026', '$invalid')).resolves.toMatchObject({ valid: false })
   })
 })
 

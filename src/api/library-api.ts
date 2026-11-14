@@ -1,3 +1,4 @@
+import { lt } from '../i18n'
 import { invokeCommand } from './tauri-api'
 
 export interface LibraryItem {
@@ -16,7 +17,7 @@ export const saveLibraryItem = (item: LibraryItem, bytes?: number[]) => invokeCo
 export const deleteLibraryItem = (id: string) => invokeCommand<LibraryItem[]>('delete_library_item', { id })
 export const readLibraryFile = (id: string) => invokeCommand<number[]>('read_library_file', { id })
 export function libraryError(cause: unknown): string {
-  return cause && typeof cause === 'object' && 'message' in cause ? String(cause.message) : '操作失败，请重试'
+  return cause && typeof cause === 'object' && 'message' in cause ? String(cause.message) : lt('操作失败，请重试', 'Operation failed. Please try again.')
 }
 export function downloadLibraryFile(name: string, bytes: Uint8Array) {
   const url = URL.createObjectURL(new Blob([new Uint8Array(bytes).buffer], { type: 'application/octet-stream' }))

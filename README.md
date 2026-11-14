@@ -1,12 +1,14 @@
 <div align="center">
 
-<img src="src-tauri/app-icon.png" width="76" height="76" alt="QuickBox 图标" />
+<img src="src-tauri/app-icon.png" width="76" height="76" alt="QuickBox Icon" />
 
 # QuickBox
 
-**让工具、命令、任务和文件，随叫随到。**
+**Tools, commands, tasks, and files — ready at a keystroke.**
 
-键盘优先的桌面开发工具箱，把日常处理、任务安排、命令查阅与个人资料收在一个工作台里。
+A keyboard-first desktop developer toolbox that brings everyday utilities, task management, offline command docs, and personal snippets/files together in one fast workspace.
+
+**English** · [简体中文](README.zh-CN.md)
 
 [![CI · GitHub Actions](https://img.shields.io/badge/CI-GitHub_Actions-7c8db5?style=flat-square&labelColor=24262b)](https://github.com/CrescentR/Quick-Box/actions/workflows/check.yml)
 [![Release · Windows + Linux](https://img.shields.io/badge/Release-Windows_%2B_Linux-81b29a?style=flat-square&labelColor=24262b)](https://github.com/CrescentR/Quick-Box/actions/workflows/release.yml)
@@ -14,151 +16,152 @@
 ![Tauri 2](https://img.shields.io/badge/Tauri-2-24c8d8?style=flat-square&labelColor=24262b)
 ![React](https://img.shields.io/badge/React-18-61dafb?style=flat-square&labelColor=24262b)
 
-[**下载安装**](https://github.com/CrescentR/Quick-Box/releases) · [产品亮点](#features) · [界面预览](#screenshots) · [上手使用](#getting-started) · [开发指南](docs/development.md)
+[**Download**](https://github.com/CrescentR/Quick-Box/releases) · [Features](#features) · [Screenshots](#screenshots) · [Getting Started](#getting-started) · [Development Guide](docs/development.md)
 
 </div>
 
-![QuickBox：69 个工具、621 份命令手册、本地任务与个人资料](docs/assets/quickbox-overview.svg)
+![QuickBox: 73 tools, 621 Linux command manuals, local tasks, and personal library](docs/assets/quickbox-overview.svg)
 
-QuickBox 面向经常处理 JSON、排查端口、查找命令、整理代码与文件的开发者。按下全局快捷键，输入工具名称或用途，就能在同一个窗口中完成操作。常用工具可以置顶，命令和文件可以留存在本机，下次需要时直接取用。
+QuickBox is built for developers who constantly inspect JSON, track down open ports, look up shell commands, and organize code or files. Press the global shortcut, type a tool name or keyword, and finish the job in a single window. Pin your favorites, keep reusable commands and files locally, and switch seamlessly between English and Simplified Chinese.
 
 <a id="features"></a>
 
-## 一个入口，覆盖日常开发
+## One Workspace for Everyday Dev Work
 
-| 你正在做的事 | QuickBox 如何帮忙 |
+| What you are doing | How QuickBox helps |
 | --- | --- |
-| **处理一段数据** | 格式化 JSON / YAML / XML / SQL，转换编码、清洗文本、比较差异，支持部分工具之间传递结果。 |
-| **回忆一个命令** | 离线检索 **621 份 Linux 命令手册**，查说明、参数和示例，或切到 tldr 快速示例。 |
-| **排查本机问题** | 查看端口占用、清理占用进程、搜索文件内容、校验文件摘要、预演批量重命名。 |
-| **留住常用资料** | 记录多行命令、保存代码片段和文件副本，按标题、标签或内容查找。 |
-| **安排接下来要做的事** | 用“明天下午三点开会”快速建任务，以列表、标签、优先级和子任务整理待办，设置重复与到期提醒。 |
-| **管理零散备份** | 在设置中保存 ZIP、SQL、图片、文档等任意格式文件，保留独立副本并随时导出。 |
-| **保持操作顺手** | 中英文搜索、使用记录排序、最多 8 个常用置顶、全局热键、托盘、浅色 / 暗色 / 跟随系统主题。 |
+| **Transform data** | Format JSON / YAML / XML / SQL, convert encodings, clean whitespace, and compare diffs with result handoff across compatible tools. |
+| **Recall a CLI flag** | Search **621 Linux command manuals** completely offline for descriptions, options, examples, or switch to tldr quick examples. |
+| **Debug your machine** | Inspect listening ports and kill processes, search local file contents, verify file checksums, and preview batch file renames. |
+| **Keep reusable notes** | Save multi-line commands, code snippets, and local file copies, searchable by title, tag, or content. |
+| **Plan upcoming work** | Create tasks with natural date input, organize lists, tags, priorities, subtasks, recurring rules, and due reminders. |
+| **Store ad-hoc backups** | Back up arbitrary ZIP, SQL, image, or document files as independent copies in Settings and export them anytime. |
+| **Stay in flow** | Bilingual search (English & Chinese), usage-based ranking, up to 8 pinned tools, global hotkey, tray controls, and Light / Dark / System themes + English / Simplified Chinese / System UI language. |
 
-目前内置 **21 个插件、69 个工具入口**。插件页支持搜索与启停；命令手册和工具视图按需加载。
+QuickBox currently ships with **21 built-in plugins and 73 tool commands**. Manage and filter plugins on the Plugins page; command manuals and tool views load on demand.
 
 <a id="screenshots"></a>
 
-## 界面预览
+## Screenshots
 
-**左侧找到工具，右侧直接处理。** Linux 命令大全支持正文搜索、分类筛选和完整 Markdown 阅读。
+**Find a tool on the left, work directly on the right.** The Linux Command Reference supports full-text search, category filtering, and complete Markdown rendering.
 
-![Linux 命令大全：在 QuickBox 中搜索并阅读 systemctl 手册](docs/assets/screenshots/linux-command-reference.png)
+![Linux Command Reference: Search and read the systemctl manual inside QuickBox](docs/assets/screenshots/linux-command-reference.png)
 
 <details>
-<summary><strong>查看命令与文件工作台</strong></summary>
+<summary><strong>Explore Commands & Files Workspace</strong></summary>
 
-保存多行命令、添加标签、检索和复制内容，也可以收藏文件的独立副本。
+Save multi-line commands, add tags, search and copy snippets, or attach independent file copies.
 
-![命令与文件：记录 Git 命令，并保存文件副本](docs/assets/screenshots/command-library.png)
+![Commands & Files: Save Git commands and keep local file copies](docs/assets/screenshots/command-library.png)
 
 </details>
 
 <a id="download"></a>
 
-## 下载与安装
+## Download & Install
 
-前往 [GitHub Releases](https://github.com/CrescentR/Quick-Box/releases) 选择安装包。标有 **Pre-release** 的版本由日常代码推送自动构建；正式版本使用 `vX.Y.Z` 标签发布。
+Grab installers from [GitHub Releases](https://github.com/CrescentR/Quick-Box/releases). Builds tagged as **Pre-release** are generated automatically from branch pushes; stable releases use `vX.Y.Z` tags.
 
-| 平台 | 安装包 | 使用说明 |
+| Platform | Installer | Notes |
 | --- | --- | --- |
-| **Windows x64** | `*_windows_x64_setup.exe` / `*_windows_x64.msi` | 优先使用 `.exe` 安装器；需要 MSI 时选择 `.msi`。 |
-| **Linux x64** | `*_linux_x64.AppImage` / `*_linux_x64.deb` | 自动构建已启用；AppImage 建议放在用户可写目录，数据目录要求见 [使用指南](docs/usage.md#linux-notes)。 |
-| **macOS** | 暂无自动发布包 | 仓库保留本地构建脚本，当前不提供 macOS Release 安装包。 |
+| **Windows x64** | `*_windows_x64_setup.exe` / `*_windows_x64.msi` | `.exe` installer recommended; `.msi` available for enterprise deployment. |
+| **Linux x64** | `*_linux_x64.AppImage` / `*_linux_x64.deb` | Automated builds enabled; run AppImage from a user-writable directory. See [Usage Guide](docs/usage.md#linux-notes). |
+| **macOS** | No prebuilt release yet | Local build scripts are included in the repo, but macOS releases are not currently published. |
 
 > [!IMPORTANT]
-> **可安装到 C 盘或其他磁盘，由用户选择。** 默认数据保存在所选安装目录下的 `data` 文件夹，不另行默认写入 AppData。请选择当前用户可写的安装目录和数据目录，例如 `C:\Apps\QuickBox` 或 `D:\Apps\QuickBox`。
+> **Choose your own install drive (C: or any drive).** By default, QuickBox stores data inside a `data` directory next to the executable rather than forcing AppData. Pick a user-writable install directory and data directory, such as `C:\Apps\QuickBox` or `D:\Apps\QuickBox`.
 
-Windows 界面依赖系统 WebView2。安装器会处理 WebView2 运行时检测；首次安装可能需要联网下载缺失的运行时。Release 中的 `SHA256SUMS.txt` 可用于核对安装包。
+On Windows, QuickBox uses the system WebView2 runtime. The installer detects WebView2 and may download it online on first install if missing. Use `SHA256SUMS.txt` in each release to verify installer integrity.
 
 <a id="getting-started"></a>
 
-## 从第一次呼出开始
+## Getting Started
 
-1. **打开工作台**：启动 QuickBox，默认使用 `Alt + Space` 呼出或隐藏窗口；热键可以在设置中修改。
-2. **找到工具**：输入 `json`、`端口`、`Linux`，或在左侧选择分类，点击结果或按 `Enter` 打开。
-3. **留下常用入口**：选中工具后按 `Ctrl + D` 置顶，之后使用 `Alt + 1–8` 直接打开。
-4. **保存自己的内容**：搜索“命令与文件”或“本地代码片段”；任意格式文件备份在“设置 → 统一备份管理”中添加。
-5. **安排日常任务**：搜索“任务管理”或 `todo`，快速记录待办；已有 Task 数据可通过 JSON 导入，见 [任务管理指南](docs/task-management.md)。
+1. **Summon the launcher**: Launch QuickBox and press `Alt + Space` to toggle the window (customizable in Settings).
+2. **Search or browse**: Type `json`, `port`, `linux`, or pick a category on the left, then click or press `Enter` to open.
+3. **Pin frequent tools**: Select a tool and press `Ctrl + D` to pin it, then open pinned tools directly with `Alt + 1–8`.
+4. **Save personal content**: Open *Commands & Files* or *Local Code Snippets*; add arbitrary file backups via *Settings → Unified Backup Management*.
+5. **Track tasks**: Open *Task Manager* (or search `todo`) to capture tasks. Existing Task users can import via JSON—see the [Task Management Guide](docs/task-management.md).
+6. **Switch language**: Change *Interface Language* (`System`, `English`, `简体中文`) in *Settings*, or press `Ctrl + K` in the launcher for a quick toggle.
 
-| 快捷键 | 操作 |
+| Shortcut | Action |
 | --- | --- |
-| `Alt + Space` | 全局呼出 / 隐藏，可在设置中修改 |
-| `↑` / `↓`、`Enter` | 在启动器中选择、打开工具 |
-| `Ctrl + D`、`Alt + 1–8` | 置顶当前工具、打开对应常用工具 |
-| `Ctrl + K` | 打开启动器动作面板 |
-| `Ctrl + ,` | 打开设置 |
-| `Ctrl + 1` / `2` / `3` | 切换启动器 / 插件 / 设置 |
+| `Alt + Space` | Global toggle (customizable in Settings) |
+| `↑` / `↓`, `Enter` | Navigate and open tools in Launcher |
+| `Ctrl + D`, `Alt + 1–8` | Pin/unpin tool, open pinned tool 1–8 |
+| `Ctrl + K` | Open Launcher Action Panel |
+| `Ctrl + ,` | Open Settings |
+| `Ctrl + 1` / `2` / `3` | Switch between Launcher / Plugins / Settings |
 
-快捷键按当前页面和输入焦点生效；工具编辑与分类导航等完整说明见 [使用指南](docs/usage.md)。
+Shortcuts respect active page and input focus; see the [Usage Guide](docs/usage.md) for full keyboard details.
 
 <a id="tools"></a>
 
-## 工具一览
+## Built-in Tools Overview
 
-工具按用途组织，下面列出常用入口；完整列表可在应用内搜索。
+Tools are grouped by everyday workflow; search the complete catalog inside the app.
 
-| 分类 | 代表工具 |
+| Category | Representative Tools |
 | --- | --- |
-| **网络与端口** | 端口占用清理、CIDR 子网计算、Cookie 解析、URL 编解码、Query 参数构建、HTTP 状态码速查、cURL ↔ fetch |
-| **编码与加密** | Base64、Unicode、HTML Entity、Hash、HMAC、AES-GCM、JWT 密钥生成 / 解析 / 生成、文件哈希、二维码 |
-| **JSON / 文本** | JSON / YAML / XML / SQL 格式化、文本差异、正则测试 / 替换 / 模板库、CSV ↔ JSON、YAML ↔ Properties、Markdown 预览与表格 |
-| **时间与生成** | 时间戳、日期差值、时区、UUID、随机字符串、Cron、占位文本 |
-| **开发与设计** | 任务管理、命令与文件、代码片段、JSON → TypeScript / Rust / Schema、Git Commit、Gitignore、SemVer、颜色转换、屏幕取色、单位换算 |
-| **系统运维** | Linux 命令大全、chmod 权限计算、文件内容搜索、批量重命名、剪贴板纯文本历史 |
+| **Network & Ports** | Port Killer, CIDR Subnet Calculator, Cookie Inspector, URL Encoder/Decoder, URL Query Builder, HTTP Status Codes, cURL ↔ fetch Converter |
+| **Encoding & Crypto** | Base64, Unicode Escape, HTML Entity, Hash, HMAC, AES-GCM, JWT Key Generator / Decoder / Generator, File Hash Checksum, QR Code Studio |
+| **JSON & Text** | JSON / YAML / XML / SQL Formatters, Text / Code Diff, Regex Tester / Replace / Library, CSV ↔ JSON, YAML ↔ Properties, Markdown Preview & Table |
+| **Time & Generators** | Timestamp Converter, Date Difference, Time Zone Converter, UUID Generator, Random String Generator, Cron Expression Helper, Placeholder Text |
+| **Dev & Design** | Task Manager, Commands & Files, Code Snippets, JSON → TypeScript / Rust / Schema, Conventional Git Commit, `.gitignore` Builder, SemVer Helper, Color Converter, Screen Color Picker, Unit Converter |
+| **System & Ops** | Linux Command Reference, chmod Calculator, File Content Search, Batch Rename Preview, Clipboard Plain Text History |
 
-### 随应用带走的 Linux 命令手册
+### Offline Linux Command Reference
 
-完整内置 [jaywcjlove/linux-command](https://github.com/jaywcjlove/linux-command) 当前快照的 **621 份文档**，包括上游生成索引尚未列出的文档。支持命令名、中文用途、参数和示例全文搜索，完整呈现说明、代码块与表格，也保留 tldr 快速示例。
+Ships with **621 Markdown manuals** from a pinned snapshot of [jaywcjlove/linux-command](https://github.com/jaywcjlove/linux-command), including entries not yet listed in upstream's generated index. Search across command names, descriptions, flags, and examples, view full Markdown tables and code blocks, or switch to tldr concise examples.
 
-文档版本为 `1.22.0`，固定提交与内容校验信息保存在 [来源清单](src/builtin-plugins/command-cheatsheet-tool/data/source.json)。日常查阅不依赖在线文档站点。
+Pinned upstream version `1.22.0` and checksum provenance live in [source.json](src/builtin-plugins/command-cheatsheet-tool/data/source.json). Completely usable offline.
 
-### 在工具箱里安排任务
+### Built-in Task Manager
 
-任务管理整合自 [CrescentR/Task](https://github.com/CrescentR/Task) 的基础能力：今天与逾期、收集箱、未来 30 天、完成记录和回收站；支持列表、标签、子任务、P1–P4 优先级、置顶、重复任务和最近 12 条创建模板。
+Task management adapts core capabilities from [CrescentR/Task](https://github.com/CrescentR/Task): Today & Overdue, Inbox, Upcoming 30 Days, Completed, and Trash views; custom lists, tags, subtasks, P1–P4 priorities, pinning, recurring tasks, and the 12 most recent task templates.
 
-可以输入“明天下午三点开会”识别日期与时间，也可以在详情中精确设置。到期提醒需要日期和时间，QuickBox 运行期间每 15 秒检查一次；隐藏到托盘仍可提醒，退出程序后不提醒。已有 Task 用户可导出 JSON 再导入 QuickBox，保留主要任务字段；CSV / Markdown 适合有限字段的交换与阅读。迁移方法和具体规则见 [任务管理指南](docs/task-management.md)。
+Type natural date/time expressions (such as tomorrow at 3 PM or Chinese expressions like `明天下午三点开会`) or configure exact due dates and times. Due reminders require both date and time and check every 15 seconds while QuickBox is running (including in tray). JSON import/export preserves core task fields; CSV and Markdown support lightweight interchange. See the [Task Management Guide](docs/task-management.md).
 
 <a id="data"></a>
 
-## 内容留在本机，位置由你选择
+## Local-First Storage
 
-配置、插件启停、使用记录、任务、命令和代码片段保存在 SQLite；文件与备份以独立副本保存在数据目录。当前不提供账号和云同步，核心工具在本地处理内容；检查更新、打开发行页及文档外链等操作需要网络。
+Settings, plugin toggles, usage history, tasks, commands, and snippets are stored in local SQLite; saved files and backups live as standalone copies inside your data directory. QuickBox has no user accounts or cloud sync—core tools process everything locally (network access is only used for update checks, external release links, and docs links).
 
-| 保存入口 | 适合存什么 | 规则 |
+| Store | Intended Content | Rules |
 | --- | --- | --- |
-| **任务管理** | 待办、日程、重复任务、标签和子任务 | JSON 导入 / 导出主要任务字段；完整应用备份还需保留整个数据目录。 |
-| **命令与文件** | 多行命令、脚本说明、标签、经常取用的文件 | 支持搜索、编辑、复制与导出；其中的文件单个最大 **20 MB**。 |
-| **本地代码片段** | 常用代码、模板 | 可标记语言，按标题、标签和正文检索。 |
-| **统一备份管理** | ZIP、SQL、图片、文档等任意格式文件 | 原样复制，不解析内容，无 20 MB 限制；同名文件分别保留。 |
+| **Task Manager** | Todos, schedules, recurring tasks, tags, subtasks | JSON import/export preserves core fields; back up the whole data directory for a full snapshot. |
+| **Commands & Files** | Multi-line commands, script notes, tags, quick-access files | Search, edit, copy, and export; attached files capped at **20 MB** each. |
+| **Local Snippets** | Reusable code snippets and templates | Tag language and search by title, tags, or body. |
+| **Unified Backups** | Arbitrary ZIP, SQL, image, and document files | Raw copy without parsing and no 20 MB cap; duplicate names kept separately. |
 
-默认目录示例：
+Example portable directory layout:
 
 ```text
 D:\Apps\QuickBox\
 ├── quickbox.exe
-├── storage-location.json     # 自定义位置配置，迁移后保存在安装目录
+├── storage-location.json     # Custom storage path config created after migration
 └── data\
-    ├── quickbox.sqlite3      # 配置、任务、命令、片段、使用记录等
-    ├── saved-files\          # “命令与文件”收藏的文件副本
-    ├── backups\              # 设置中的统一文件备份
-    └── webview\              # 界面缓存与浏览器本地状态
+    ├── quickbox.sqlite3      # Settings, tasks, commands, snippets, usage stats, clipboard history
+    ├── saved-files\          # File copies saved in Commands & Files
+    ├── backups\              # Files added via Unified Backup Management
+    └── webview\              # WebView cache and local UI state
 ```
 
-在“设置 → 数据存储位置”点击 **选择文件夹**，选取自己需要的可写空目录，再点击 **迁移并使用**。数据库、收藏文件和备份会一起复制，原目录保留副本；重启后 WebView 缓存也会使用新位置。
+To move your data, go to *Settings → Data Storage Location*, click **Choose Folder** to pick an empty writable directory, and click **Migrate and Use**. Database, saved files, and backups are copied while keeping the original directory intact; after restart, WebView cache also uses the new path.
 
-统一备份管理用于保管用户文件的副本。需要备份整个 QuickBox 时，退出应用后复制当前完整数据目录，并保留安装目录中的位置配置。迁移恢复、剪贴板行为和常见问题见 [数据管理说明](docs/usage.md#data-management)。
+See [Data Management Notes](docs/usage.md#data-management) for restore steps, clipboard notes, and troubleshooting.
 
 <a id="development"></a>
 
-## 参与开发
+## Development
 
-项目采用 **Tauri 2 + React 18 + TypeScript + Rust + SQLite**，由 Vite 提供前端开发与构建，Zustand 管理状态，pnpm 管理前端依赖。React 负责界面和工具交互，Rust 负责窗口、快捷键、文件和持久化等系统能力。
+Built with **Tauri 2 + React 18 + TypeScript + Rust + SQLite**, bundled by Vite, state-managed with Zustand, and managed via pnpm. React handles views and interactive tools; Rust handles windows, global shortcuts, system APIs, and SQLite/file persistence.
 
-### 启动项目
+### Quick Start
 
-准备 **Node.js 24、pnpm 9.15.4、Rust stable** 和平台依赖，详见 [开发环境配置](docs/development.md)。Windows 需要 MSVC C++ 构建工具与 WebView2，代码仓库应放在当前用户可写的目录，磁盘由你选择。
+Install **Node.js 24, pnpm 9.15.4, Rust stable**, and platform prerequisites—see [Development Environment Setup](docs/development.md). On Windows, MSVC C++ Build Tools and WebView2 are required, and the repo should reside in a user-writable directory.
 
 ```bash
 git clone https://github.com/CrescentR/Quick-Box.git
@@ -167,87 +170,88 @@ pnpm install --frozen-lockfile
 pnpm tauri:dev
 ```
 
-只调整界面时可以运行 `pnpm dev`，在 `http://127.0.0.1:1420` 预览。全局快捷键、原生文件夹选择、磁盘备份和进程管理等系统能力需要桌面环境。
+When working strictly on UI views, run `pnpm dev` and preview at `http://127.0.0.1:1420`. Global shortcuts, native folder pickers, file backups, and process management require the desktop Tauri shell.
 
-| 开发任务 | 命令 |
+| Task | Command |
 | --- | --- |
-| 启动桌面开发 | `pnpm tauri:dev` |
-| 浏览器预览 | `pnpm dev` |
-| 复用已运行的 Vite，启动桌面壳 | `pnpm tauri:dev:attach` |
-| 前端类型、lint、测试、构建与 Rust 检查 | `pnpm verify` |
-| Rust 单元测试 | `cargo test --locked --manifest-path src-tauri/Cargo.toml --lib` |
-| 打包 Windows / Linux | `pnpm tauri:build:win` / `pnpm tauri:build:linux` |
-| 同步完整 Linux 命令文档 | `pnpm sync:linux-commands` |
+| Run Tauri desktop app in dev mode | `pnpm tauri:dev` |
+| Browser UI preview | `pnpm dev` |
+| Attach Tauri shell to running Vite server | `pnpm tauri:dev:attach` |
+| Typecheck, ESLint, Vitest, build, and Rust checks | `pnpm verify` |
+| Rust unit tests | `cargo test --locked --manifest-path src-tauri/Cargo.toml --lib` |
+| Bundle Windows / Linux | `pnpm tauri:build:win` / `pnpm tauri:build:linux` |
+| Sync full Linux command docs | `pnpm sync:linux-commands` |
 
-`pnpm verify` 包含 ESLint、Rust `cargo check`、`cargo fmt --check` 与 `cargo clippy`；提交前另外运行上面的 Rust 单测命令。双终端开发、脚本全表、存储约定与故障排查见 [开发指南](docs/development.md)。
+`pnpm verify` runs TypeScript typechecking, ESLint (`--max-warnings 0`), Vitest, Vite production build, `cargo check`, `cargo fmt --check`, and `cargo clippy`. Run the Rust unit tests separately before pushing. See [Development Guide](docs/development.md) for dual-terminal workflows, full script tables, and troubleshooting.
 
-### 自动构建与发布
+### CI & Releases
 
-- **Pull Request**：运行 Check 工作流，验证类型、前端测试、前端构建与 Rust 单测。
-- **推送 `main/master`**：通过验证与两个平台的构建后，自动发布带提交标识的预览版。
-- **推送 `vX.Y.Z` 标签**：校验应用版本一致后，自动发布正式版。
+- **Pull Requests**: Runs the Check workflow (typecheck, Vitest, frontend build, Rust unit tests).
+- **Pushes to `main` / `master`**: Runs verification and builds Windows & Linux installers, publishing a Pre-release stamped with commit metadata.
+- **Tag pushes (`vX.Y.Z`)**: Verifies matching app versions and publishes a formal Release with `SHA256SUMS.txt`.
 
-安装包先按平台构建并汇总，全部成功后才公开 Release，同时生成 SHA256 校验文件。首次 Rust 优化编译和 Linux 打包可能需要数分钟；可以在 Actions 中展开构建步骤查看进度。完整发布流程见 [发布指南](docs/release.md)。
+See [Release Guide](docs/release.md) for the complete release pipeline.
 
 <a id="docs"></a>
 
-## 文档导航
+## Documentation
 
-完整目录见 [文档中心](docs/README.md)。
+Full docs index: [docs/README.md](docs/README.md) (currently written in Chinese alongside the Chinese README).
 
-| 你想了解的内容 | 从这里开始 |
+| Topic | Link |
 | --- | --- |
-| 安装、快捷键、工具使用与数据备份 | [使用指南](docs/usage.md) |
-| 待办、重复与提醒、从 Task 迁移 | [任务管理指南](docs/task-management.md) |
-| 环境准备、日常开发、验证与排查 | [开发指南](docs/development.md) |
-| 添加工具、注册命令和视图 | [插件开发示例](docs/插件示范.md) |
-| 打包、自动预览版与正式发布 | [发布指南](docs/release.md) |
-| 前端与 Rust 的职责划分 | [架构概览](ARCHITECTURE.md) |
-| 组件、主题与视图规范 | [核心组件规范](docs/核心组件规范.md) · [插件视图规则](docs/React渲染插件View规则.md) |
+| Installation, shortcuts, tools & backups | [Usage Guide](docs/usage.md) |
+| Tasks, recurrence, reminders & Task migration | [Task Management Guide](docs/task-management.md) |
+| Environment setup, dev workflow & verification | [Development Guide](docs/development.md) |
+| Adding tools, registering commands & views | [Plugin Example](docs/插件示范.md) |
+| Packaging, pre-releases & tagged releases | [Release Guide](docs/release.md) |
+| Frontend vs. Rust responsibilities | [Architecture Overview](ARCHITECTURE.md) |
+| UI components, tokens & plugin view rules | [Core Component Spec](docs/核心组件规范.md) · [Plugin View Rules](docs/React渲染插件View规则.md) |
 
 <details>
-<summary>项目目录与设计资料</summary>
+<summary>Repository Structure & Design Archive</summary>
 
 ```text
 Quick-Box/
 ├── src/
-│   ├── pages/              # 启动器、插件管理、设置
-│   ├── builtin-plugins/    # 内置工具与命令文档
-│   ├── core/               # 命令、插件、工具上下文与工作台模型
-│   ├── api/                # 前端系统能力调用
-│   ├── stores/             # 状态与持久化交互
-│   └── ui/                 # 通用界面组件
+│   ├── i18n/               # Bilingual catalog & runtime locale state
+│   ├── pages/              # Launcher, Plugins, Settings
+│   ├── builtin-plugins/    # 21 built-in plugins (73 commands) & command manuals
+│   ├── core/               # Command search, plugin registry, tool context & workspace
+│   ├── api/                # Tauri IPC wrappers & web fallbacks
+│   ├── stores/             # Zustand state & persistence
+│   └── ui/                 # Shared UI primitives
 ├── src-tauri/
-│   ├── src/commands/       # Rust 系统命令
-│   ├── src/storage/        # 数据库、存储位置与迁移
-│   └── src/platform/       # 平台差异实现
-├── tests/                  # 前端逻辑与交互测试
-├── scripts/                # 启动、构建辅助与命令文档同步
-├── docs/                   # 使用、开发、发布与设计文档
-└── .github/workflows/      # 验证与 Release 自动化
+│   ├── src/commands/       # Rust Tauri commands
+│   ├── src/storage/        # SQLite database, storage location & migration
+│   └── src/platform/       # OS-specific implementations
+├── tests/                  # Vitest frontend logic & UI tests
+├── scripts/                # Dev/build helpers & Linux command sync
+├── docs/                   # Usage, dev, release & design documentation
+└── .github/workflows/      # CI verification & release automation
 ```
 
-历史设计与规划可参考 [架构设计](docs/history/early-architecture.md)、[UI 设计稿](docs/quickbox_ui_design_system.md)、[项目发展规划](docs/项目发展规划.md) 和 [插件市场方案](docs/插件市场需求与技术方案.md)。规划文档不代表当前版本已交付的功能；当前加载器只注册仓库内置插件。
+Historical architecture and UI design documents live in [Early Architecture](docs/history/early-architecture.md), [UI Design System](docs/quickbox_ui_design_system.md), [Product Roadmap](docs/项目发展规划.md), and [Plugin Marketplace Proposal](docs/插件市场需求与技术方案.md).
 
 </details>
 
 <a id="credits"></a>
 
-## 致谢与许可
+## Credits & Licenses
 
-QuickBox 基于 Tauri、React、Vite、Zustand、SQLite 等开源项目构建，感谢这些项目及贡献者。
+QuickBox is built on Tauri, React, Vite, Zustand, SQLite, and other open-source software.
 
-| 内置内容 | 来源与许可 |
+| Bundled Content | Source & License |
 | --- | --- |
-| 任务管理基础能力 | [CrescentR/Task](https://github.com/CrescentR/Task) · 基于固定提交移植并适配 QuickBox，见 [来源与范围](docs/task-management.md#source)；该来源快照未附 `LICENSE` |
-| Linux 命令大全 | [jaywcjlove/linux-command](https://github.com/jaywcjlove/linux-command) · [MIT 许可原文](src/builtin-plugins/command-cheatsheet-tool/data/LICENSE.linux-command.txt)，保留作者署名 |
-| tldr 快速示例 | [tldr-pages/tldr](https://github.com/tldr-pages/tldr) · CC BY 4.0，整理自上游示例 |
-| IBM Plex Sans 字体 | [本地许可文件](src/assets/fonts/IBM-Plex-Sans-LICENSE.txt) |
+| Task Management core capabilities | [CrescentR/Task](https://github.com/CrescentR/Task) · Ported and adapted from a pinned commit; see [Source & Scope](docs/task-management.md#source) (upstream snapshot had no `LICENSE` file) |
+| Linux Command Reference | [jaywcjlove/linux-command](https://github.com/jaywcjlove/linux-command) · [MIT License](src/builtin-plugins/command-cheatsheet-tool/data/LICENSE.linux-command.txt) |
+| tldr quick examples | [tldr-pages/tldr](https://github.com/tldr-pages/tldr) · CC BY 4.0 |
+| IBM Plex Sans font | [Local license file](src/assets/fonts/IBM-Plex-Sans-LICENSE.txt) |
 
-仓库目前未附项目级 `LICENSE` 文件；第三方依赖与内置内容遵循各自许可证。`package.json` 的 `private: true` 用于防止意外发布到 npm，不代表一份开源许可证。
+This repository does not currently carry a top-level project `LICENSE` file; third-party dependencies and bundled assets remain governed by their respective licenses. `private: true` in `package.json` prevents accidental npm publishing.
 
 <div align="center">
 
-[下载 QuickBox](https://github.com/CrescentR/Quick-Box/releases) · [反馈问题](https://github.com/CrescentR/Quick-Box/issues) · [查看构建](https://github.com/CrescentR/Quick-Box/actions)
+[Download QuickBox](https://github.com/CrescentR/Quick-Box/releases) · [Report Issue](https://github.com/CrescentR/Quick-Box/issues) · [GitHub Actions](https://github.com/CrescentR/Quick-Box/actions)
 
 </div>

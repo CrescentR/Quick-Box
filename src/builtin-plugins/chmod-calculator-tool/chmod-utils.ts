@@ -13,13 +13,13 @@ export interface ChmodPermissions {
   other: ChmodTriplet
 }
 
-export const chmodPresets: Array<{ label: string; mode: string; description: string }> = [
-  { label: '755', mode: '755', description: '目录 / 可执行文件' },
-  { label: '644', mode: '644', description: '普通文件' },
-  { label: '600', mode: '600', description: '仅所有者可读写' },
-  { label: '777', mode: '777', description: '全部权限（慎用）' },
-  { label: '700', mode: '700', description: '仅所有者可读写执行' },
-  { label: '664', mode: '664', description: '组内可写' },
+export const chmodPresets: Array<{ label: string; mode: string; description: string; enDescription: string }> = [
+  { label: '755', mode: '755', description: '目录 / 可执行文件', enDescription: 'Directories / executables' },
+  { label: '644', mode: '644', description: '普通文件', enDescription: 'Regular files' },
+  { label: '600', mode: '600', description: '仅所有者可读写', enDescription: 'Owner read/write only' },
+  { label: '777', mode: '777', description: '全部权限（慎用）', enDescription: 'Full permissions (use with caution)' },
+  { label: '700', mode: '700', description: '仅所有者可读写执行', enDescription: 'Owner full access only' },
+  { label: '664', mode: '664', description: '组内可写', enDescription: 'Group writable' },
 ]
 
 const defaultPermissions: ChmodPermissions = {

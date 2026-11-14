@@ -6,6 +6,8 @@ import { replaceWithRegex } from '../src/builtin-plugins/workflow-tools/regex-re
 import { csvToJson, parseCsv } from '../src/builtin-plugins/workflow-tools/csv-to-json'
 import { csvEscape, jsonToCsv } from '../src/builtin-plugins/workflow-tools/json-to-csv'
 import { jsonToRust, toPascalCase, toSnakeCase } from '../src/builtin-plugins/workflow-tools/json-to-rust'
+import { javaBeanToJson, jsonToJavaBean } from '../src/builtin-plugins/workflow-tools/java-bean-json'
+import { generateSqlMock, parseMockColumns } from '../src/builtin-plugins/workflow-tools/sql-mock'
 import { evaluateJsonPath, parseJsonPath } from '../src/builtin-plugins/workflow-tools/json-path'
 import { curlToFetch, fetchToCurl, tokenizeShellLike } from '../src/builtin-plugins/workflow-tools/curl-fetch'
 import { parseEnvText, unquoteEnvValue } from '../src/builtin-plugins/workflow-tools/env-parser'
@@ -65,7 +67,7 @@ describe('CSV 与 JSON 互转', () => {
   })
 })
 
-describe('JSON 转 Rust 结构体', () => {
+describe('JSON 转 Rust 结构体与 Java Bean 互转', () => {
   it('转换命名风格', () => {
     expect(toPascalCase('user-profile_item')).toBe('UserProfileItem')
     expect(toSnakeCase('userName')).toBe('user_name')
@@ -78,6 +80,40 @@ describe('JSON 转 Rust 结构体', () => {
     expect(output).toContain('#[serde(rename = "userName")]\n    pub user_name: String,')
     expect(output).toContain('pub profile: RootProfile,')
     expect(output).toContain('pub active: bool,')
+  })
+
+  it('JSON 与 Java Bean 双向转换', () => {
+    const javaCode = jsonToJavaBean('{"user_id":1,"tags":["a"],"meta":{"enabled":true}}', 'UserDto', true)
+    expect(javaCode).toContain('import lombok.Data;')
+    expect(javaCode).toContain('import java.util.List;')
+    expect(javaCode).toContain('public class UserDto')
+    expect(javaCode).toContain('private Long userId;')
+    expect(javaCode).toContain('private List<String> tags;')
+    expect(javaCode).toContain('public static class UserDtoMeta')
+
+    const jsonTemplate = javaBeanToJson(
+      'public class User { private Long id; private String userName; private Boolean active; private List<String> roles; }',
+    )
+    expect(JSON.parse(jsonTemplate)).toEqual({
+      id: 0,
+      userName: '',
+      active: false,
+      roles: [''],
+    })
+  })
+})
+
+describe('SQL Mock 生成', () => {
+  it('解析字段定义并生成多行 INSERT 语句', () => {
+    expect(parseMockColumns('id:id\nuser_name VARCHAR(64)')).toEqual([
+      { name: 'id', type: 'id' },
+      { name: 'user_name', type: 'varchar(64)' },
+    ])
+    const sql = generateSqlMock('sys_user', 'id:id\nemail:email\nactive:bool', 2)
+    expect(sql).toContain('INSERT INTO sys_user (id, email, active)')
+    expect(sql).toContain("(1, 'user1@example.com', TRUE)")
+    expect(sql).toContain("(2, 'user2@example.com', FALSE);")
+    expect(generateSqlMock('123bad', 'id:id', 1)).toMatch(/合法的表名/)
   })
 })
 

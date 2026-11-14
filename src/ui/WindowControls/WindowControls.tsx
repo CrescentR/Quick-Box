@@ -7,10 +7,12 @@ import {
   minimizeCurrentWindow,
   unmaximizeCurrentWindow,
 } from '../../api/window-api'
+import { useT } from '../../i18n'
 import { Icon } from '../Icon/Icon'
 import './WindowControls.css'
 
 export function WindowControls() {
+  const tr = useT()
   const [isMaximized, setIsMaximized] = useState(false)
 
   useEffect(() => {
@@ -39,8 +41,8 @@ export function WindowControls() {
       <button
         type="button"
         className="qb-window-controls__button qb-window-controls__button--close qb-focus-ring"
-        aria-label="关闭窗口"
-        title="关闭"
+        aria-label={tr('关闭窗口', 'Close window')}
+        title={tr('关闭', 'Close')}
         onClick={() => {
           void closeCurrentWindow()
         }}
@@ -51,8 +53,8 @@ export function WindowControls() {
       <button
         type="button"
         className="qb-window-controls__button qb-window-controls__button--minimize qb-focus-ring"
-        aria-label="最小化窗口"
-        title="最小化"
+        aria-label={tr('最小化窗口', 'Minimize window')}
+        title={tr('最小化', 'Minimize')}
         onClick={() => {
           void minimizeCurrentWindow()
         }}
@@ -63,8 +65,8 @@ export function WindowControls() {
       <button
         type="button"
         className="qb-window-controls__button qb-window-controls__button--maximize qb-focus-ring"
-        aria-label={isMaximized ? '还原窗口大小' : '最大化窗口'}
-        title={isMaximized ? '还原' : '最大化'}
+        aria-label={isMaximized ? tr('还原窗口大小', 'Restore window') : tr('最大化窗口', 'Maximize window')}
+        title={isMaximized ? tr('还原', 'Restore') : tr('最大化', 'Maximize')}
         onClick={async () => {
           if (isMaximized) {
             await unmaximizeCurrentWindow()

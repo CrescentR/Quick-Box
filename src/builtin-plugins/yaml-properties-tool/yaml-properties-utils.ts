@@ -1,3 +1,5 @@
+import { lt } from '../../i18n'
+
 export type ConfigValue = null | boolean | number | string | ConfigValue[] | { [key: string]: ConfigValue }
 
 type YamlLine = {
@@ -59,7 +61,7 @@ function collectYamlLines(input: string) {
     if (!withoutComment.trim() || withoutComment.trim().startsWith('#')) return
     const indent = raw.match(/^\s*/)?.[0].length ?? 0
     if (indent % 2 !== 0) {
-      throw new Error(`第 ${index + 1} 行缩进不是 2 的倍数`)
+      throw new Error(lt(`第 ${index + 1} 行缩进不是 2 的倍数`, `Line ${index + 1}: indentation must be a multiple of 2`))
     }
     lines.push({ indent, text: withoutComment.trim(), line: index + 1 })
   })
@@ -108,7 +110,7 @@ function parseYamlList(lines: YamlLine[], parentIndent: number, start: number) {
     }
 
     if (children.length) {
-      throw new Error(`第 ${itemLine} 行列表标量后不能再嵌套`)
+      throw new Error(lt(`第 ${itemLine} 行列表标量后不能再嵌套`, `Line ${itemLine}: cannot nest blocks under a list scalar`))
     }
     items.push(parseScalar(rest))
   }
@@ -123,7 +125,7 @@ function parseYamlMap(lines: YamlLine[], parentIndent: number, start: number) {
 
   while (index < lines.length && lines[index].indent === mapIndent && !lines[index].text.startsWith('-')) {
     const pair = splitKeyValue(lines[index].text)
-    if (!pair) throw new Error(`第 ${lines[index].line} 行缺少冒号`)
+    if (!pair) throw new Error(lt(`第 ${lines[index].line} 行缺少冒号`, `Line ${lines[index].line}: missing colon`))
     if (!pair.value) {
       const nested = parseYamlNodes(lines, mapIndent, index + 1)
       result[pair.key] = nested.value
@@ -184,7 +186,7 @@ function tokenizePropertyKey(key: string) {
   key.split('.').forEach((segment) => {
     const match = segment.match(/^([^[\]]+)((?:\[\d+])*)$/)
     if (!match || !match[1]) {
-      throw new Error(`无法解析属性键：${key}`)
+      throw new Error(lt(`无法解析属性键：${key}`, `Unable to parse property key: ${key}`))
     }
     tokens.push(match[1])
     const indexes = match[2].match(/\[(\d+)]/g) ?? []
@@ -257,13 +259,13 @@ export function parseProperties(input: string): { [key: string]: ConfigValue } {
     const trimmed = line.trim()
     if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('!')) return
     const separator = findPropertySeparator(trimmed)
-    if (separator < 0) throw new Error(`第 ${lineIndex + 1} 行缺少 = 或 :`)
+    if (separator < 0) throw new Error(lt(`第 ${lineIndex + 1} 行缺少 = 或 :`, `Line ${lineIndex + 1}: missing = or :`))
     const key = trimmed.slice(0, separator).trim().replace(/\\=/g, '=')
     const value = parsePropertyValue(trimmed.slice(separator + 1))
     setPath(root, tokenizePropertyKey(key), value)
   })
 
-  if (pending) throw new Error('properties 文本以未结束的续行符结尾')
+  if (pending) throw new Error(lt('properties 文本以未结束的续行符结尾', 'Properties text ends with an unterminated line continuation'))
   return root
 }
 

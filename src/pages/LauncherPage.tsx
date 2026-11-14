@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   AppWindow,
   Command,
+  Languages,
   LayoutPanelTop,
   PackageSearch,
   Pin,
@@ -16,6 +17,8 @@ import { hideLauncherWindow } from '../api/window-api'
 import { runCommand } from '../core/command/command-runner'
 import type { Command as QuickBoxCommand } from '../core/command/command-types'
 import { pluginRegistry } from '../core/plugin/plugin-registry'
+import { localizeCommand, useLocale, useT } from '../i18n'
+import { useConfigStore } from '../stores/config-store'
 import { useLauncherStore } from '../stores/launcher-store'
 import {
   ActionPanel,
@@ -29,10 +32,11 @@ import {
 } from '../ui'
 import { CategoryFilter } from './launcher/components/CategoryFilter'
 import { QuickTiles } from './launcher/components/QuickTiles'
+import { ToolDetail } from './launcher/components/ToolDetail'
 import { ToolIcon } from './launcher/components/ToolIcon'
 import { ToolRow } from './launcher/components/ToolRow'
 import { ToolViewPane } from './launcher/components/ToolViewPane'
-import { TOOL_CATEGORIES, type ToolCategoryFilter } from './launcher/launcher-catalog'
+import { getCategoryLabel, TOOL_CATEGORIES, type ToolCategoryFilter } from './launcher/launcher-catalog'
 import { MAX_QUICK_COMMANDS } from './launcher/launcher-preferences'
 import { useCommandUsage } from './launcher/use-command-usage'
 import { useLauncherResults } from './launcher/use-launcher-results'
@@ -56,6 +60,9 @@ function focusWorkspace() {
 }
 
 export default function LauncherPage({ currentPage, onPageChange }: PageNavigationProps) {
+  const locale = useLocale()
+  const tr = useT()
+  const { config, setConfig } = useConfigStore()
   const {
     query,
     selectedIndex,
@@ -96,36 +103,52 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
           closeView,
         })
       } catch (error) {
-        setToast({ tone: 'danger', title: '工具打开失败', description: error instanceof Error ? error.message : '请重试或选择其他工具。' })
+        setToast({
+          tone: 'danger',
+          title: locale === 'en-US' ? 'Failed to open tool' : '工具打开失败',
+          description: error instanceof Error ? error.message : (locale === 'en-US' ? 'Please retry or select another tool.' : '请重试或选择其他工具。'),
+        })
         return
       }
       await recordUsage(command.id)
     },
-    [closeView, openView, recordUsage],
+    [closeView, locale, openView, recordUsage],
   )
 
   const toggleQuickCommand = useCallback(
     (command: QuickBoxCommand) => {
+      const commandTitle = localizeCommand(command, locale).title
       void useWorkspaceStore.getState().update((data) => {
         const isQuick = data.quickCommandIds.includes(command.id)
-        if (!isQuick && data.quickCommandIds.length >= MAX_QUICK_COMMANDS) throw new Error('常用工具最多 8 个，请先取消一个置顶。')
+        if (!isQuick && data.quickCommandIds.length >= MAX_QUICK_COMMANDS) {
+          throw new Error(locale === 'en-US' ? 'Up to 8 tools can be pinned. Unpin one first.' : '常用工具最多 8 个，请先取消一个置顶。')
+        }
         return { ...data, quickCommandIds: isQuick ? data.quickCommandIds.filter((id) => id !== command.id) : [...data.quickCommandIds, command.id] }
       }).then(() => {
         const pinned = useWorkspaceStore.getState().data.quickCommandIds.includes(command.id)
-        setToast({ tone: 'success', title: pinned ? '已置顶到常用' : '已取消置顶', description: command.title })
-      }).catch((error) => setToast({ tone: 'warning', title: '未更改常用工具', description: error instanceof Error ? error.message : '保存失败，请重试' }))
-    }, [],
+        setToast({
+          tone: 'success',
+          title: pinned ? (locale === 'en-US' ? 'Pinned to Quick Access' : '已置顶到常用') : (locale === 'en-US' ? 'Unpinned' : '已取消置顶'),
+          description: commandTitle,
+        })
+      }).catch((error) => setToast({
+        tone: 'warning',
+        title: locale === 'en-US' ? 'Pinned tools unchanged' : '未更改常用工具',
+        description: error instanceof Error ? error.message : (locale === 'en-US' ? 'Failed to save. Please retry.' : '保存失败，请重试'),
+      }))
+    }, [locale],
   )
 
   const addQuickCommand = useCallback(
     (command: QuickBoxCommand) => {
+      const commandTitle = localizeCommand(command, locale).title
       if (quickCommandIds.includes(command.id)) {
-        setToast({ tone: 'warning', title: '已经在常用里了', description: command.title })
+        setToast({ tone: 'warning', title: locale === 'en-US' ? 'Already pinned' : '已经在常用里了', description: commandTitle })
         return
       }
       toggleQuickCommand(command)
     },
-    [quickCommandIds, toggleQuickCommand],
+    [locale, quickCommandIds, toggleQuickCommand],
   )
 
   const {
@@ -233,7 +256,6 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
       viewport.scrollTo({ top: nextScrollTop, behavior: 'smooth' })
     }
   }, [results, selectedIndex])
-
 
   useEffect(() => {
     if (!activeViewId || pluginStatus === 'idle' || pluginStatus === 'loading') return
@@ -363,18 +385,24 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
     setIsActionPanelOpen(false)
   }
 
+  const matchedCategory = TOOL_CATEGORIES.find((item) => item.id === category)
   const listTitle =
     hasQuery
-      ? '搜索结果'
+      ? tr('搜索结果', 'Search Results')
       : category === 'quick'
-        ? '常用置顶'
-        : TOOL_CATEGORIES.find((item) => item.id === category)?.name ?? '全部工具'
+        ? tr('常用置顶', 'Pinned')
+        : matchedCategory
+          ? getCategoryLabel(matchedCategory, locale)
+          : tr('全部工具', 'All Tools')
+
+  const selectedLocalized = selectedResult ? localizeCommand(selectedResult.command, locale) : undefined
+  const nextLocale = locale === 'en-US' ? 'zh-CN' : 'en-US'
 
   const actionItems: ActionPanelItem[] = [
     {
       id: 'run-selected',
-      title: selectedResult ? `打开 ${selectedResult.command.title}` : '打开选中工具',
-      description: selectedResult?.command.description ?? '请先选择一个工具',
+      title: selectedLocalized ? tr(`打开 ${selectedLocalized.title}`, `Open ${selectedLocalized.title}`) : tr('打开选中工具', 'Open Selected Tool'),
+      description: selectedLocalized?.description ?? tr('请先选择一个工具', 'Select a tool first'),
       icon: <Icon icon={selectedResult?.command.executeMode === 'view' ? AppWindow : Command} size={16} tone="primary" />,
       shortcut: 'Enter',
       disabled: !selectedResult,
@@ -386,8 +414,8 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
     },
     {
       id: 'toggle-quick-selected',
-      title: selectedIsQuick ? '取消置顶' : '置顶到常用',
-      description: selectedResult ? selectedResult.command.title : '请先选择一个工具',
+      title: selectedIsQuick ? tr('取消置顶', 'Unpin Tool') : tr('置顶到常用', 'Pin to Quick Access'),
+      description: selectedLocalized ? selectedLocalized.title : tr('请先选择一个工具', 'Select a tool first'),
       icon: <Icon icon={selectedIsQuick ? PinOff : Pin} size={16} tone={selectedIsQuick ? 'warning' : 'muted'} />,
       shortcut: 'Ctrl+D',
       disabled: !selectedResult,
@@ -398,9 +426,20 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
       },
     },
     {
+      id: 'switch-language',
+      title: tr('Switch to English', '切换为简体中文'),
+      description: tr('将界面语言切换为英文', 'Switch interface language to Simplified Chinese'),
+      icon: <Icon icon={Languages} size={16} tone="primary" />,
+      keywords: ['language', 'english', 'chinese', 'i18n', '语言', '英文', '中文'],
+      onAction: () => {
+        setIsActionPanelOpen(false)
+        void setConfig({ ...config, language: nextLocale })
+      },
+    },
+    {
       id: 'go-plugins',
-      title: '打开插件',
-      description: '查看官方工具和启用状态。',
+      title: tr('打开插件', 'Open Plugins'),
+      description: tr('查看官方工具和启用状态。', 'Manage built-in tools and enable status.'),
       icon: <Icon icon={LayoutPanelTop} size={16} tone="primary" />,
       shortcut: 'Ctrl+2',
       keywords: ['plugins', '插件'],
@@ -408,8 +447,8 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
     },
     {
       id: 'go-settings',
-      title: '打开设置',
-      description: '主题、呼出方式和桌面集成。',
+      title: tr('打开设置', 'Open Settings'),
+      description: tr('主题、语言、呼出方式和桌面集成。', 'Theme, language, hotkey, and local storage.'),
       icon: <Icon icon={Settings2} size={16} tone="primary" />,
       shortcut: 'Ctrl+3',
       keywords: ['settings', '设置'],
@@ -417,8 +456,8 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
     },
     {
       id: 'hide-launcher',
-      title: '隐藏 QuickBox',
-      description: '收起窗口。',
+      title: tr('隐藏 QuickBox', 'Hide QuickBox'),
+      description: tr('收起窗口。', 'Collapse the launcher window.'),
       icon: <Icon icon={AppWindow} size={16} tone="muted" />,
       shortcut: 'Esc',
       keywords: ['hide', '隐藏', '关闭'],
@@ -445,7 +484,7 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
               value={query}
               onChange={handleQueryChange}
               data-qb-launcher-search="true"
-              placeholder="搜索工具"
+              placeholder={tr('搜索工具', 'Search tools')}
             />
             <span className="qb-launcher-search__meta">
               {results.length}
@@ -457,14 +496,14 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
       footer={
         <div className="qb-launcher-footer">
           <div className="qb-launcher-footer__group">
-            <span className="qb-launcher-footer__hint"><KeyboardShortcut keys={['↑', '↓']} separator="" />选择</span>
-            <span className="qb-launcher-footer__hint"><KeyboardShortcut keys="Enter" />打开</span>
-            <span className="qb-launcher-footer__hint"><KeyboardShortcut keys="Tab" />工作台</span>
-            <span className="qb-launcher-footer__hint"><KeyboardShortcut keys={['Alt', '1-8']} />常用</span>
+            <span className="qb-launcher-footer__hint"><KeyboardShortcut keys={['↑', '↓']} separator="" />{tr('选择', 'Select')}</span>
+            <span className="qb-launcher-footer__hint"><KeyboardShortcut keys="Enter" />{tr('打开', 'Open')}</span>
+            <span className="qb-launcher-footer__hint"><KeyboardShortcut keys="Tab" />{tr('工作台', 'Focus')}</span>
+            <span className="qb-launcher-footer__hint"><KeyboardShortcut keys={['Alt', '1-8']} />{tr('常用', 'Pinned')}</span>
           </div>
           <div className="qb-launcher-footer__group">
-            <span className="qb-launcher-footer__hint"><KeyboardShortcut keys={['Ctrl', 'D']} />置顶</span>
-            <span className="qb-launcher-footer__hint"><KeyboardShortcut keys={['Ctrl', 'K']} />动作</span>
+            <span className="qb-launcher-footer__hint"><KeyboardShortcut keys={['Ctrl', 'D']} />{tr('置顶', 'Pin')}</span>
+            <span className="qb-launcher-footer__hint"><KeyboardShortcut keys={['Ctrl', 'K']} />{tr('动作', 'Actions')}</span>
           </div>
         </div>
       }
@@ -487,7 +526,7 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
               commands={quickCommands}
               selectedCommandId={selectedResult?.command.id}
               openCommandId={activeCommandId}
-              draggingTitle={draggedCommand?.title}
+              draggingTitle={draggedCommand ? localizeCommand(draggedCommand, locale).title : undefined}
               isDropActive={isQuickDropActive}
               onLaunch={(command) => void launchQuickCommand(command)}
               onRemove={toggleQuickCommand}
@@ -527,8 +566,8 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
               ) : (
                 <EmptyState
                   icon={<Icon icon={PackageSearch} size={18} tone="muted" />}
-                  title={hasQuery ? `没有「${query.trim()}」` : '这个分类还是空的'}
-                  description="换个词，或到插件页打开更多工具。"
+                  title={hasQuery ? tr(`没有「${query.trim()}」`, `No results for "${query.trim()}"`) : tr('这个分类还是空的', 'This category is empty')}
+                  description={tr('换个词，或到插件页打开更多工具。', 'Try another keyword, or enable more tools in Plugins.')}
                 />
               )}
             </div>
@@ -548,21 +587,23 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
               onOpenActions={() => setIsActionPanelOpen(true)}
             />
           ) : (
-            <div className="qb-launcher-idle">
-              <p>点选左侧工具，在这里打开</p>
-              <p>
-                <KeyboardShortcut keys="Enter" /> 打开
-                <span> · </span>
-                <KeyboardShortcut keys="Tab" /> 把键盘交给工作台
-              </p>
-            </div>
+            <ToolDetail
+              command={selectedResult?.command}
+              usage={selectedResult ? usageByCommandId[selectedResult.command.id] : undefined}
+              isQuick={selectedIsQuick}
+              onRun={() => void launchSelected()}
+              onToggleQuick={() => {
+                if (selectedResult) toggleQuickCommand(selectedResult.command)
+              }}
+              onOpenActions={() => setIsActionPanelOpen(true)}
+            />
           )}
         </section>
 
         <ActionPanel
           open={isActionPanelOpen}
-          title="动作"
-          description={selectedResult?.command.title}
+          title={tr('动作', 'Actions')}
+          description={selectedLocalized?.title}
           actions={actionItems}
           query={actionQuery}
           onQueryChange={setActionQuery}
@@ -582,7 +623,7 @@ export default function LauncherPage({ currentPage, onPageChange }: PageNavigati
           <div ref={dragGhostRef} className="qb-launcher-drag-ghost" aria-hidden="true">
             <div className="qb-launcher-drag-ghost__card">
               <ToolIcon command={draggedCommand} />
-              <span className="qb-launcher-drag-ghost__title">{draggedCommand.title}</span>
+              <span className="qb-launcher-drag-ghost__title">{localizeCommand(draggedCommand, locale).title}</span>
             </div>
           </div>
         ) : null}

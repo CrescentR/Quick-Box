@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode, type Se
 export type ToolDataType = 'text' | 'json' | 'url' | 'csv' | 'timestamp' | 'jwt' | 'cidr'
 export interface ToolInput { type: ToolDataType; text: string; source: string; sensitive?: boolean }
 export type ToolResult = { ok: true; data: ToolInput } | { ok: false; message: string }
-export interface ToolAction { commandId: string; title: string; accepts: ToolDataType[] }
+export interface ToolAction { commandId: string; title: string; enTitle: string; accepts: ToolDataType[] }
 const Context = createContext<{ viewId: string; input?: ToolInput }>({ viewId: '' })
 const drafts = new Map<string, string>()
 
@@ -36,12 +36,14 @@ export function clearToolDrafts() { drafts.clear() }
 export function useToolContext() { return useContext(Context) }
 
 export const TOOL_ACTIONS: ToolAction[] = [
-  { commandId: 'official.json-tool.open', title: 'JSON 工具', accepts: ['json', 'text'] },
-  { commandId: 'official.utility-tools.json-to-typescript', title: 'TypeScript 类型', accepts: ['json'] },
-  { commandId: 'official.json-schema-tool.open', title: 'JSON Schema', accepts: ['json'] },
-  { commandId: 'official.utility-tools.query-builder', title: 'Query 参数', accepts: ['url'] },
-  { commandId: 'official.workflow-tools.text-cleaner', title: '文本清洗', accepts: ['text', 'csv'] },
-  { commandId: 'official.workflow-tools.text-deduplicate', title: '按行去重', accepts: ['text', 'csv'] },
-  { commandId: 'official.workflow-tools.csv-to-json', title: 'CSV 转 JSON', accepts: ['csv', 'text'] },
-  { commandId: 'official.workflow-tools.json-to-csv', title: 'JSON 转 CSV', accepts: ['json'] },
+  { commandId: 'official.json-tool.open', title: 'JSON 工具', enTitle: 'JSON Formatter', accepts: ['json', 'text'] },
+  { commandId: 'official.utility-tools.json-to-typescript', title: 'TypeScript 类型', enTitle: 'TypeScript Types', accepts: ['json'] },
+  { commandId: 'official.workflow-tools.json-to-rust', title: 'Rust Struct', enTitle: 'Rust Struct', accepts: ['json'] },
+  { commandId: 'official.workflow-tools.java-bean-json', title: 'Java Bean', enTitle: 'Java Bean', accepts: ['json'] },
+  { commandId: 'official.json-schema-tool.open', title: 'JSON Schema', enTitle: 'JSON Schema', accepts: ['json'] },
+  { commandId: 'official.utility-tools.query-builder', title: 'Query 参数', enTitle: 'Query String Builder', accepts: ['url'] },
+  { commandId: 'official.workflow-tools.text-cleaner', title: '文本清洗', enTitle: 'Whitespace Cleaner', accepts: ['text', 'csv'] },
+  { commandId: 'official.workflow-tools.text-deduplicate', title: '按行去重', enTitle: 'Deduplicate Lines', accepts: ['text', 'csv'] },
+  { commandId: 'official.workflow-tools.csv-to-json', title: 'CSV 转 JSON', enTitle: 'CSV to JSON', accepts: ['csv', 'text'] },
+  { commandId: 'official.workflow-tools.json-to-csv', title: 'JSON 转 CSV', enTitle: 'JSON to CSV', accepts: ['json'] },
 ]

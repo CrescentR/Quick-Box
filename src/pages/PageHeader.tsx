@@ -1,12 +1,7 @@
 import type { ReactNode } from 'react'
+import { useT } from '../i18n'
 import { WindowControls } from '../ui'
 import type { AppPage, PageNavigationProps } from './page-types'
-
-const pageLabels: Record<AppPage, string> = {
-  launcher: '启动器',
-  plugins: '插件',
-  settings: '设置',
-}
 
 export interface PageHeaderProps extends PageNavigationProps {
   eyebrow?: string
@@ -26,6 +21,13 @@ export default function PageHeader({
   compact = false,
   children,
 }: PageHeaderProps) {
+  const tr = useT()
+  const pageLabels: Record<AppPage, string> = {
+    launcher: tr('启动器', 'Launcher'),
+    plugins: tr('插件', 'Plugins'),
+    settings: tr('设置', 'Settings'),
+  }
+
   const pageNav = (
     <div className="qb-page-nav">
       {(['launcher', 'plugins', 'settings'] as AppPage[]).map((page) => (

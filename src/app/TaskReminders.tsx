@@ -4,13 +4,17 @@ import { listen } from '@tauri-apps/api/event'
 import { taskApi } from '../api/task-api'
 import { invokeCommand } from '../api/tauri-api'
 import type { TaskReminder } from '../core/tasks/task-types'
+import { lt, useT } from '../i18n'
 import { usePluginStore } from '../stores/plugin-store'
 import { useConfigStore } from '../stores/config-store'
 import { useAppTheme } from './useAppTheme'
 import './TaskReminders.css'
 
 const native = () => Boolean((window as Window & { __TAURI_INTERNALS__?: unknown }).__TAURI_INTERNALS__)
-const messageOf = (cause: unknown) => cause && typeof cause === 'object' && 'message' in cause ? String(cause.message) : '无法读取任务提醒，请重试。'
+const messageOf = (cause: unknown) =>
+  cause && typeof cause === 'object' && 'message' in cause
+    ? String(cause.message)
+    : lt('无法读取任务提醒，请重试。', 'Unable to load task reminders. Please try again.')
 
 function useReminders(active: boolean, popup: boolean) {
   const [notices, setNotices] = useState<TaskReminder[]>([])
@@ -71,6 +75,7 @@ function useReminders(active: boolean, popup: boolean) {
 }
 
 function ReminderCard({ active, popup = false, onOpen }: { active: boolean; popup?: boolean; onOpen?: (id: string) => void }) {
+  const tr = useT()
   const { notices, acknowledge: acknowledgeNotices, error, setError, refresh } = useReminders(active, popup)
   const [busy, setBusy] = useState(false)
   const current = notices[0]
@@ -94,17 +99,17 @@ function ReminderCard({ active, popup = false, onOpen }: { active: boolean; popu
   }
 
   if (!active || (!current && !popup)) return null
-  return <section className={`qb-task-reminder${popup ? ' qb-task-reminder--window' : ''}`} aria-label="任务提醒" role="status">
-    <header><span><BellRing size={16} />任务提醒</span>{notices.length > 1 && <small>另有 {notices.length - 1} 条</small>}
-      {current && <button type="button" disabled={busy} aria-label="关闭当前任务提醒" onClick={() => void acknowledge(false)}><X size={15} /></button>}
+  return <section className={`qb-task-reminder${popup ? ' qb-task-reminder--window' : ''}`} aria-label={tr('任务提醒', 'Task Reminder')} role="status">
+    <header><span><BellRing size={16} />{tr('任务提醒', 'Task Reminder')}</span>{notices.length > 1 && <small>{tr(`另有 ${notices.length - 1} 条`, `${notices.length - 1} more`)}</small>}
+      {current && <button type="button" disabled={busy} aria-label={tr('关闭当前任务提醒', 'Dismiss reminder')} onClick={() => void acknowledge(false)}><X size={15} /></button>}
     </header>
-    <strong className="qb-task-reminder__title">{current?.title ?? '正在读取提醒…'}</strong>
-    {current && <p>{current.due_date} {current.due_time} 到期</p>}
+    <strong className="qb-task-reminder__title">{current?.title ?? tr('正在读取提醒…', 'Loading reminder…')}</strong>
+    {current && <p>{current.due_date} {current.due_time} {tr('到期', 'due')}</p>}
     {error && <p role="alert" className="qb-task-reminder__error">{error}</p>}
     <footer>{current ? <>
-      <button className="qb-tool-button qb-tool-button--primary" type="button" disabled={busy} onClick={() => void acknowledge(true)}><ExternalLink size={13} />查看任务</button>
-      <button className="qb-tool-button" type="button" disabled={busy} onClick={() => void acknowledge(false)}>{busy ? '处理中…' : '知道了'}</button>
-    </> : <button className="qb-tool-button" type="button" onClick={() => void refresh()}>重新读取</button>}</footer>
+      <button className="qb-tool-button qb-tool-button--primary" type="button" disabled={busy} onClick={() => void acknowledge(true)}><ExternalLink size={13} />{tr('查看任务', 'View Task')}</button>
+      <button className="qb-tool-button" type="button" disabled={busy} onClick={() => void acknowledge(false)}>{busy ? tr('处理中…', 'Working…') : tr('知道了', 'Got it')}</button>
+    </> : <button className="qb-tool-button" type="button" onClick={() => void refresh()}>{tr('重新读取', 'Reload')}</button>}</footer>
   </section>
 }
 

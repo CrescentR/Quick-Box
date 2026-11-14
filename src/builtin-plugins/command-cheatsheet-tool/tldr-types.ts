@@ -1,3 +1,5 @@
+import { lt, type ResolvedLocale } from '../../i18n'
+
 export type TldrPlatform = 'common' | 'linux' | 'osx' | 'windows'
 
 export interface TldrExample {
@@ -20,4 +22,9 @@ export const tldrPlatformLabels: Record<TldrPlatform, string> = {
   linux: 'Linux',
   osx: 'macOS',
   windows: 'Windows',
+}
+
+export function getTldrPlatformLabel(platform: TldrPlatform, locale?: ResolvedLocale): string {
+  if (platform === 'common') return lt('通用', 'Common', locale)
+  return tldrPlatformLabels[platform]
 }

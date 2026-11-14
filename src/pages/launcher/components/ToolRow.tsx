@@ -2,6 +2,7 @@ import type { PointerEvent as ReactPointerEvent } from 'react'
 import clsx from 'clsx'
 import { Star } from 'lucide-react'
 import type { Command as QuickBoxCommand } from '../../../core/command/command-types'
+import { localizeCommand, useLocale, useT } from '../../../i18n'
 import { getCommandAlias } from '../launcher-catalog'
 import { ToolIcon } from './ToolIcon'
 
@@ -45,7 +46,10 @@ export function ToolRow({
   onTogglePin,
   onPointerDown,
 }: ToolRowProps) {
+  const locale = useLocale()
+  const tr = useT()
   const alias = getCommandAlias(command)
+  const localized = localizeCommand(command, locale)
 
   return (
     <div
@@ -68,18 +72,18 @@ export function ToolRow({
         <span className="qb-tool-row__copy">
           <span className="qb-tool-row__title">
             <span className="qb-tool-row__name">
-              <HighlightText text={command.title} query={query} />
+              <HighlightText text={localized.title} query={query} />
             </span>
             {alias ? <span className="qb-tool-row__alias">{alias}</span> : null}
           </span>
-          {command.description ? <span className="qb-tool-row__desc">{command.description}</span> : null}
+          {localized.description ? <span className="qb-tool-row__desc">{localized.description}</span> : null}
         </span>
       </button>
       <button
         type="button"
         className={clsx('qb-tool-row__star', pinned && 'is-on')}
         onClick={onTogglePin}
-        title={pinned ? '取消置顶' : '置顶到常用'}
+        title={pinned ? tr('取消置顶', 'Unpin') : tr('置顶到常用', 'Pin to Quick Access')}
         aria-pressed={pinned}
       >
         <Star size={13} strokeWidth={1.8} fill={pinned ? 'currentColor' : 'none'} />

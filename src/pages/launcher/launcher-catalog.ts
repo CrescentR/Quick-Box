@@ -59,6 +59,7 @@ import {
   Workflow,
 } from 'lucide-react'
 import type { Command as QuickBoxCommand } from '../../core/command/command-types'
+import { getCurrentLocale, lt, type ResolvedLocale } from '../../i18n'
 
 /** 工具分类 id */
 export type ToolCategoryId = 'network' | 'codec' | 'text' | 'time' | 'dev' | 'system' | 'other'
@@ -69,6 +70,7 @@ export type ToolCategoryFilter = ToolCategoryId | 'all' | 'quick'
 export interface ToolCategory {
   id: ToolCategoryId
   name: string
+  enName: string
   /** 侧栏里的分类图标 */
   icon: LucideIcon
 }
@@ -80,14 +82,18 @@ export interface ToolMeta {
 
 /** 分类列表，顺序即侧栏与列表分组的顺序 */
 export const TOOL_CATEGORIES: ToolCategory[] = [
-  { id: 'network', name: '网络与端口', icon: Network },
-  { id: 'codec', name: '编码与加密', icon: Lock },
-  { id: 'text', name: 'JSON / 文本', icon: Braces },
-  { id: 'time', name: '时间与生成', icon: Clock },
-  { id: 'dev', name: '开发与设计', icon: Code },
-  { id: 'system', name: '系统运维', icon: Terminal },
-  { id: 'other', name: '其他', icon: AppWindow },
+  { id: 'network', name: '网络与端口', enName: 'Network & Ports', icon: Network },
+  { id: 'codec', name: '编码与加密', enName: 'Encoding & Crypto', icon: Lock },
+  { id: 'text', name: 'JSON / 文本', enName: 'JSON & Text', icon: Braces },
+  { id: 'time', name: '时间与生成', enName: 'Time & Generators', icon: Clock },
+  { id: 'dev', name: '开发与设计', enName: 'Dev & Design', icon: Code },
+  { id: 'system', name: '系统运维', enName: 'System & Ops', icon: Terminal },
+  { id: 'other', name: '其他', enName: 'Other', icon: AppWindow },
 ]
+
+export function getCategoryLabel(category: ToolCategory, locale: ResolvedLocale = getCurrentLocale()) {
+  return locale === 'en-US' ? category.enName : category.name
+}
 
 const CATEGORY_BY_ID = new Map(TOOL_CATEGORIES.map((category) => [category.id, category]))
 
@@ -146,8 +152,10 @@ const BUILTIN_TOOL_META: Record<string, [ToolCategoryId, LucideIcon]> = {
   'advanced-tools.hmac': ['codec', ShieldCheck],
   'advanced-tools.cron': ['time', CalendarClock],
   'advanced-tools.password-strength': ['codec', Lock],
+  'advanced-tools.password-hash': ['codec', KeyRound],
   'advanced-tools.sensitive-mask': ['text', EyeOff],
   'advanced-tools.css-clamp': ['dev', Ruler],
+  'advanced-tools.css-visual': ['dev', Palette],
   'advanced-tools.ast-visualizer': ['dev', Workflow],
   'advanced-tools.batch-rename': ['system', FilePen],
   'advanced-tools.file-content-search': ['system', FileSearch],
@@ -159,6 +167,8 @@ const BUILTIN_TOOL_META: Record<string, [ToolCategoryId, LucideIcon]> = {
   'workflow-tools.csv-to-json': ['text', Sheet],
   'workflow-tools.json-to-csv': ['text', Sheet],
   'workflow-tools.json-to-rust': ['dev', FileCode],
+  'workflow-tools.java-bean-json': ['dev', FileCode],
+  'workflow-tools.sql-mock': ['dev', Database],
   'workflow-tools.json-path': ['text', Route],
   'workflow-tools.aes-gcm': ['codec', Lock],
   'workflow-tools.curl-fetch': ['network', ArrowLeftRight],
@@ -197,18 +207,18 @@ export function getToolMeta(command: QuickBoxCommand): ToolMeta {
  * 把最近使用时间格式化为相对时间
  * @param lastRunAt ISO 时间字符串
  */
-export function formatLastRun(lastRunAt?: string) {
-  if (!lastRunAt) return '还没用过'
+export function formatLastRun(lastRunAt?: string, locale: ResolvedLocale = getCurrentLocale()) {
+  if (!lastRunAt) return lt('还没用过', 'Never run', locale)
 
   const time = new Date(lastRunAt).getTime()
-  if (Number.isNaN(time)) return '还没用过'
+  if (Number.isNaN(time)) return lt('还没用过', 'Never run', locale)
 
   const minutes = Math.floor((Date.now() - time) / 60_000)
-  if (minutes < 1) return '刚刚'
-  if (minutes < 60) return `${minutes} 分钟前`
+  if (minutes < 1) return lt('刚刚', 'Just now', locale)
+  if (minutes < 60) return lt(`${minutes} 分钟前`, `${minutes}m ago`, locale)
 
   const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours} 小时前`
+  if (hours < 24) return lt(`${hours} 小时前`, `${hours}h ago`, locale)
 
-  return `${Math.floor(hours / 24)} 天前`
+  return lt(`${Math.floor(hours / 24)} 天前`, `${Math.floor(hours / 24)}d ago`, locale)
 }

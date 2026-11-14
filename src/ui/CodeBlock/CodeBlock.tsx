@@ -5,6 +5,7 @@ import { writeClipboardText } from '../../api/clipboard-api'
 import './CodeBlock.css'
 import { ToolResultActions } from '../../core/tool/ToolResultActions'
 import type { ToolDataType } from '../../core/tool/tool-context'
+import { useT } from '../../i18n'
 
 export interface CodeBlockProps extends HTMLAttributes<HTMLElement> {
   code: string
@@ -25,15 +26,23 @@ export function CodeBlock({
   className,
   ...props
 }: CodeBlockProps) {
-  const [copyLabel, setCopyLabel] = useState('复制')
+  const tr = useT()
+  const [copyState, setCopyState] = useState<'idle' | 'copied' | 'failed'>('idle')
   const lines = code.split('\n')
+
+  const copyLabel =
+    copyState === 'copied'
+      ? tr('已复制', 'Copied')
+      : copyState === 'failed'
+        ? tr('复制失败，请重试', 'Copy failed')
+        : tr('复制', 'Copy')
 
   const handleCopy = async () => {
     try {
       await writeClipboardText(code)
-      setCopyLabel('已复制')
-    } catch { setCopyLabel('复制失败，请重试') }
-    window.setTimeout(() => setCopyLabel('复制'), 1200)
+      setCopyState('copied')
+    } catch { setCopyState('failed') }
+    window.setTimeout(() => setCopyState('idle'), 1200)
   }
 
   return (

@@ -1,6 +1,7 @@
 import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from 'react'
 import clsx from 'clsx'
 import { CheckCircle2, Info, TriangleAlert, X, XCircle } from 'lucide-react'
+import { useT } from '../../i18n'
 import { Icon } from '../Icon/Icon'
 import './Toast.css'
 
@@ -40,6 +41,7 @@ export function Toast({
   className,
   ...props
 }: ToastProps) {
+  const tr = useT()
   const toneIcon = getToneIcon(tone)
 
   return (
@@ -60,7 +62,7 @@ export function Toast({
         <button
           type="button"
           className="qb-toast__dismiss qb-focus-ring"
-          aria-label="关闭消息"
+          aria-label={tr('关闭消息', 'Dismiss notification')}
           onClick={onDismiss}
         >
           <X size={16} />

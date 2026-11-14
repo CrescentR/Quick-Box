@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import type { HTMLAttributes, ReactNode } from 'react'
 import clsx from 'clsx'
 import { Search } from 'lucide-react'
+import { useT } from '../../i18n'
 import { Action, type ActionProps } from '../Action/Action'
 import { CommandInput } from '../CommandInput/CommandInput'
 import { EmptyState } from '../EmptyState/EmptyState'
@@ -39,8 +40,8 @@ function filterActions(actions: ActionPanelItem[], query: string) {
 
 export function ActionPanel({
   open,
-  title = '动作面板',
-  description = '当前启动器上下文中的快捷动作。',
+  title,
+  description,
   actions,
   query,
   onQueryChange,
@@ -49,6 +50,9 @@ export function ActionPanel({
   className,
   ...props
 }: ActionPanelProps) {
+  const tr = useT()
+  const resolvedTitle = title ?? tr('动作面板', 'Actions')
+  const resolvedDescription = description ?? tr('当前启动器上下文中的快捷动作。', 'Quick actions for the current launcher context.')
   const [internalQuery, setInternalQuery] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(0)
   const panelRef = useRef<HTMLElement>(null)
@@ -124,15 +128,15 @@ export function ActionPanel({
         ref={panelRef}
         role="dialog"
         aria-modal="true"
-        aria-label={title}
+        aria-label={resolvedTitle}
         className={clsx('qb-action-panel', className)}
         onClick={(event) => event.stopPropagation()}
         {...props}
       >
         <header className="qb-action-panel__header">
           <div className="qb-action-panel__copy">
-            <div className="qb-action-panel__title">{title}</div>
-            <div className="qb-action-panel__description">{description}</div>
+            <div className="qb-action-panel__title">{resolvedTitle}</div>
+            <div className="qb-action-panel__description">{resolvedDescription}</div>
           </div>
           <div className="qb-action-panel__hint">
             <KeyboardShortcut keys="Esc" />
@@ -148,7 +152,7 @@ export function ActionPanel({
               setInternalQuery(value)
             }
           }}
-          placeholder="搜索动作"
+          placeholder={tr('搜索动作', 'Search actions')}
           className="qb-action-panel__input"
         />
 
@@ -161,8 +165,8 @@ export function ActionPanel({
             emptyState ?? (
               <EmptyState
                 icon={<Icon icon={Search} size={18} tone="muted" />}
-                title="没有找到动作"
-                description="换一个更宽泛的关键词，或关闭面板。"
+                title={tr('没有找到动作', 'No actions found')}
+                description={tr('换一个更宽泛的关键词，或关闭面板。', 'Try a broader keyword or close the panel.')}
               />
             )
           )}

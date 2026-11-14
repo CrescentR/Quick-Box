@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useT } from '../../i18n'
 import { Detail, Tag } from '../../ui'
 import type { TagProps } from '../../ui'
 
@@ -26,23 +27,24 @@ export function levelTone(level: string): TagTone {
 
 /** 所有内置工具共用的面板骨架：统一标题区、标签与说明。 */
 export function ToolShell({ title, description, level, badge, badgeTone, notes, children }: ToolShellProps) {
+  const tr = useT()
   const label = level ?? badge
   const tone = badgeTone ?? (level ? levelTone(level) : 'default')
   return (
     <section className="qb-tool-view">
       <header className="qb-tool-view__header">
         <div className="qb-tool-view__header-copy">
-          <div className="qb-tool-view__eyebrow">官方工具</div>
+          <div className="qb-tool-view__eyebrow">{tr('官方工具', 'Official Tool')}</div>
           <div className="qb-tool-view__title">{title}</div>
           <div className="qb-tool-view__description">{description}</div>
         </div>
         <div className="qb-tool-view__header-meta">
-          <Tag tone="primary">内置</Tag>
+          <Tag tone="primary">{tr('内置', 'Built-in')}</Tag>
           {label ? <Tag tone={tone}>{label}</Tag> : null}
         </div>
       </header>
       {children}
-      {notes ? <Detail title="说明" markdown={notes} /> : null}
+      {notes ? <Detail title={tr('说明', 'Notes')} markdown={notes} /> : null}
     </section>
   )
 }

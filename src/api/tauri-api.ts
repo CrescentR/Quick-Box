@@ -1,4 +1,5 @@
 import { invoke } from '@tauri-apps/api/core'
+import { lt } from '../i18n'
 
 export interface CommandError {
   code: string
@@ -14,6 +15,7 @@ const previewClipboardHistoryKey = 'quickbox.preview.clipboardHistory'
 const previewDefaultConfig = {
   hotkey: 'Alt+Space',
   theme: 'dark',
+  language: 'system',
   enableTray: true,
   alwaysOnTop: false,
 }
@@ -77,9 +79,9 @@ async function invokePreviewCommand<TResponse>(
     case 'export_backup_file':
     case 'delete_backup_file':
     case 'open_backup_directory':
-      throw new Error('请选择 QuickBox 桌面应用中的此功能，浏览器预览无法打开系统文件夹或管理磁盘备份。')
+      throw new Error(lt('请选择 QuickBox 桌面应用中的此功能，浏览器预览无法打开系统文件夹或管理磁盘备份。', 'This feature requires the QuickBox desktop app. Browser preview cannot open system folders or manage disk backups.'))
     case 'set_storage_location':
-      throw new Error('设置磁盘存储位置需要 QuickBox 桌面应用。')
+      throw new Error(lt('设置磁盘存储位置需要 QuickBox 桌面应用。', 'Configuring disk storage requires the QuickBox desktop app.'))
     case 'load_workspace':
       return readLocalStorageJson('quickbox.preview.workspace', null) as TResponse
     case 'save_workspace':
@@ -186,7 +188,7 @@ async function invokePreviewCommand<TResponse>(
     case 'search_file_contents':
     case 'cancel_file_search':
     case 'file_search_progress':
-      throw new Error('此操作需要 QuickBox 桌面应用，浏览器预览无法访问本地文件系统。')
+      throw new Error(lt('此操作需要 QuickBox 桌面应用，浏览器预览无法访问本地文件系统。', 'This action requires the QuickBox desktop app. Browser preview cannot access local files.'))
     case 'pick_screen_color':
       return {
         x: 0,

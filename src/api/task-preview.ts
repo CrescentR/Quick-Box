@@ -1,3 +1,4 @@
+import { lt } from '../i18n'
 import { isValidDate, isValidTime, localDate, nextRecurringDate } from '../core/tasks/natural-date'
 import { exportTaskContent, validateImportTask, type ImportFormat } from '../core/tasks/task-transfer'
 import type { ImportResult, QueryInput, Tag, Task, TaskInput, TaskList, TaskReminder } from '../core/tasks/task-types'
@@ -17,7 +18,12 @@ const isStamp = (value: unknown) => typeof value === 'string' && Number.isFinite
 const byteLength = (value: string) => new Blob([value]).size
 const validId = (value: unknown): value is string => typeof value === 'string' && /^[a-zA-Z0-9_-]{1,80}$/.test(value)
 
-function damaged(): never { throw new Error('任务预览数据已损坏，原始数据已保留；请先备份浏览器中的 quickbox.preview.tasks 数据。') }
+function damaged(): never {
+  throw new Error(lt(
+    '任务预览数据已损坏，原始数据已保留；请先备份浏览器中的 quickbox.preview.tasks 数据。',
+    'Task preview data is corrupted; original data was preserved. Back up quickbox.preview.tasks in browser storage first.',
+  ))
+}
 
 function readData(): TaskData {
   const raw = window.localStorage.getItem(DATA_KEY)
@@ -78,31 +84,31 @@ function exposed(task: StoredTask): Task {
 }
 
 function findTask(data: TaskData, id: unknown, allowDeleted = false): StoredTask {
-  if (!validId(id)) throw new Error('任务 ID 无效')
+  if (!validId(id)) throw new Error(lt('任务 ID 无效', 'Invalid task ID'))
   const task = data.tasks.find(item => item.id === id)
-  if (!task || (!allowDeleted && task.deleted_at)) throw new Error('任务不存在或已删除')
+  if (!task || (!allowDeleted && task.deleted_at)) throw new Error(lt('任务不存在或已删除', 'Task not found or already deleted'))
   return task
 }
 
 function requireName(value: unknown, label: string): string {
-  if (!isNonempty(value)) throw new Error(`${label}不能为空`)
+  if (!isNonempty(value)) throw new Error(lt(`${label}不能为空`, `${label} cannot be empty`))
   const name = value.trim()
-  if (byteLength(value) > 240 || value.includes('\0')) throw new Error(`${label}不能超过 240 字节且不能包含空字符`)
+  if (byteLength(value) > 240 || value.includes('\0')) throw new Error(lt(`${label}不能超过 240 字节且不能包含空字符`, `${label} cannot exceed 240 bytes or contain null bytes`))
   return name
 }
 
 function getOrCreateList(data: TaskData, rawName: string | null | undefined): TaskList | null {
   const name = rawName?.trim()
-  if (!name || name === '收集箱') return null
+  if (!name || name === '收集箱' || name.toLowerCase() === 'inbox') return null
   const existing = data.lists.find(list => list.name === name)
   if (existing) return existing
-  const list = { id: newId(), name: requireName(name, '列表名称'), icon: 'list', sort_order: data.lists.reduce((max, item) => Math.max(max, item.sort_order), -1) + 1 }
+  const list = { id: newId(), name: requireName(name, lt('列表名称', 'List name')), icon: 'list', sort_order: data.lists.reduce((max, item) => Math.max(max, item.sort_order), -1) + 1 }
   data.lists.push(list)
   return list
 }
 
 function getOrCreateTag(data: TaskData, rawName: unknown): Tag {
-  const name = requireName(rawName, '标签名称')
+  const name = requireName(rawName, lt('标签名称', 'Tag name'))
   const existing = data.tags.find(tag => tag.name === name)
   if (existing) return existing
   const tag = { id: newId(), name }
@@ -111,32 +117,32 @@ function getOrCreateTag(data: TaskData, rawName: unknown): Tag {
 }
 
 function buildTask(data: TaskData, input: TaskInput, previous?: StoredTask): StoredTask {
-  if (!isRecord(input)) throw new Error('任务数据无效')
+  if (!isRecord(input)) throw new Error(lt('任务数据无效', 'Invalid task payload'))
   const normalized = validateImportTask(input)
-  if (!normalized.title) throw new Error('任务标题不能为空')
-  if (byteLength(input.title) > 2000 || input.title.includes('\0')) throw new Error('任务标题不能超过 2000 字节且不能包含空字符')
-  if (byteLength(normalized.description ?? '') > 200_000) throw new Error('任务说明不能超过 200 KB')
-  if (!previous && data.tasks.length >= 100_000) throw new Error('最多保存 100000 条任务')
-  if (input.list_id != null && typeof input.list_id !== 'string') throw new Error('任务列表无效')
+  if (!normalized.title) throw new Error(lt('任务标题不能为空', 'Task title cannot be empty'))
+  if (byteLength(input.title) > 2000 || input.title.includes('\0')) throw new Error(lt('任务标题不能超过 2000 字节且不能包含空字符', 'Task title cannot exceed 2000 bytes or contain null bytes'))
+  if (byteLength(normalized.description ?? '') > 200_000) throw new Error(lt('任务说明不能超过 200 KB', 'Task description cannot exceed 200 KB'))
+  if (!previous && data.tasks.length >= 100_000) throw new Error(lt('最多保存 100000 条任务', 'Maximum of 100,000 tasks reached'))
+  if (input.list_id != null && typeof input.list_id !== 'string') throw new Error(lt('任务列表无效', 'Invalid task list'))
   const list = input.list_id ? data.lists.find(item => item.id === input.list_id) : null
-  if (input.list_id && !list) throw new Error('所选列表不存在')
+  if (input.list_id && !list) throw new Error(lt('所选列表不存在', 'Selected list does not exist'))
   const tagIds = input.tag_ids ?? []
-  if (!Array.isArray(tagIds) || tagIds.length > 100 || new Set(tagIds).size !== tagIds.length || tagIds.some(id => !validId(id) || !data.tags.some(tag => tag.id === id))) throw new Error('标签无效、重复或超过 100 个')
-  if (input.subtasks != null && !Array.isArray(input.subtasks)) throw new Error('子任务格式无效')
-  if ((input.subtasks?.length ?? 0) > 200) throw new Error('每个任务最多 200 个子任务')
+  if (!Array.isArray(tagIds) || tagIds.length > 100 || new Set(tagIds).size !== tagIds.length || tagIds.some(id => !validId(id) || !data.tags.some(tag => tag.id === id))) throw new Error(lt('标签无效、重复或超过 100 个', 'Invalid, duplicate, or more than 100 tags'))
+  if (input.subtasks != null && !Array.isArray(input.subtasks)) throw new Error(lt('子任务格式无效', 'Invalid subtasks format'))
+  if ((input.subtasks?.length ?? 0) > 200) throw new Error(lt('每个任务最多 200 个子任务', 'A task can have at most 200 subtasks'))
   const id = previous?.id ?? newId(), seen = new Set<string>()
   const subtasks = (input.subtasks ?? []).map((sub, sort_order) => {
     const subId = sub.id || newId()
-    if (!sub.title.trim() || byteLength(sub.title) > 2000 || sub.title.includes('\0')) throw new Error('子任务标题不能为空且不能超过 2000 字节')
-    if (!validId(subId) || seen.has(subId) || data.tasks.some(task => task.id !== id && task.subtasks.some(item => item.id === subId))) throw new Error('子任务 ID 无效或重复')
+    if (!sub.title.trim() || byteLength(sub.title) > 2000 || sub.title.includes('\0')) throw new Error(lt('子任务标题不能为空且不能超过 2000 字节', 'Subtask title cannot be empty or exceed 2000 bytes'))
+    if (!validId(subId) || seen.has(subId) || data.tasks.some(task => task.id !== id && task.subtasks.some(item => item.id === subId))) throw new Error(lt('子任务 ID 无效或重复', 'Invalid or duplicate subtask ID'))
     seen.add(subId)
     return { id: subId, task_id: id, title: sub.title.trim(), completed: sub.completed ?? false, sort_order }
   })
   const due_date = normalized.due_date ?? null, due_time = normalized.due_time ?? null
   const reminder_minutes = normalized.reminder_minutes ?? null
-  if (due_time && !due_date) throw new Error('截止时间需要有效日期')
-  if (reminder_minutes !== null && (!due_date || !due_time)) throw new Error('设置提醒时需要截止日期和时间')
-  if (normalized.recurrence && !due_date) throw new Error('设置重复时需要截止日期')
+  if (due_time && !due_date) throw new Error(lt('截止时间需要有效日期', 'Due time requires a valid due date'))
+  if (reminder_minutes !== null && (!due_date || !due_time)) throw new Error(lt('设置提醒时需要截止日期和时间', 'Reminders require both a due date and due time'))
+  if (normalized.recurrence && !due_date) throw new Error(lt('设置重复时需要截止日期', 'Recurrence requires a due date'))
   const changedSchedule = previous && (previous.due_date !== due_date || previous.due_time !== due_time || previous.reminder_minutes !== reminder_minutes)
   return {
     id, title: normalized.title, description: normalized.description ?? '', status: previous?.status ?? 'pending',
@@ -180,8 +186,8 @@ function remindersEnabled(): boolean {
   const states = window.localStorage.getItem('quickbox.preview.pluginStates')
   if (!states) return true
   let plugins: unknown
-  try { plugins = JSON.parse(states) } catch { throw new Error('插件状态数据已损坏，暂停任务预览提醒') }
-  if (!Array.isArray(plugins)) throw new Error('插件状态数据无效，暂停任务预览提醒')
+  try { plugins = JSON.parse(states) } catch { throw new Error(lt('插件状态数据已损坏，暂停任务预览提醒', 'Plugin state data is corrupted; task preview reminders paused')) }
+  if (!Array.isArray(plugins)) throw new Error(lt('插件状态数据无效，暂停任务预览提醒', 'Plugin state data is invalid; task preview reminders paused'))
   return !plugins.some(plugin => isRecord(plugin) && plugin.id === 'official.task-tool' && plugin.enabled === false)
 }
 
@@ -208,29 +214,29 @@ function isDue(task: StoredTask, now: number): boolean {
 
 export async function taskPreview(command: string, args: Record<string, unknown> = {}): Promise<unknown> {
   if (command === 'task_get_setting' || command === 'task_set_setting') {
-    if (typeof args.key !== 'string' || !/^[a-zA-Z0-9_.-]{1,80}$/.test(args.key)) throw new Error('任务设置键无效')
+    if (typeof args.key !== 'string' || !/^[a-zA-Z0-9_.-]{1,80}$/.test(args.key)) throw new Error(lt('任务设置键无效', 'Invalid task setting key'))
     const key = args.key
     if (command === 'task_get_setting') return window.localStorage.getItem(`${SETTINGS_PREFIX}${key}`)
-    if (typeof args.value !== 'string') throw new Error('设置值必须是文本')
-    if (byteLength(args.value) > 1_000_000) throw new Error('任务设置值不能超过 1 MB')
+    if (typeof args.value !== 'string') throw new Error(lt('设置值必须是文本', 'Setting value must be text'))
+    if (byteLength(args.value) > 1_000_000) throw new Error(lt('任务设置值不能超过 1 MB', 'Task setting value cannot exceed 1 MB'))
     window.localStorage.setItem(`${SETTINGS_PREFIX}${key}`, args.value)
     return
   }
   const data = readData()
   switch (command) {
     case 'task_get': {
-      if (!validId(args.id)) throw new Error('任务 ID 无效')
+      if (!validId(args.id)) throw new Error(lt('任务 ID 无效', 'Invalid task ID'))
       const task = data.tasks.find(item => item.id === args.id)
       return task ? exposed(task) : null
     }
     case 'task_query': {
       const input = args.input as QueryInput
-      if (!isRecord(input) || typeof input.view !== 'string') throw new Error('任务查询无效')
+      if (!isRecord(input) || typeof input.view !== 'string') throw new Error(lt('任务查询无效', 'Invalid task query'))
       if (!['today', 'inbox', 'upcoming', 'all', 'completed', 'trash', 'search'].includes(input.view) &&
-        !(input.view.startsWith('list:') && validId(input.view.slice(5))) && !(input.view.startsWith('tag:') && validId(input.view.slice(4)))) throw new Error('任务视图无效')
+        !(input.view.startsWith('list:') && validId(input.view.slice(5))) && !(input.view.startsWith('tag:') && validId(input.view.slice(4)))) throw new Error(lt('任务视图无效', 'Invalid task view'))
       if ((input.search !== undefined && typeof input.search !== 'string') || byteLength(input.search ?? '') > 2000 ||
         (input.offset !== undefined && (!isInteger(input.offset) || input.offset < 0 || input.offset > 100_000)) ||
-        (input.limit !== undefined && !isInteger(input.limit))) throw new Error('搜索或分页参数无效')
+        (input.limit !== undefined && !isInteger(input.limit))) throw new Error(lt('搜索或分页参数无效', 'Invalid search or pagination parameters'))
       const search = typeof input.search === 'string' ? input.search.trim().toLowerCase() : ''
       const offset = isInteger(input.offset) ? Math.max(0, input.offset) : 0
       const limit = isInteger(input.limit) ? Math.max(1, Math.min(200, input.limit)) : 50
@@ -253,8 +259,8 @@ export async function taskPreview(command: string, args: Record<string, unknown>
       const scheduleKey = `${task.due_date}|${task.recurrence}`
       if (completing && task.due_date && task.recurrence && !task.generated_schedules.includes(scheduleKey)) {
         const nextDate = nextRecurringDate(task.due_date, task.recurrence)
-        if (!nextDate) throw new Error('无法生成下一次重复日期，请调整截止日期')
-        if (data.tasks.length >= 100_000) throw new Error('最多保存 100000 条任务')
+        if (!nextDate) throw new Error(lt('无法生成下一次重复日期，请调整截止日期', 'Unable to calculate next recurring date; please adjust due date'))
+        if (data.tasks.length >= 100_000) throw new Error(lt('最多保存 100000 条任务', 'Maximum of 100,000 tasks reached'))
         const id = newId(), time = stamp()
         const next: StoredTask = {
           ...structuredClone(task), id, status: 'pending', due_date: nextDate, completed_at: null,
@@ -270,35 +276,35 @@ export async function taskPreview(command: string, args: Record<string, unknown>
     case 'task_restore': { const task = findTask(data, args.id, true); task.deleted_at = null; task.updated_at = stamp(); saveData(data); return }
     case 'task_purge': {
       const task = findTask(data, args.id, true)
-      if (!task.deleted_at) throw new Error('请先将任务移入回收站')
+      if (!task.deleted_at) throw new Error(lt('请先将任务移入回收站', 'Move the task to trash before purging'))
       data.tasks = data.tasks.filter(item => item.id !== task.id); saveData(data); return
     }
     case 'task_reorder': {
       const ids = args.orderedIds
       if (!Array.isArray(ids) || !ids.length || ids.length > 10_000 || ids.some(id => !validId(id)) || new Set(ids).size !== ids.length || !ids.includes(args.draggedId) ||
-        !isInteger(args.priority) || args.priority < 1 || args.priority > 4) throw new Error('任务排序数据无效')
+        !isInteger(args.priority) || args.priority < 1 || args.priority > 4) throw new Error(lt('任务排序数据无效', 'Invalid task reorder payload'))
       const tasks = ids.map(id => findTask(data, id))
-      if (tasks.some(task => task.status !== 'pending')) throw new Error('只能排序未完成任务')
+      if (tasks.some(task => task.status !== 'pending')) throw new Error(lt('只能排序未完成任务', 'Only pending tasks can be reordered'))
       tasks.forEach((task, index) => { task.sort_order = index; task.updated_at = stamp(); if (task.id === args.draggedId) task.priority = args.priority as Task['priority'] })
       saveData(data); return
     }
     case 'task_lists': return [...data.lists].sort((a, b) => a.sort_order - b.sort_order || a.name.localeCompare(b.name))
     case 'task_create_list': {
-      const name = requireName(args.name, '列表名称')
-      if (data.lists.some(list => list.name === name)) throw new Error('列表名称已存在')
+      const name = requireName(args.name, lt('列表名称', 'List name'))
+      if (data.lists.some(list => list.name === name)) throw new Error(lt('列表名称已存在', 'List name already exists'))
       const list = getOrCreateList(data, name)
-      if (!list) throw new Error('收集箱为内置列表，请使用其他名称')
+      if (!list) throw new Error(lt('收集箱为内置列表，请使用其他名称', 'Inbox is a built-in list; please choose another name'))
       saveData(data); return list
     }
     case 'task_delete_list': {
-      if (!data.lists.some(list => list.id === args.id)) throw new Error('列表不存在')
+      if (!data.lists.some(list => list.id === args.id)) throw new Error(lt('列表不存在', 'List not found'))
       data.tasks.forEach(task => { if (task.list_id === args.id) { task.list_id = null; task.list_name = null; task.updated_at = stamp() } })
       data.lists = data.lists.filter(list => list.id !== args.id); saveData(data); return
     }
     case 'task_tags': return [...data.tags].sort((a, b) => a.name.localeCompare(b.name))
     case 'task_create_tag': { const tag = getOrCreateTag(data, args.name); saveData(data); return tag }
     case 'task_delete_tag': {
-      if (!data.tags.some(tag => tag.id === args.id)) throw new Error('标签不存在')
+      if (!data.tags.some(tag => tag.id === args.id)) throw new Error(lt('标签不存在', 'Tag not found'))
       data.tags = data.tags.filter(tag => tag.id !== args.id)
       data.tasks.forEach(task => { task.tags = task.tags.filter(tag => tag.id !== args.id) })
       saveData(data); return
@@ -312,15 +318,15 @@ export async function taskPreview(command: string, args: Record<string, unknown>
       }
     }
     case 'task_import': {
-      if (!Array.isArray(args.items)) throw new Error('导入数据必须是任务数组')
-      if (args.items.length > 10_000) throw new Error('单次最多导入 10000 条任务')
+      if (!Array.isArray(args.items)) throw new Error(lt('导入数据必须是任务数组', 'Import payload must be an array of tasks'))
+      if (args.items.length > 10_000) throw new Error(lt('单次最多导入 10000 条任务', 'Cannot import more than 10,000 tasks at once'))
       const result: ImportResult = { imported: 0, skipped: 0, errors: [] }
       for (const [index, item] of args.items.entries()) {
         // Use a per-item copy so a rejected row cannot leave new lists or tags behind.
         const candidate = structuredClone(data)
         try {
           const normalized = validateImportTask(item)
-          if (!normalized.title) throw new Error('任务标题不能为空')
+          if (!normalized.title) throw new Error(lt('任务标题不能为空', 'Task title cannot be empty'))
           const list = getOrCreateList(candidate, normalized.list_name)
           const tags = (normalized.tag_names ?? []).map(name => getOrCreateTag(candidate, name))
           const task = buildTask(candidate, {
@@ -330,7 +336,13 @@ export async function taskPreview(command: string, args: Record<string, unknown>
           task.status = normalized.status ?? 'pending'; task.completed_at = task.status === 'completed' ? stamp() : null
           candidate.tasks.push(task)
           data.tasks = candidate.tasks; data.lists = candidate.lists; data.tags = candidate.tags; result.imported++
-        } catch (error) { result.skipped++; if (result.errors.length < 8) result.errors.push(`第 ${index + 1} 项：${errorText(error)}`) }
+        } catch (error) {
+          result.skipped++
+          if (result.errors.length < 8) {
+            const msg = errorText(error)
+            result.errors.push(lt(`第 ${index + 1} 项：${msg}`, `Item ${index + 1}: ${msg}`))
+          }
+        }
       }
       saveData(data); return result
     }
@@ -343,13 +355,13 @@ export async function taskPreview(command: string, args: Record<string, unknown>
         .slice(0, 100).map(task => ({ id: task.id, title: task.title, due_date: task.due_date!, due_time: task.due_time! } satisfies TaskReminder))
     }
     case 'task_acknowledge_reminders': {
-      if (!Array.isArray(args.ids) || args.ids.length > 1000 || args.ids.some(id => !validId(id))) throw new Error('提醒 ID 无效，单次最多确认 1000 条')
+      if (!Array.isArray(args.ids) || args.ids.length > 1000 || args.ids.some(id => !validId(id))) throw new Error(lt('提醒 ID 无效，单次最多确认 1000 条', 'Invalid reminder IDs; max 1000 per call'))
       if (!remindersEnabled()) return
       const ids = new Set(args.ids)
       const now = currentCivilTime()
       data.tasks.forEach(task => { if (ids.has(task.id) && isDue(task, now)) task.notified_at = stamp() })
       saveData(data); return
     }
-    default: throw new Error(`未知任务命令：${command}`)
+    default: throw new Error(lt(`未知任务命令：${command}`, `Unknown task command: ${command}`))
   }
 }

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useClipboardToast } from '../../hooks/useClipboardToast'
+import { useT } from '../../i18n'
 import { CodeBlock, Detail } from '../../ui'
 import { propertiesToYaml, yamlToProperties } from './yaml-properties-utils'
 import { ToolShell } from '../../core/tool/ToolShell'
@@ -29,6 +30,7 @@ app.features[0]=search
 app.features[1]=clipboard`
 
 export default function YamlPropertiesToolView() {
+  const tr = useT()
   const [direction, setDirection] = useState<ConvertDirection>('yaml-to-properties')
   const [input, setInput] = useState(sampleYaml)
   const { copyText, clipboardToast } = useClipboardToast()
@@ -37,9 +39,9 @@ export default function YamlPropertiesToolView() {
     try {
       return direction === 'yaml-to-properties' ? yamlToProperties(input) : propertiesToYaml(input)
     } catch (error) {
-      return error instanceof Error ? error.message : '转换失败'
+      return error instanceof Error ? error.message : tr('转换失败', 'Conversion failed')
     }
-  }, [direction, input])
+  }, [direction, input, tr])
 
   const switchDirection = (next: ConvertDirection) => {
     setDirection(next)
@@ -47,8 +49,14 @@ export default function YamlPropertiesToolView() {
   }
 
   return (
-    <ToolShell title="YAML / Properties 互转" description="把嵌套 YAML 转成 Spring 风格的点分 properties，也可以把 properties 还原成缩进 YAML。" badge={direction === 'yaml-to-properties' ? 'YAML → Properties' : 'Properties → YAML'}>
-
+    <ToolShell
+      title={tr('YAML / Properties 互转', 'YAML / Properties Converter')}
+      description={tr(
+        '把嵌套 YAML 转成 Spring 风格的点分 properties，也可以把 properties 还原成缩进 YAML。',
+        'Convert nested YAML into Spring-style dot-separated properties or restore properties back into indented YAML.',
+      )}
+      badge={direction === 'yaml-to-properties' ? 'YAML → Properties' : 'Properties → YAML'}
+    >
       <div className="qb-tool-actions">
         <button
           className={`qb-tool-button${direction === 'yaml-to-properties' ? ' qb-tool-button--primary' : ''}`}
@@ -65,7 +73,7 @@ export default function YamlPropertiesToolView() {
           Properties → YAML
         </button>
         <button className="qb-tool-button" type="button" onClick={() => void copyText(output, 'Converted config')}>
-          复制结果
+          {tr('复制结果', 'Copy result')}
         </button>
       </div>
 
@@ -83,7 +91,7 @@ export default function YamlPropertiesToolView() {
         <div className="qb-tool-field">
           <span className="qb-tool-label">{direction === 'yaml-to-properties' ? 'Properties' : 'YAML'}</span>
           <CodeBlock
-            code={output || '// 转换结果为空'}
+            code={output || tr('// 转换结果为空', '// Empty conversion output')}
             language={direction === 'yaml-to-properties' ? 'properties' : 'yaml'}
             wrap
             copyable
@@ -92,12 +100,15 @@ export default function YamlPropertiesToolView() {
       </div>
 
       <Detail
-        title="使用说明"
-        markdown="- 面向 Spring Boot 常见的 application.yml / application.properties。\n- 嵌套对象会展开成 `server.port` 这类点分键。\n- YAML 列表会转成 `app.features[0]` 索引写法。\n- 支持注释、布尔值、数字和普通标量；不覆盖 YAML 锚点、多文档和复杂 flow 语法。"
+        title={tr('使用说明', 'Guide')}
+        markdown={tr(
+          '- 面向 Spring Boot 常见的 application.yml / application.properties。\n- 嵌套对象会展开成 `server.port` 这类点分键。\n- YAML 列表会转成 `app.features[0]` 索引写法。\n- 支持注释、布尔值、数字和普通标量；不覆盖 YAML 锚点、多文档和复杂 flow 语法。',
+          '- Built for Spring Boot application.yml and application.properties files.\n- Nested objects flatten into dotted keys like `server.port`.\n- YAML lists convert to indexed keys like `app.features[0]`.\n- Supports comments, booleans, numbers, and scalars (excludes anchors, multi-docs, and complex flow syntax).',
+        )}
         metadata={[
-          { label: '方向', value: '双向' },
-          { label: '列表', value: '索引键 [0] / [1]' },
-          { label: '场景', value: 'Spring 配置互转' },
+          { label: tr('方向', 'Direction'), value: tr('双向', 'Bidirectional') },
+          { label: tr('列表', 'Lists'), value: tr('索引键 [0] / [1]', 'Indexed keys [0] / [1]') },
+          { label: tr('场景', 'Use case'), value: tr('Spring 配置互转', 'Spring config conversion') },
         ]}
       />
       {clipboardToast}

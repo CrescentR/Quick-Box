@@ -2,6 +2,7 @@ use crate::config::QuickBoxConfig;
 use crate::errors::CommandError;
 use crate::shortcuts;
 use crate::storage::config_store;
+use crate::tray;
 use tauri::Manager;
 
 #[tauri::command]
@@ -36,6 +37,10 @@ pub fn save_config(app: tauri::AppHandle, config: QuickBoxConfig) -> Result<(), 
         }
 
         return Err(error);
+    }
+
+    if previous_config.language != config.language {
+        let _ = tray::refresh_menu(&app, &config.language);
     }
 
     Ok(())

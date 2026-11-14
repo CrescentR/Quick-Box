@@ -2,9 +2,11 @@ import { useState } from 'react'
 import { commandRegistry } from '../command/command-registry'
 import { useLauncherStore } from '../../stores/launcher-store'
 import { usePluginStore } from '../../stores/plugin-store'
+import { useT } from '../../i18n'
 import { TOOL_ACTIONS, useToolContext, type ToolDataType } from './tool-context'
 
 export function ToolResultActions({ text, type }: { text: string; type: ToolDataType }) {
+  const tr = useT()
   const { input, viewId } = useToolContext()
   const enabled = usePluginStore((state) => state.enabledPluginIds)
   const [error, setError] = useState('')
@@ -13,7 +15,7 @@ export function ToolResultActions({ text, type }: { text: string; type: ToolData
     const command = commandRegistry.get(id)
     if (!command) return
     try {
-      if (text.length > 1_000_000) throw new Error('结果超过 1 MB，请缩小数据后再传递。')
+      if (text.length > 1_000_000) throw new Error(tr('结果超过 1 MB，请缩小数据后再传递。', 'Output exceeds 1 MB. Trim the data before sending.'))
       await command.run({
         closeView: useLauncherStore.getState().closeView,
         openView: async (target, params) => useLauncherStore.getState().openView(target, {
@@ -21,12 +23,12 @@ export function ToolResultActions({ text, type }: { text: string; type: ToolData
           toolInput: { text, type, source: viewId, sensitive: input?.sensitive },
         }),
       })
-    } catch (cause) { setError(cause instanceof Error ? cause.message : '发送失败') }
+    } catch (cause) { setError(cause instanceof Error ? cause.message : tr('发送失败', 'Transfer failed')) }
   }
   return <div className="qb-tool-actions">
-    <label>发送到工具 <select aria-label="发送到工具" className="qb-tool-input" value="" onChange={(event) => void transfer(event.target.value)}>
-      <option value="">选择下一步…</option>
-      {actions.map((action) => <option key={action.commandId} value={action.commandId}>{action.title}</option>)}
+    <label>{tr('发送到工具', 'Send to tool')} <select aria-label={tr('发送到工具', 'Send to tool')} className="qb-tool-input" value="" onChange={(event) => void transfer(event.target.value)}>
+      <option value="">{tr('选择下一步…', 'Choose next step…')}</option>
+      {actions.map((action) => <option key={action.commandId} value={action.commandId}>{tr(action.title, action.enTitle)}</option>)}
     </select></label>
     {error && <span role="alert">{error}</span>}
   </div>

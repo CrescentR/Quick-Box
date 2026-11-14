@@ -1,6 +1,7 @@
 import { ToolShell } from '../../core/tool/ToolShell'
 import { useToolContext } from '../../core/tool/tool-context'
 import { useMemo, useState } from 'react'
+import { useT } from '../../i18n'
 import { CodeBlock } from '../../ui'
 
 function buildQuery(baseUrl: string, rawParams: string) {
@@ -22,21 +23,26 @@ function buildQuery(baseUrl: string, rawParams: string) {
 }
 
 export default function QueryBuilderToolView() {
+  const tr = useT()
   const { input: incoming } = useToolContext()
   const initialUrl = (() => { try { return incoming ? new URL(incoming.text) : null } catch { return null } })()
   const [baseUrl, setBaseUrl] = useState(initialUrl ? `${initialUrl.origin}${initialUrl.pathname}${initialUrl.hash}` : 'https://api.quickbox.local/search')
-  const [params, setParams] = useState(initialUrl ? Array.from(initialUrl.searchParams).map(([key, value]) => `${key}=${value}`).join('\n') : 'q=桌面工具\nsort=recent\npage=1')
+  const [params, setParams] = useState(initialUrl ? Array.from(initialUrl.searchParams).map(([key, value]) => `${key}=${value}`).join('\n') : 'q=desktop tools\nsort=recent\npage=1')
   const output = useMemo(() => buildQuery(baseUrl, params), [baseUrl, params])
 
   return (
-    <ToolShell title="Query 参数构建器" level="L1" description="把简单的键值行转换为已编码的 URL query 字符串。">
+    <ToolShell
+      title={tr('Query 参数构建器', 'URL Query Builder')}
+      level="L1"
+      description={tr('把简单的键值行转换为已编码的 URL query 字符串。', 'Convert simple key=value lines into a properly encoded URL query string.')}
+    >
       <div className="qb-tool-grid">
         <label className="qb-tool-field qb-tool-field--full">
-          <span className="qb-tool-label">基础 URL</span>
+          <span className="qb-tool-label">{tr('基础 URL', 'Base URL')}</span>
           <input className="qb-tool-input qb-mono" value={baseUrl} onChange={(event) => setBaseUrl(event.target.value)} />
         </label>
         <label className="qb-tool-field qb-tool-field--full">
-          <span className="qb-tool-label">参数</span>
+          <span className="qb-tool-label">{tr('参数', 'Parameters')}</span>
           <textarea className="qb-tool-textarea qb-mono" value={params} onChange={(event) => setParams(event.target.value)} />
         </label>
         <div className="qb-tool-field qb-tool-field--full">

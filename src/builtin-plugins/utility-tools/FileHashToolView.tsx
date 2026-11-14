@@ -1,5 +1,6 @@
 import { ToolShell } from '../../core/tool/ToolShell'
 import { useState } from 'react'
+import { lt, useT } from '../../i18n'
 import { CodeBlock } from '../../ui'
 
 type FileHashAlgorithm = 'MD5' | 'SHA-1' | 'SHA-256' | 'SHA-512'
@@ -81,7 +82,7 @@ function arrayBufferToHex(buffer: ArrayBuffer) {
 }
 
 async function hashFile(file: File, algorithm: FileHashAlgorithm) {
-  if (file.size > 32 * 1024 * 1024) throw new Error('当前浏览器哈希工具限制为 32 MB，请选择更小文件。')
+  if (file.size > 32 * 1024 * 1024) throw new Error(lt('当前浏览器哈希工具限制为 32 MB，请选择更小文件。', 'Browser file hashing is limited to 32 MB. Please choose a smaller file.'))
   const buffer = await file.arrayBuffer()
   if (algorithm === 'MD5') return md5ArrayBuffer(buffer)
   const digest = await crypto.subtle.digest(algorithm, buffer)
@@ -100,14 +101,15 @@ function formatBytes(bytes: number) {
 }
 
 export default function FileHashToolView() {
+  const tr = useT()
   const [algorithm, setAlgorithm] = useState<FileHashAlgorithm>('SHA-256')
   const [expectedHash, setExpectedHash] = useState('')
-  const [result, setResult] = useState('// 选择文件后点击计算')
+  const [result, setResult] = useState('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
   const calculateHash = async () => {
     if (!selectedFile) {
-      setResult('请先选择文件')
+      setResult(lt('请先选择文件', 'Please select a file first'))
       return
     }
 
@@ -134,24 +136,27 @@ export default function FileHashToolView() {
         ),
       )
     } catch (error) {
-      setResult(error instanceof Error ? error.message : '文件哈希计算失败')
+      setResult(error instanceof Error ? error.message : lt('文件哈希计算失败', 'Failed to compute file hash'))
     }
   }
 
   return (
     <ToolShell
-      title="文件哈希校验器"
+      title={tr('文件哈希校验器', 'File Hash Checksum')}
       level="L1"
-      description="对本地文件计算 MD5、SHA1、SHA256 或 SHA512，并可与期望值比对。"
-      notes="- 文件只在本地浏览器上下文读取，不会上传。\n- 当前版本一次读取整个文件，超大文件后续可升级为分块计算。"
+      description={tr('对本地文件计算 MD5、SHA1、SHA256 或 SHA512，并可与期望值比对。', 'Calculate MD5, SHA-1, SHA-256, or SHA-512 checksums for local files and verify against an expected hash.')}
+      notes={tr(
+        '- 文件只在本地浏览器上下文读取，不会上传。\n- 当前版本一次读取整个文件，超大文件后续可升级为分块计算。',
+        '- Files are read strictly in your local browser context and never uploaded.\n- Currently reads the whole file at once (32 MB cap).',
+      )}
     >
       <div className="qb-tool-grid">
         <label className="qb-tool-field">
-          <span className="qb-tool-label">文件</span>
+          <span className="qb-tool-label">{tr('文件', 'File')}</span>
           <input className="qb-tool-input" type="file" onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)} />
         </label>
         <label className="qb-tool-field">
-          <span className="qb-tool-label">算法</span>
+          <span className="qb-tool-label">{tr('算法', 'Algorithm')}</span>
           <select className="qb-tool-input" value={algorithm} onChange={(event) => setAlgorithm(event.target.value as FileHashAlgorithm)}>
             <option value="MD5">MD5</option>
             <option value="SHA-1">SHA1</option>
@@ -160,17 +165,17 @@ export default function FileHashToolView() {
           </select>
         </label>
         <label className="qb-tool-field qb-tool-field--full">
-          <span className="qb-tool-label">期望哈希，可留空</span>
+          <span className="qb-tool-label">{tr('期望哈希，可留空', 'Expected Hash (optional)')}</span>
           <input className="qb-tool-input qb-mono" value={expectedHash} onChange={(event) => setExpectedHash(event.target.value)} />
         </label>
         <div className="qb-tool-field qb-tool-field--full">
-          <span className="qb-tool-label">结果</span>
-          <CodeBlock code={result} language={result.trim().startsWith('{') ? 'json' : 'txt'} wrap copyable />
+          <span className="qb-tool-label">{tr('结果', 'Result')}</span>
+          <CodeBlock code={result || tr('// 选择文件后点击计算', '// Select a file and click Calculate')} language={result.trim().startsWith('{') ? 'json' : 'txt'} wrap copyable />
         </div>
       </div>
       <div className="qb-tool-actions">
         <button className="qb-tool-button qb-tool-button--primary" type="button" onClick={() => void calculateHash()} disabled={!selectedFile}>
-          计算哈希
+          {tr('计算哈希', 'Calculate Hash')}
         </button>
       </div>
     </ToolShell>

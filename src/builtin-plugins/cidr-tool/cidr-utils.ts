@@ -1,3 +1,5 @@
+import { lt } from '../../i18n'
+
 export type CidrInfo = {
   cidr: string
   ip: string
@@ -18,7 +20,7 @@ export type CidrInfo = {
 function ipToInt(ip: string) {
   const parts = ip.split('.').map((part) => Number(part))
   if (parts.length !== 4 || parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)) {
-    throw new Error('请输入合法的 IPv4 地址')
+    throw new Error(lt('请输入合法的 IPv4 地址', 'Enter a valid IPv4 address'))
   }
   return ((parts[0] << 24) | (parts[1] << 16) | (parts[2] << 8) | parts[3]) >>> 0
 }
@@ -40,7 +42,7 @@ function toBinaryOctets(value: number) {
 
 function maskToPrefix(mask: number) {
   const binary = mask.toString(2).padStart(32, '0')
-  if (!/^1*0*$/.test(binary)) throw new Error('子网掩码不是合法的连续 1 位')
+  if (!/^1*0*$/.test(binary)) throw new Error(lt('子网掩码不是合法的连续 1 位', 'Netmask must have contiguous leading 1 bits'))
   return binary.replace(/0/g, '').length
 }
 
@@ -49,7 +51,7 @@ export function parseCidrInput(input: string) {
   const cidrMatch = trimmed.match(/^(\d{1,3}(?:\.\d{1,3}){3})\s*\/\s*(\d{1,2})$/)
   if (cidrMatch) {
     const prefix = Number(cidrMatch[2])
-    if (prefix < 0 || prefix > 32) throw new Error('CIDR 前缀必须在 0 到 32 之间')
+    if (prefix < 0 || prefix > 32) throw new Error(lt('CIDR 前缀必须在 0 到 32 之间', 'CIDR prefix must be between 0 and 32'))
     return { ip: cidrMatch[1], prefix }
   }
 
@@ -58,7 +60,7 @@ export function parseCidrInput(input: string) {
     return { ip: maskMatch[1], prefix: maskToPrefix(ipToInt(maskMatch[2])) }
   }
 
-  throw new Error('请输入 192.168.1.0/24，或 IP 加子网掩码')
+  throw new Error(lt('请输入 192.168.1.0/24，或 IP 加子网掩码', 'Enter 192.168.1.0/24 or IP + netmask'))
 }
 
 export function analyzeCidr(input: string): CidrInfo {

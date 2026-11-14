@@ -1,3 +1,5 @@
+import { getCurrentLocale, lt, type ResolvedLocale } from '../../i18n'
+
 export interface ParsedTask { title: string; due_date: string | null; due_time: string | null }
 
 const pad = (value: number) => String(value).padStart(2, '0')
@@ -119,13 +121,17 @@ export function parseNaturalTask(raw: string, now = new Date()): ParsedTask {
   return { title: title.replace(/\s+/g, ' ').trim() || raw.trim(), due_date, due_time }
 }
 
-export function relativeDate(value: string | null, now = new Date()): string {
+const ENGLISH_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+export function relativeDate(value: string | null, now = new Date(), locale: ResolvedLocale = getCurrentLocale()): string {
   if (!value || !isValidDate(value)) return ''
   const target = dateAtNoon(value)
   const today = dateAtNoon(localDate(now))
   const days = Math.round((target.getTime() - today.getTime()) / 86_400_000)
-  if (days === 0) return '今天'
-  if (days === 1) return '明天'
-  if (days === -1) return '昨天'
-  return `${target.getUTCMonth() + 1}月${target.getUTCDate()}日`
+  if (days === 0) return lt('今天', 'Today', locale)
+  if (days === 1) return lt('明天', 'Tomorrow', locale)
+  if (days === -1) return lt('昨天', 'Yesterday', locale)
+  const month = target.getUTCMonth() + 1
+  const day = target.getUTCDate()
+  return locale === 'en-US' ? `${ENGLISH_MONTHS[month - 1]} ${day}` : `${month}月${day}日`
 }

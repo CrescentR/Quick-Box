@@ -1,3 +1,4 @@
+import { getCommandEnglishTerms } from '../../i18n'
 import type { Command, CommandSearchResult, CommandUsageInfo } from './command-types'
 
 function normalize(value: string) {
@@ -5,7 +6,12 @@ function normalize(value: string) {
 }
 
 function scoreCommand(command: Command, query: string) {
-  const haystack = [command.title, command.description ?? '', ...command.keywords]
+  const haystack = [
+    command.title,
+    command.description ?? '',
+    ...getCommandEnglishTerms(command),
+    ...command.keywords,
+  ]
   let bestScore = 0
   let matchedText = ''
 

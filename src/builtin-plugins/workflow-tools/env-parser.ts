@@ -1,3 +1,5 @@
+import { getCurrentLocale, lt, type ResolvedLocale } from '../../i18n'
+
 export type EnvParseIssue = { line: number; text: string; message: string }
 
 export function unquoteEnvValue(value: string) {
@@ -19,7 +21,7 @@ export function unquoteEnvValue(value: string) {
   return trimmed.replace(/\s+#.*$/, '').trim()
 }
 
-export function parseEnvText(input: string) {
+export function parseEnvText(input: string, locale: ResolvedLocale = getCurrentLocale()) {
   const values: Record<string, string> = {}
   const issues: EnvParseIssue[] = []
   let blankLines = 0
@@ -43,7 +45,7 @@ export function parseEnvText(input: string) {
     const separatorIndex = withoutExport.indexOf('=')
 
     if (separatorIndex <= 0) {
-      issues.push({ line: lineNumber, text: rawLine, message: '缺少 key=value 结构' })
+      issues.push({ line: lineNumber, text: rawLine, message: lt('缺少 key=value 结构', 'Missing key=value syntax', locale) })
       return
     }
 
@@ -51,7 +53,11 @@ export function parseEnvText(input: string) {
     const rawValue = withoutExport.slice(separatorIndex + 1)
 
     if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key)) {
-      issues.push({ line: lineNumber, text: rawLine, message: '变量名只能包含字母、数字和下划线，且不能以数字开头' })
+      issues.push({
+        line: lineNumber,
+        text: rawLine,
+        message: lt('变量名只能包含字母、数字和下划线，且不能以数字开头', 'Key must start with a letter or underscore and use letters, digits, or underscores', locale),
+      })
       return
     }
 

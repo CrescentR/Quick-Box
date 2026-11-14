@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react'
+import { useLocale, useT } from '../../i18n'
 import { CodeBlock } from '../../ui'
 import { ToolShell } from '../../core/tool/ToolShell'
 import { createHmac } from './hmac'
 import type { HmacAlgorithm } from './hmac'
 
 export default function HmacToolView() {
+  const tr = useT()
+  const locale = useLocale()
   const [message, setMessage] = useState('method=POST&path=/api/tools&ts=1716400000')
   const [secret, setSecret] = useState('quickbox-secret')
   const [algorithm, setAlgorithm] = useState<HmacAlgorithm>('SHA-256')
@@ -23,28 +26,35 @@ export default function HmacToolView() {
       .catch((nextError) => {
         if (!cancelled) {
           setDigest('')
-          setError(nextError instanceof Error ? nextError.message : '无法生成 HMAC')
+          setError(nextError instanceof Error ? nextError.message : (locale === 'en-US' ? 'Unable to generate HMAC' : '无法生成 HMAC'))
         }
       })
     return () => {
       cancelled = true
     }
-  }, [algorithm, message, secret])
+  }, [algorithm, locale, message, secret])
 
   return (
-    <ToolShell title="HMAC 生成器" level="L2" description="使用 Web Crypto 在本地生成接口签名调试常用的 HMAC 摘要。">
+    <ToolShell
+      title={tr('HMAC 生成器', 'HMAC Generator')}
+      level="L2"
+      description={tr(
+        '使用 Web Crypto 在本地生成接口签名调试常用的 HMAC 摘要。',
+        'Compute HMAC digests locally using Web Crypto for API signature debugging.',
+      )}
+    >
       <div className="qb-tool-grid">
         <label className="qb-tool-field">
-          <span className="qb-tool-label">签名内容</span>
+          <span className="qb-tool-label">{tr('签名内容', 'Message')}</span>
           <textarea className="qb-tool-textarea qb-mono" value={message} onChange={(event) => setMessage(event.target.value)} />
         </label>
         <div className="qb-tool-field">
           <label className="qb-tool-field">
-            <span className="qb-tool-label">密钥</span>
+            <span className="qb-tool-label">{tr('密钥', 'Secret')}</span>
             <input className="qb-tool-input qb-mono" value={secret} onChange={(event) => setSecret(event.target.value)} />
           </label>
           <label className="qb-tool-field">
-            <span className="qb-tool-label">算法</span>
+            <span className="qb-tool-label">{tr('算法', 'Algorithm')}</span>
             <select className="qb-tool-input" value={algorithm} onChange={(event) => setAlgorithm(event.target.value as HmacAlgorithm)}>
               <option value="SHA-256">SHA-256</option>
               <option value="SHA-384">SHA-384</option>
@@ -53,8 +63,8 @@ export default function HmacToolView() {
           </label>
         </div>
         <div className="qb-tool-field qb-tool-field--full">
-          <span className="qb-tool-label">签名结果</span>
-          <CodeBlock code={error || digest || '// 等待输入'} language="txt" wrap copyable />
+          <span className="qb-tool-label">{tr('签名结果', 'HMAC digest')}</span>
+          <CodeBlock code={error || digest || tr('// 等待输入', '// Waiting for input')} language="txt" wrap copyable />
         </div>
       </div>
     </ToolShell>
